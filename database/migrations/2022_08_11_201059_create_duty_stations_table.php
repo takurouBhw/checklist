@@ -15,6 +15,16 @@ class CreateDutyStationsTable extends Migration
     {
         Schema::create('duty_stations', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('company_id')->unsigned();
+            $table->bigInteger('branch_office_id')->unsigned()->nullable();
+            $table->string('name');
+            $table->string('postal_code');
+            $table->string('address');
+            $table->string('email');
+            $table->string('phone');
+            $table->string('representative')->nullable();
+            $table->string('responsible')->nullable();
+            $table->string('url')->nullable();
             $table->timestamps();
         });
     }

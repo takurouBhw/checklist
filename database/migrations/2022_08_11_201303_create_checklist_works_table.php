@@ -15,6 +15,12 @@ class CreateChecklistWorksTable extends Migration
     {
         Schema::create('checklist_works', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('category_id')->unsigned();
+            $table->bigInteger('checklist_id')->unsigned();
+            $table->string('user_id',32);
+            $table->string('title', 100);
+            $table->string('started_at')->nullable();
+            $table->string('ended_at')->nullable();
             $table->timestamps();
         });
     }
