@@ -15,10 +15,10 @@ class CreateChecklistTodosTable extends Migration
     {
         Schema::create('checklist_todos', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('category_id')->unsigned();
-            $table->bigInteger('checklist_id')->unsigned();
-            $table->tinyInteger('headline')->unsigned();
-            $table->tinyInteger('attention')->unsigned();
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('checklist_id');
+            $table->unsignedTinyInteger('headline');
+            $table->unsignedTinyInteger('attention');
             $table->text('check_item')->nullable();
             $table->dateTime('locked_at')->nullable();
             $table->integer('sort_num')->default(0);

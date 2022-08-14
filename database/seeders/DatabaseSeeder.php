@@ -14,12 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
-            UserSeeder::class,
-        ]);
-        \App\Models\Category::factory(10)->create();
+       \App\Models\Category::factory(10)->create();
         \App\Models\Company::factory(1)->create();
         \App\Models\BranchOffice::factory(10)->create();
         \App\Models\DutyStation::factory(10)->create();
-    }
+        $this->call([
+            UserSeeder::class,
+        ]);
+     }
 }

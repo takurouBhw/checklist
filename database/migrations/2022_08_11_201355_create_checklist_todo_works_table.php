@@ -15,8 +15,8 @@ class CreateChecklistTodoWorksTable extends Migration
     {
         Schema::create('checklist_todo_works', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('category_id')->unsigned();
-            $table->bigInteger('checklist_id')->unsigned();
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('checklist_id');
             $table->string('user_id', 32);
             $table->tinyInteger('headline')->unsigned()->default(0)->comment('見出しフラグ:　見出しにするとチェック項目から除外');
             $table->tinyInteger('attention')->unsigned()->default(0)->comment('注目項目');

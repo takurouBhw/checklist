@@ -15,11 +15,11 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id',32)->unique()->default(uniqid())->comment('ユーザーID UUID');
+            $table->string('user_id',32)->unique()->comment('ユーザーID UUID');
             $table->string('name',50)->comment('ユーザー名');
-            $table->BigInteger('company_id')->comment('所属会社')->nullable();
-            $table->BigInteger('branch_office_id')->comment('所属支店')->nullable();
-            $table->BigInteger('duty_station_id')->comment('所属部署')->nullable();
+            $table->unsignedBigInteger('company_id')->comment('所属会社');
+            $table->unsignedBigInteger('duty_station_id')->comment('所属部署');
+            $table->unsignedBigInteger('branch_office_id')->comment('所属支店');
             $table->string('email',255)->unique();
             $table->string('phone', 15)->comment('電話番号')->nullable();
             $table->softDeletes()->comment('退社日。※論理削除用');

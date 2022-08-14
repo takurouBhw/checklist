@@ -15,7 +15,7 @@ class CreateBranchOfficesTable extends Migration
     {
         Schema::create('branch_offices', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('company_id')->unsigned()->comment('多対一: 本社');
+            $table->unsignedBigInteger('company_id')->comment('多対一: 本社');
             $table->string('name', 100)->comment('支社社名');
             $table->string('postal_code', 8);
             $table->string('address', 255);

@@ -15,8 +15,8 @@ class CreateChecklistParticipantsTable extends Migration
     {
         Schema::create('checklist_participants', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('category_id')->unsigned();
-            $table->bigInteger('checklist_id')->unsigned();
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('checklist_id');
             $table->string('user_id', 32);
             $table->timestamps();
         });
