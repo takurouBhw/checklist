@@ -14,9 +14,9 @@ class ChecklistFactory extends Factory
     public function definition()
     {
         return [
-            'category_id' => $this->faker->randomNumber(10),
-            'user_id' => $this->faker->randomNumber(10),
-            'priority' => random_int(0, 2),
+            'category_id' => 1,
+            'user_id' => '1',
+            'priority' => 1,
             'title' => $this->faker->title(),
             'drafted_at' => $this->faker->dateTime() ,
             'opened_at' => $this->faker->dateTime(),

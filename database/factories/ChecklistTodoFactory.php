@@ -14,7 +14,13 @@ class ChecklistTodoFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'category_id' => 1,
+            'checklist_id' => 1,
+            'headline' => 0,
+            'attention' => 0,
+            'check_item' => $this->faker->text(),
+            'locked_at' => null,
+            'sort_num' => 0,
         ];
     }
 }

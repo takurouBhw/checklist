@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             'name' => 'テスト太郎',
-            'user_id' => uniqid(),
+            'user_id' => '1',
             'company_id' => 1,
             'branch_office_id' => 1,
             'duty_station_id' => 1,

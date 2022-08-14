@@ -14,7 +14,15 @@ class ChecklistTodoWorkFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'category_id' => 1,
+            'checklist_id' => 1,
+            'user_id' => '1',
+            'headline' => 0,
+            'attention' => 0,
+            'check_item' => $this->faker->text(),
+            'checked' => 1,
+            'memo' => $this->faker->text(),
+            'second' => time(),
         ];
     }
 }
