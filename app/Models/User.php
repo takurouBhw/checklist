@@ -8,6 +8,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\Company;
+use App\Models\BranchOffice;
+use App\Models\DutyStation;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -42,4 +46,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+    public function branchOffice()
+    {
+        return $this->belongsTo(BranchOffice::class);
+    }
+
+    public function dutyStation()
+    {
+        return $this->belongsTo(DutyStation::class);
+    }
 }
