@@ -25,8 +25,8 @@ class CreateChecklistsTable extends Migration
             $table->double('progress')->default(0);
             $table->dateTime('locked_at')->nullable();
             $table->integer('sort_num')->default(0);
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -22,6 +22,7 @@ class CreateChecklistWorksTable extends Migration
             $table->string('started_at')->nullable();
             $table->string('ended_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -26,6 +26,7 @@ class CreateDutyStationsTable extends Migration
             $table->string('responsible')->nullable();
             $table->string('url')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

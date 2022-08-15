@@ -24,8 +24,8 @@ class CreateBranchOfficesTable extends Migration
             $table->string('representative')->nullable();
             $table->string('responsible')->nullable();
             $table->string('url')->nullable();
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

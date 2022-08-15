@@ -23,6 +23,7 @@ class CreateChecklistTodosTable extends Migration
             $table->dateTime('locked_at')->nullable();
             $table->integer('sort_num')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

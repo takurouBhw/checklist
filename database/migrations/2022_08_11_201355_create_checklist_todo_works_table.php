@@ -24,8 +24,8 @@ class CreateChecklistTodoWorksTable extends Migration
             $table->tinyInteger('checked')->unsigned()->default(0);
             $table->text('memo');
             $table->integer('second');
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -25,6 +25,7 @@ class CreateCompaniesTable extends Migration
             $table->string('responsible', 100)->nullable()->comment('担当者');
             $table->string('url')->nullable()->comment('ホームページ');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
