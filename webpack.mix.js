@@ -12,12 +12,10 @@ const mix = require('laravel-mix');
  */
 
 // viteだとCSSが正常に反映されないためmixにする
-// mix.js('resources/js/app.js', 'public/js')
-//     .postCss('resources/css/app.css', 'public/css', [
-//         //
-//     ]);
-mix.js('resources/js/app.js', 'public/js').postCss('resources/css/app.css', 'public/css', [
-    require('postcss-import'),
-    require('tailwindcss'),
-    require('autoprefixer'),
-]);
+mix.ts('resources/ts/index.tsx', 'public/js')
+    .sass('resources/sass/app.scss', 'public/css');
+
+// CSSのキャッシュ対策(CSSパラメータ自動付与)
+if(mix.inProduction()){
+    mix.version();
+}
