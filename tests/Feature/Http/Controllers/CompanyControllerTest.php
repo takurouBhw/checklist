@@ -38,9 +38,9 @@ class CompanyControllerTest extends TestCase
     public function 登録することができる()
     {
         $data = [
-            "client_key" => '1',
+            "client_key" => hash( "sha256", '1'),
             "name" => 'テスト商事',
-            "postal_code" => "1234567",
+            "postal_code" => "123-4567",
             "address" => "神奈川県藤沢市大庭432-20",
             "email" => "test1@test.com",
             "phone" => "0466872686"
@@ -62,9 +62,9 @@ class CompanyControllerTest extends TestCase
     {
         // @マークが存在しない
         $data = [
-            'client_key' => '1',
+            "client_key" => hash( "sha256", '1'),
             'name' => 'テスト商事1',
-            'postal_code' => '1234567',
+            'postal_code' => '123-4567',
             'address' => '神奈川県藤沢市大庭432-20',
             'email' => 'test1test.com',
             'phone' => '0466872686'
@@ -83,7 +83,7 @@ class CompanyControllerTest extends TestCase
     public function emailを重複して登録できない()
     {
         $data = [
-            'client_key' => '1',
+            'client_key' => hash( "sha256", '1'),
             'name' => 'テスト商事1',
             'postal_code' => '1234567',
             'address' => '神奈川県藤沢市大庭432-20',
@@ -93,9 +93,9 @@ class CompanyControllerTest extends TestCase
         $response = $this->postJson('api/comapnies', $data);
 
         $data = [
-            'client_key' => '1',
+            'client_key' => hash( "sha256", '1'),
             'name' => 'テスト商事2',
-            'postal_code' => '1234567',
+            'postal_code' => '123-4567',
             'address' => '神奈川県藤沢市大庭432-20',
             'email' => 'test1@test.com',
             'phone' => '0466872686'
@@ -108,19 +108,19 @@ class CompanyControllerTest extends TestCase
     }
 
     /**
-     * 異常系 郵便番号が半角数字以外が含まれた場合はエラー
+     * 異常系 郵便番号が数字以外が含まれた場合はエラー
      * ステータスコード　 422
      * @test
      * @group testing-company-post-error
      * @return void
      */
-    public function 郵便番号が半角数字以外含まれた場合は登録できない()
+    public function 郵便番号に数字以外が含まれた場合は登録できない()
     {
-        // 郵便番号ハイフンの場合
+        // 郵便番号に半角記号が含まれた場合
         $data = [
-            'client_key' => '1',
+            'client_key' => hash( "sha256", '1'),
             'name' => 'テスト商事',
-            'postal_code' => '123-4567',
+            'postal_code' => '12--4567',
             'address' => '神奈川県藤沢市大庭432-20',
             'email' => 'test1@test.com',
             'phone' => '0466878'
@@ -132,7 +132,7 @@ class CompanyControllerTest extends TestCase
 
         // 郵便番号に全角が含まれた場合
         $data = [
-            'client_key' => '1',
+            'client_key' => hash( "sha256", '1'),
             'name' => 'テスト商事',
             'postal_code' => '１２３４５６７',
             'address' => '神奈川県藤沢市大庭432-20',
@@ -156,7 +156,7 @@ class CompanyControllerTest extends TestCase
     {
         // ７桁より少ない
         $data = [
-            'client_key' => '1',
+            'client_key' => hash( "sha256", '1'),
             'name' => 'テスト商事',
             'postal_code' => '123567',
             'address' => '神奈川県藤沢市大庭432-20',
@@ -169,7 +169,7 @@ class CompanyControllerTest extends TestCase
 
         // 7桁超過
         $data = [
-            'client_key' => '1',
+            'client_key' => hash( "sha256", '1'),
             'name' => 'テスト商事',
             'postal_code' => '123567',
             'address' => '神奈川県藤沢市大庭432-20',
@@ -207,7 +207,7 @@ class CompanyControllerTest extends TestCase
      * @group testing-company-delete
      * @return void
      */
-    public function 論理削除することができる()
+    public function 削除することができる()
     {
         $company = Company::factory()->count(10)->create();
 

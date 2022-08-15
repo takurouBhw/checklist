@@ -44,16 +44,22 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             'url' => '有効なURL形式で指定してください。',
-            'postal_code' => '郵便番号はハイフンなしの最大８桁の数字を指定してください。',
+            'postal_code' => '郵便番号はハイフンの最大８桁の数字を指定してください。',
             'phone' => '電話番号は15桁以下でハイフンなしの数字を指定してください。',
         ];
     }
 
-    /**
-     * @return  Validator  $validator
-     */
-    public function getValidator()
+    public function companyAttributes()
     {
-        return $this->getValidatorInstance();
+        return $this->only([
+            'name',
+            'postal_code',
+            'address',
+            'email',
+            'phone',
+            'representative',
+            'responsible',
+            'url',
+        ]);
     }
 }
