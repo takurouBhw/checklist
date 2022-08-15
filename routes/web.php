@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('{all}', function () {
     return view('index');
     // return view('welcome');
-});
+})
+->where(['all' => '.*']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
