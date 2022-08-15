@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCompanyRequest;
+use App\Http\Requests\UpdateCompanyRequest;
 use Illuminate\Http\Request;
+use App\Models\Company;
+use Illuminate\Http\JsonResponse;
 
 class CompanyController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
+        return Company::all()->toArray();
     }
 
     /**
@@ -23,18 +27,22 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreCompanyRequest $request
+     * @param Company $company
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(StoreCompanyRequest $request, Company $company): JsonResponse
     {
-        //
+        // 作成
+        $company = Company::create($request->all());
+        return $company
+            ? response()->json($company, 201)
+            : response()->json([], 500);
     }
 
     /**
@@ -62,23 +70,36 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param UpdateCompanyRequest $request
+     * @param [type] $id
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCompanyRequest $request, $id): JsonResponse
     {
-        //
+        $company = Company::find($id);
+
+        $company->update($request->companyAttributes());
+        // return $company->toArray();
+        // 更新
+        return $company->update($request->companyAttributes())
+            ? response()->json($company)
+            : response()->json([], 500);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
-        //
+        // 論理削除
+        $company = Company::findOrFail($id)->delete();
+
+        return $company
+        ? response()->json($company)
+        : response()->json([], 500);
+
     }
 }

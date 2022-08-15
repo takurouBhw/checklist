@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             'branch_office_id' => 1,
             'duty_station_id' => 1,
             'phone' => '0557553478',
-            'deleted_at' => null,
+            // 'deleted_at' => null,
             'role' => 2,
             'email' => 'test@test.com',
             'email_verified_at' => now(),

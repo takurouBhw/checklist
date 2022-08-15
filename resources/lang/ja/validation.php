@@ -96,6 +96,8 @@ return [
     'not_regex'            => ':attributeの形式が無効です。',
     'numeric'              => ':attributeには、数字を指定してください。',
     'password'             => 'パスワードが正しくありません。',
+    'phone'                => '電話番号',
+    'postal_code'          => '郵便番号',
     'present'              => ':attributeが存在している必要があります。',
     'prohibited'           => ':attributeフィールドは禁止されています。',
     'prohibited_if'        => ':attributeフィールドは、:otherが:valueの場合は禁止されています。',
@@ -133,6 +135,8 @@ return [
         'email' => 'メールアドレス',
         'name' => '名前',
         'quantity' => '数量',
-        'image' => '画像ファイル'
+        'image' => '画像ファイル',
+        'postal_code' => '郵便番号',
+        'phone' => '電話番号',
     ],
 ];
