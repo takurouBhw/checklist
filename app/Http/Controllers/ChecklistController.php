@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Checklist;
 use Illuminate\Http\Request;
 
 class ChecklistController extends Controller
@@ -13,7 +14,8 @@ class ChecklistController extends Controller
      */
     public function index()
     {
-        //
+        $checklist = Checklist::findAllForAllUsers()->get();
+        return $checklist->toArray();
     }
 
     /**
