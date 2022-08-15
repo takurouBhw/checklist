@@ -13,7 +13,6 @@ class Company extends Model
     protected $table = 'companies';
     protected $guarded = [
         'id',
-        // 'client_key',
         'created_at',
         'updated_at',
         'deleted_at',
