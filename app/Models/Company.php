@@ -11,13 +11,12 @@ class Company extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'companies';
-    protected $fillable = [
-        'client_key',
-        'name',
-        'postal_code',
-        'address',
-        'email',
-        'phone'
+    protected $guarded = [
+        'id',
+        // 'client_key',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
 }
