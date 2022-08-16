@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ChecklistTodoWork;
+use App\Models\ChecklistWork;
 
 class ChecklistWorkController extends Controller
 {
@@ -13,7 +15,7 @@ class ChecklistWorkController extends Controller
      */
     public function index()
     {
-        //
+        return ChecklistWork::all()->toArray();
     }
 
     /**
@@ -80,5 +82,14 @@ class ChecklistWorkController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function updateDone(ChecklistWork $checklistWork, Request $request)
+    {
+        $checklistWork->user_id == $request->user_id;
+
+        return $checklistWork->update()
+            ? response()->json()
+            : response()->json([], 500);
     }
 }

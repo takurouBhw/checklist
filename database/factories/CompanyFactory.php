@@ -23,6 +23,7 @@ class CompanyFactory extends Factory
             'representative' => $this->faker->name(),
             'responsible' => $this->faker->name(),
             'url' => $this->faker->url(),
+            'is_done' => random_int(0, 1),
         ];
     }
 }

@@ -17,6 +17,9 @@ class CategoryController extends Controller
         return Category::all()->toArray();
     }
 
+    public function getCategory(string $user_id) {
+        return Category::all()->toArray();
+    }
     /**
      * Show the form for creating a new resource.
      *

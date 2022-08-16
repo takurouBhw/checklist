@@ -24,6 +24,7 @@ class CreateCompaniesTable extends Migration
             $table->string('representative', 100)->nullable()->comment('代表者');
             $table->string('responsible', 100)->nullable()->comment('担当者');
             $table->string('url')->nullable()->comment('ホームページ');
+            $table->boolean('is_done')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -76,12 +76,12 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, $id): JsonResponse
     {
+        abort(500);
         $company = Company::find($id);
-
         $company->update($request->companyAttributes());
         // 更新
         return $company->update($request->companyAttributes())
-            ? response()->json($company)
+            ? response()->json($company, 200)
             : response()->json([], 500);
     }
 

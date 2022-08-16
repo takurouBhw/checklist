@@ -26,12 +26,12 @@ class UpdateCompanyRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|max:100',
-            'postal_code' =>  ['required', new ZipCodeRule()],
-            'address' => 'required|max:255',
-            'email' => 'required|email|unique:companies,email,' . $this->id . '|max:255',
-            'phone' => 'required|max:15',
-            'url' => 'url',
+            // 'name' => 'required|max:100',
+            // 'postal_code' =>  ['required', new ZipCodeRule()],
+            // 'address' => 'required|max:255',
+            // 'email' => 'required|email|unique:companies,email,' . $this->id . '|max:255',
+            // 'phone' => 'required|max:15',
+            // 'url' => 'url',
         ];
     }
 
@@ -46,6 +46,7 @@ class UpdateCompanyRequest extends FormRequest
             'representative',
             'responsible',
             'url',
+            'is_done',
         ]);
     }
 }
