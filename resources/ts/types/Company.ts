@@ -12,6 +12,7 @@ type Company = {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
+    is_done: boolean;
 };
 
 export default Company;

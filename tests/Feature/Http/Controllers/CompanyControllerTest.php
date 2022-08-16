@@ -185,13 +185,14 @@ class CompanyControllerTest extends TestCase
      * 正常系 更新することができる
      * ステータスコード 200
      * @test
-     * @group testing-company-update
+     * @group testing-company-update1
      * @return void
      */
     public function 更新することができる()
     {
         $company = Company::factory()->create();
         $company->name = '更新された';
+        $company->is_done = 0;
 
         // 更新
         $response = $this->patchJson("api/comapnies/{$company->id}", $company->toArray());
