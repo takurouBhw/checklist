@@ -39,7 +39,7 @@ class CompanyController extends Controller
     public function store(StoreCompanyRequest $request, Company $company): JsonResponse
     {
         // 作成
-        $company = Company::create($request->all());
+        $company = Company::create($request->companyAttributes());
         return $company
             ? response()->json($company, 201)
             : response()->json([], 500);
@@ -79,7 +79,6 @@ class CompanyController extends Controller
         $company = Company::find($id);
 
         $company->update($request->companyAttributes());
-        // return $company->toArray();
         // 更新
         return $company->update($request->companyAttributes())
             ? response()->json($company)

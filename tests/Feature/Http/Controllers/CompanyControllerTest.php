@@ -185,7 +185,7 @@ class CompanyControllerTest extends TestCase
      * 正常系 更新することができる
      * ステータスコード 200
      * @test
-     * @group testing-company-company-update
+     * @group testing-company-update
      * @return void
      */
     public function 更新することができる()
