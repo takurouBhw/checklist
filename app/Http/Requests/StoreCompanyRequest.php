@@ -27,11 +27,11 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             'name' => 'required|max:100',
-            'postal_code' =>  ['required', new ZipCodeRule()],
-            'address' => 'required|max:255',
-            'email' => 'required|email|unique:companies|max:255',
-            'phone' => 'required|max:15',
-            'url' => 'url',
+            // 'postal_code' =>  ['required', new ZipCodeRule()],
+            // 'address' => 'required|max:255',
+            // 'email' => 'required|email|unique:companies|max:255',
+            // 'phone' => 'required|max:15',
+            // 'url' => 'url',
         ];
     }
 
@@ -53,13 +53,13 @@ class StoreCompanyRequest extends FormRequest
     {
         return $this->only([
             'name',
-            'postal_code',
-            'address',
-            'email',
-            'phone',
-            'representative',
-            'responsible',
-            'url',
+            // 'postal_code',
+            // 'address',
+            // 'email',
+            // 'phone',
+            // 'representative',
+            // 'responsible',
+            // 'url',
         ]);
     }
 }

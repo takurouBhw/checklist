@@ -32,18 +32,18 @@ class CompanyControllerTest extends TestCase
      * 正常系　登録
      * ステータスコード 201
      * @test
-     * @group testing-company-post
+     * @group company-post-success
      * @return void
      */
     public function 登録することができる()
     {
         $data = [
-            "client_key" => hash( "sha256", '1'),
+            // "client_key" => hash( "sha256", '1'),
             "name" => 'テスト商事',
-            "postal_code" => "123-4567",
-            "address" => "神奈川県藤沢市大庭432-20",
-            "email" => "test1@test.com",
-            "phone" => "0466872686"
+            // "postal_code" => "123-4567",
+            // "address" => "神奈川県藤沢市大庭432-20",
+            // "email" => "test1@test.com",
+            // "phone" => "0466872686"
         ];
 
         $response = $this->postJson('api/comapnies', $data);
@@ -51,6 +51,29 @@ class CompanyControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_CREATED);
     }
 
+   /**
+     * 正常系　登録
+     * ステータスコード 201
+     * @test
+     * @group company-post-error-name-isempty
+     * @return void
+     */
+    public function 会社名が空の場合は登録できない()
+    {
+        $data = [
+            // "client_key" => hash( "sha256", '1'),
+            "name" => '',
+            // "postal_code" => "123-4567",
+            // "address" => "神奈川県藤沢市大庭432-20",
+            // "email" => "test1@test.com",
+            // "phone" => "0466872686"
+        ];
+
+        $response = $this->postJson('api/comapnies', $data);
+        dd($response->json());
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
     /**
      * 異常系 登録時のメール書式エラー
      * ステータスコード 422

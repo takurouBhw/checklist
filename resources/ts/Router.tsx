@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Link , useLocation} from "react-router-dom";
 import CompanyPage from "./pages/company";
 import LoginPage from "./pages/login";
 import CategoryPage from "./pages/category";
@@ -12,7 +12,7 @@ export default function App() {
                 <header className="global-head">
                     <nav>
                         <ul>
-                             <li>
+                            <li>
                                 <Link to="/company">会社</Link>
                             </li>
                             <li>
