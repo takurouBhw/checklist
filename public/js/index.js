@@ -2118,6 +2118,46 @@ exports["default"] = App;
 "use strict";
 
 
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  var desc = Object.getOwnPropertyDescriptor(m, k);
+
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+    desc = {
+      enumerable: true,
+      get: function get() {
+        return m[k];
+      }
+    };
+  }
+
+  Object.defineProperty(o, k2, desc);
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -2128,17 +2168,13 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
 var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 
 var company_1 = __importDefault(__webpack_require__(/*! ./pages/company */ "./resources/ts/pages/company/index.tsx"));
 
 var login_1 = __importDefault(__webpack_require__(/*! ./pages/login */ "./resources/ts/pages/login/index.tsx"));
-
-var category_1 = __importDefault(__webpack_require__(/*! ./pages/category */ "./resources/ts/pages/category/index.tsx"));
-
-var checklist_work_1 = __importDefault(__webpack_require__(/*! ./pages/checklist_work */ "./resources/ts/pages/checklist_work/index.tsx"));
 
 var AuthQuery_1 = __webpack_require__(/*! ./queries/AuthQuery */ "./resources/ts/queries/AuthQuery.ts");
 
@@ -2151,20 +2187,42 @@ function Router() {
       isAuth = _ref.isAuth,
       setIsAuth = _ref.setIsAuth;
 
+  var _ref2 = (0, AuthQuery_1.useUser)(),
+      isLoading = _ref2.isLoading,
+      authUser = _ref2.data;
+
+  (0, react_1.useEffect)(function () {
+    if (authUser) {
+      setIsAuth(true);
+    }
+  }, [authUser]);
+
+  var GuardRoute = function GuardRoute(props) {
+    if (!isAuth) return react_1["default"].createElement(react_router_dom_1.Redirect, {
+      to: "/login"
+    });
+    return react_1["default"].createElement(react_router_dom_1.Route, Object.assign({}, props));
+  };
+
+  var LoginRoute = function LoginRoute(props) {
+    if (isAuth) return react_1["default"].createElement(react_router_dom_1.Redirect, {
+      to: "/"
+    });
+    return react_1["default"].createElement(react_router_dom_1.Route, Object.assign({}, props));
+  };
+
   var Navigation = function Navigation() {
     return react_1["default"].createElement("header", {
       className: "global-head"
     }, react_1["default"].createElement("nav", null, react_1["default"].createElement("ul", null, react_1["default"].createElement("li", null, react_1["default"].createElement(react_router_dom_1.Link, {
-      to: "/category"
-    }, "\u30AB\u30C6\u30B4\u30EA")), react_1["default"].createElement("li", null, react_1["default"].createElement(react_router_dom_1.Link, {
+      to: "/"
+    }, "\u30C8\u30C3\u30D7")), react_1["default"].createElement("li", null, react_1["default"].createElement(react_router_dom_1.Link, {
       to: "/company"
-    }, "\u4F1A\u793E")), react_1["default"].createElement("li", null, react_1["default"].createElement(react_router_dom_1.Link, {
-      to: "/checklist_work"
-    }, "\u30C1\u30A7\u30C3\u30AF\u30EA\u30B9\u30C8")), react_1["default"].createElement("li", {
+    }, "\u4F1A\u793E")), react_1["default"].createElement("li", {
       onClick: function onClick() {
         return logout.mutate();
       }
-    }, react_1["default"].createElement("span", null, "\u30ED\u30B0\u30A2\u30A6\u30C8")))));
+    }, react_1["default"].createElement("span", null, "\u30ED\u30B0\u30A2\u30A6\u30C8")))), react_1["default"].createElement("p", null));
   };
 
   var LoginNavigation = function LoginNavigation() {
@@ -2178,15 +2236,16 @@ function Router() {
   return react_1["default"].createElement(react_router_dom_1.BrowserRouter, null, react_1["default"].createElement(react_1["default"].Fragment, null, isAuth ? react_1["default"].createElement(Navigation, null) : react_1["default"].createElement(LoginNavigation, null)
   /* A <Switch> looks through its children <Route>s and
   renders the first one that matches the current URL. */
-  , react_1["default"].createElement(react_router_dom_1.Switch, null, react_1["default"].createElement(react_router_dom_1.Route, {
+  , react_1["default"].createElement(react_router_dom_1.Switch, null, react_1["default"].createElement(GuardRoute, {
+    path: "/",
+    exact: true
+  }, react_1["default"].createElement("h1", null, "\u30D8\u30ED\u30FC")), react_1["default"].createElement(LoginRoute, {
     path: "/login"
-  }, react_1["default"].createElement(login_1["default"], null)), react_1["default"].createElement(react_router_dom_1.Route, {
-    path: "/category"
-  }, react_1["default"].createElement(category_1["default"], null)), react_1["default"].createElement(react_router_dom_1.Route, {
-    path: "/company"
-  }, react_1["default"].createElement(company_1["default"], null)), react_1["default"].createElement(react_router_dom_1.Route, {
-    path: "/checklist_work"
-  }, react_1["default"].createElement(checklist_work_1["default"], null)))));
+  }, react_1["default"].createElement(login_1["default"], null)), react_1["default"].createElement(GuardRoute, {
+    path: "/company",
+    exact: true,
+    component: company_1["default"]
+  }))));
 }
 
 exports["default"] = Router;
@@ -2336,182 +2395,6 @@ var logout = function logout() {
 };
 
 exports.logout = logout;
-
-/***/ }),
-
-/***/ "./resources/ts/api/CategoryAPI.ts":
-/*!*****************************************!*\
-  !*** ./resources/ts/api/CategoryAPI.ts ***!
-  \*****************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-
-var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
-  function adopt(value) {
-    return value instanceof P ? value : new P(function (resolve) {
-      resolve(value);
-    });
-  }
-
-  return new (P || (P = Promise))(function (resolve, reject) {
-    function fulfilled(value) {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function rejected(value) {
-      try {
-        step(generator["throw"](value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function step(result) {
-      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-    }
-
-    step((generator = generator.apply(thisArg, _arguments || [])).next());
-  });
-};
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.getCategories = void 0;
-
-var axios_1 = __importDefault(__webpack_require__(/*! axios */ "./node_modules/axios/index.js"));
-
-var getCategories = function getCategories() {
-  return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var _yield$axios_1$defaul, data;
-
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return axios_1["default"].get("api/get_category");
-
-          case 2:
-            _yield$axios_1$defaul = _context.sent;
-            data = _yield$axios_1$defaul.data;
-            console.log(data);
-            return _context.abrupt("return", data);
-
-          case 6:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-};
-
-exports.getCategories = getCategories;
-
-/***/ }),
-
-/***/ "./resources/ts/api/ChecklistWorkAPI.ts":
-/*!**********************************************!*\
-  !*** ./resources/ts/api/ChecklistWorkAPI.ts ***!
-  \**********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-
-var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
-  function adopt(value) {
-    return value instanceof P ? value : new P(function (resolve) {
-      resolve(value);
-    });
-  }
-
-  return new (P || (P = Promise))(function (resolve, reject) {
-    function fulfilled(value) {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function rejected(value) {
-      try {
-        step(generator["throw"](value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function step(result) {
-      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-    }
-
-    step((generator = generator.apply(thisArg, _arguments || [])).next());
-  });
-};
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.getChecklistWorks = void 0;
-
-var axios_1 = __importDefault(__webpack_require__(/*! axios */ "./node_modules/axios/index.js"));
-
-var getChecklistWorks = function getChecklistWorks() {
-  return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var _yield$axios_1$defaul, data;
-
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return axios_1["default"].get("api/get_checklist_works");
-
-          case 2:
-            _yield$axios_1$defaul = _context.sent;
-            data = _yield$axios_1$defaul.data;
-            console.log(data);
-            return _context.abrupt("return", data);
-
-          case 6:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-};
-
-exports.getChecklistWorks = getChecklistWorks;
 
 /***/ }),
 
@@ -2850,267 +2733,6 @@ if (container) {
   var root = (0, client_1.createRoot)(container);
   root.render(react_1["default"].createElement(App_1["default"], null));
 }
-
-/***/ }),
-
-/***/ "./resources/ts/pages/category/index.tsx":
-/*!***********************************************!*\
-  !*** ./resources/ts/pages/category/index.tsx ***!
-  \***********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var CategoryQuery_1 = __webpack_require__(/*! ../../queries/CategoryQuery */ "./resources/ts/queries/CategoryQuery.ts");
-
-var CategoryPage = function CategoryPage() {
-  var _ref = (0, CategoryQuery_1.useCategory)(),
-      companies = _ref.data,
-      status = _ref.status;
-
-  if (status === "loading") {
-    return react_1["default"].createElement("div", {
-      className: "loader"
-    });
-  } else if (status === "error") {
-    return react_1["default"].createElement("div", {
-      className: "align-center"
-    }, "\u30C7\u30FC\u30BF\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002");
-  } else if (!companies || companies.length <= 0) {
-    return react_1["default"].createElement("div", {
-      className: "align-center"
-    }, "\u767B\u9332\u3055\u308C\u305F\u30AB\u30C6\u30B4\u30EA\u304C\u5B58\u5728\u3057\u307E\u305B\u3093\u3002");
-  }
-
-  return react_1["default"].createElement("div", null, react_1["default"].createElement("table", null, react_1["default"].createElement("tr", null, react_1["default"].createElement("th", null))));
-};
-
-exports["default"] = CategoryPage;
-
-/***/ }),
-
-/***/ "./resources/ts/pages/checklist_work/components/ChecklistWorkInput.tsx":
-/*!*****************************************************************************!*\
-  !*** ./resources/ts/pages/checklist_work/components/ChecklistWorkInput.tsx ***!
-  \*****************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var ChecklistWorkInput = function ChecklistWorkInput() {
-  return react_1["default"].createElement("form", {
-    className: "input-form"
-  }, react_1["default"].createElement("div", {
-    className: "inner"
-  }, react_1["default"].createElement("input", {
-    type: "text",
-    className: "input",
-    placeholder: "TODO\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
-    defaultValue: ""
-  }), react_1["default"].createElement("button", {
-    className: "btn is-primary"
-  }, "\u8FFD\u52A0")));
-};
-
-exports["default"] = ChecklistWorkInput;
-
-/***/ }),
-
-/***/ "./resources/ts/pages/checklist_work/components/ChecklistWorkItem.tsx":
-/*!****************************************************************************!*\
-  !*** ./resources/ts/pages/checklist_work/components/ChecklistWorkItem.tsx ***!
-  \****************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var ChecklistWorkItem = function ChecklistWorkItem(_ref) {
-  var checklistWork = _ref.checklistWork;
-  return react_1["default"].createElement("li", {
-    key: checklistWork.id
-  }, react_1["default"].createElement("label", {
-    className: "checkbox-label"
-  }, react_1["default"].createElement("input", {
-    type: "checkbox",
-    className: "checkbox-input"
-  })), react_1["default"].createElement("div", null, react_1["default"].createElement("span", null, checklistWork.title)), react_1["default"].createElement("button", {
-    className: "btn is-delete"
-  }, "\u524A\u9664"));
-};
-
-exports["default"] = ChecklistWorkItem;
-
-/***/ }),
-
-/***/ "./resources/ts/pages/checklist_work/components/ChecklistWorkList.tsx":
-/*!****************************************************************************!*\
-  !*** ./resources/ts/pages/checklist_work/components/ChecklistWorkList.tsx ***!
-  \****************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var ChecklistWorkQuery_1 = __webpack_require__(/*! ../../../queries/ChecklistWorkQuery */ "./resources/ts/queries/ChecklistWorkQuery.ts");
-
-var ChecklistWorkItem_1 = __importDefault(__webpack_require__(/*! ./ChecklistWorkItem */ "./resources/ts/pages/checklist_work/components/ChecklistWorkItem.tsx"));
-
-var ChecklistWorkList = function ChecklistWorkList() {
-  var _ref = (0, ChecklistWorkQuery_1.useChecklistWork)(),
-      checklist_works = _ref.data,
-      status = _ref.status;
-
-  if (status === "loading") {
-    return react_1["default"].createElement("div", {
-      className: "loader"
-    });
-  } else if (status === "error") {
-    return react_1["default"].createElement("div", {
-      className: "align-center"
-    }, "\u30C7\u30FC\u30BF\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002");
-  } else if (!checklist_works || checklist_works.length <= 0) {
-    return react_1["default"].createElement("div", {
-      className: "align-center"
-    }, "\u767B\u9332\u3055\u308C\u305F\u30C1\u30A7\u30C3\u30AF\u30EA\u30B9\u30C8\u304C\u5B58\u5728\u3057\u307E\u305B\u3093\u3002");
-  }
-
-  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
-    className: "inner"
-  }, react_1["default"].createElement("ul", {
-    className: "task-list"
-  }, checklist_works.map(function (checklistWork) {
-    return react_1["default"].createElement(ChecklistWorkItem_1["default"], {
-      checklistWork: checklistWork
-    });
-  }), react_1["default"].createElement("li", null, react_1["default"].createElement("label", {
-    className: "checkbox-label"
-  }, react_1["default"].createElement("input", {
-    type: "checkbox",
-    className: "checkbox-input"
-  })), react_1["default"].createElement("div", null, react_1["default"].createElement("span", null, "\u65B0\u3057\u3044TODO")), react_1["default"].createElement("button", {
-    className: "btn is-delete"
-  }, "\u524A\u9664")), react_1["default"].createElement("li", null, react_1["default"].createElement("label", {
-    className: "checkbox-label"
-  }, react_1["default"].createElement("input", {
-    type: "checkbox",
-    className: "checkbox-input"
-  })), react_1["default"].createElement("form", null, react_1["default"].createElement("input", {
-    type: "text",
-    className: "input",
-    defaultValue: "\u7DE8\u96C6\u4E2D\u306ETODO"
-  })), react_1["default"].createElement("button", {
-    className: "btn"
-  }, "\u66F4\u65B0")), react_1["default"].createElement("li", {
-    className: "done"
-  }, react_1["default"].createElement("label", {
-    className: "checkbox-label"
-  }, react_1["default"].createElement("input", {
-    type: "checkbox",
-    className: "checkbox-input"
-  })), react_1["default"].createElement("div", null, react_1["default"].createElement("span", null, "\u5B9F\u884C\u3057\u305FTODO")), react_1["default"].createElement("button", {
-    className: "btn is-delete"
-  }, "\u524A\u9664")), react_1["default"].createElement("li", null, react_1["default"].createElement("label", {
-    className: "checkbox-label"
-  }, react_1["default"].createElement("input", {
-    type: "checkbox",
-    className: "checkbox-input"
-  })), react_1["default"].createElement("div", null, react_1["default"].createElement("span", null, "\u30B4\u30DF\u6368\u3066")), react_1["default"].createElement("button", {
-    className: "btn is-delete"
-  }, "\u524A\u9664")), react_1["default"].createElement("li", null, react_1["default"].createElement("label", {
-    className: "checkbox-label"
-  }, react_1["default"].createElement("input", {
-    type: "checkbox",
-    className: "checkbox-input"
-  })), react_1["default"].createElement("div", null, react_1["default"].createElement("span", null, "\u6383\u9664")), react_1["default"].createElement("button", {
-    className: "btn is-delete"
-  }, "\u524A\u9664")))));
-};
-
-exports["default"] = ChecklistWorkList;
-
-/***/ }),
-
-/***/ "./resources/ts/pages/checklist_work/index.tsx":
-/*!*****************************************************!*\
-  !*** ./resources/ts/pages/checklist_work/index.tsx ***!
-  \*****************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var ChecklistWorkInput_1 = __importDefault(__webpack_require__(/*! ./components/ChecklistWorkInput */ "./resources/ts/pages/checklist_work/components/ChecklistWorkInput.tsx"));
-
-var ChecklistWorkList_1 = __importDefault(__webpack_require__(/*! ./components/ChecklistWorkList */ "./resources/ts/pages/checklist_work/components/ChecklistWorkList.tsx"));
-
-var ChecklistWorkPane = function ChecklistWorkPane() {
-  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(ChecklistWorkInput_1["default"], null), react_1["default"].createElement(ChecklistWorkList_1["default"], null));
-};
-
-exports["default"] = ChecklistWorkPane;
 
 /***/ }),
 
@@ -3738,138 +3360,6 @@ var useLogout = function useLogout() {
 };
 
 exports.useLogout = useLogout;
-
-/***/ }),
-
-/***/ "./resources/ts/queries/CategoryQuery.ts":
-/*!***********************************************!*\
-  !*** ./resources/ts/queries/CategoryQuery.ts ***!
-  \***********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  var desc = Object.getOwnPropertyDescriptor(m, k);
-
-  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-    desc = {
-      enumerable: true,
-      get: function get() {
-        return m[k];
-      }
-    };
-  }
-
-  Object.defineProperty(o, k2, desc);
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-
-var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
-  Object.defineProperty(o, "default", {
-    enumerable: true,
-    value: v
-  });
-} : function (o, v) {
-  o["default"] = v;
-});
-
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) {
-    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-  }
-
-  __setModuleDefault(result, mod);
-
-  return result;
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.useCategory = void 0;
-
-var react_query_1 = __webpack_require__(/*! react-query */ "./node_modules/react-query/es/index.js");
-
-var api = __importStar(__webpack_require__(/*! ../api/CategoryAPI */ "./resources/ts/api/CategoryAPI.ts"));
-
-var useCategory = function useCategory() {
-  return (0, react_query_1.useQuery)("categories", api.getCategories);
-};
-
-exports.useCategory = useCategory;
-
-/***/ }),
-
-/***/ "./resources/ts/queries/ChecklistWorkQuery.ts":
-/*!****************************************************!*\
-  !*** ./resources/ts/queries/ChecklistWorkQuery.ts ***!
-  \****************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  var desc = Object.getOwnPropertyDescriptor(m, k);
-
-  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-    desc = {
-      enumerable: true,
-      get: function get() {
-        return m[k];
-      }
-    };
-  }
-
-  Object.defineProperty(o, k2, desc);
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-
-var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
-  Object.defineProperty(o, "default", {
-    enumerable: true,
-    value: v
-  });
-} : function (o, v) {
-  o["default"] = v;
-});
-
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) {
-    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-  }
-
-  __setModuleDefault(result, mod);
-
-  return result;
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.useChecklistWork = void 0;
-
-var react_query_1 = __webpack_require__(/*! react-query */ "./node_modules/react-query/es/index.js");
-
-var api = __importStar(__webpack_require__(/*! ../api/ChecklistWorkAPI */ "./resources/ts/api/ChecklistWorkAPI.ts"));
-
-var useChecklistWork = function useChecklistWork() {
-  return (0, react_query_1.useQuery)("checklist_works", api.getChecklistWorks);
-};
-
-exports.useChecklistWork = useChecklistWork;
 
 /***/ }),
 
