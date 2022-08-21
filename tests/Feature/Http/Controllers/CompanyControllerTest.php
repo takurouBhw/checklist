@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -13,11 +14,16 @@ use \Symfony\Component\HttpFoundation\Response;
 class CompanyControllerTest extends TestCase
 {
     use RefreshDatabase;
+    public function setUp():void {
+        parent::setUp();
+        $user = User::factory()->create();
+        $this->actingAs($user);
+    }
     /**
      * 正常系 一覧参照
      * ステータスコード 200
      * @test
-     * @group testing-company-all
+     * @group company-all-success
      * @return void
      */
     public function 一覧を取得できる()
@@ -40,6 +46,7 @@ class CompanyControllerTest extends TestCase
         $data = [
             // "client_key" => hash( "sha256", '1'),
             "name" => 'テスト商事',
+            "email" => 'testshouji@test.com',
             // "postal_code" => "123-4567",
             // "address" => "神奈川県藤沢市大庭432-20",
             // "email" => "test1@test.com",

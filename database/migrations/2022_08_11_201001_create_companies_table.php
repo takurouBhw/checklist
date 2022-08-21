@@ -17,6 +17,7 @@ class CreateCompaniesTable extends Migration
             $table->id();
             // $table->string('client_key',64)->comment('クライアントキー');
             $table->string('name',100)->comment('会社名');
+            $table->foreignId('user_id')->constrained();
             // $table->string('postal_code', 8)->comment('郵便番号');
             // $table->string('address', 255)->comment('住所');
             // $table->string('email', 255)->unique();

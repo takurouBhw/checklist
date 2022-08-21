@@ -16,6 +16,7 @@ class CompanyFactory extends Factory
         return [
             // 'client_key' => '1',
             'name' => $this->faker->company(),
+            'user_id' => $this->faker->numberBetween(1, 2),
             // 'postal_code' => '133-4566',
             // 'address' => $this->faker->address(),
             // 'email' => $this->faker->email(),

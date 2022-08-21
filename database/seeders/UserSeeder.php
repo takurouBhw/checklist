@@ -16,19 +16,40 @@ class UserSeeder extends Seeder
     public function run()
     {
         DB::table('users')->insert([
-            'name' => 'テスト太郎',
-            'user_id' => '1',
-            'company_id' => 1,
-            'branch_office_id' => 1,
-            'duty_station_id' => 1,
-            'phone' => '0557553478',
-            // 'deleted_at' => null,
-            'role' => 2,
-            'email' => 'test@test.com',
-            'email_verified_at' => now(),
-            'password' => 'password',
-            'last_logined_at' => null,
-            'last_checklist_id' => null,
+            [
+                'name' => 'テスト太郎',
+                // 'user_id' => '1',
+                'company_id' => 1,
+                // 'branch_office_id' => 1,
+                // 'duty_station_id' => 1,
+                // 'phone' => '0557553478',
+                // 'deleted_at' => null,
+                // 'role' => 2,
+                'email' => 'test@test.com',
+                // 'email_verified_at' => now(),
+                'password' => Hash::make('123456789'),
+                'created_at' => now(),
+                'updated_at' => now(),
+                // 'last_logined_at' => null,
+                // 'last_checklist_id' => null,
+            ],
+            [
+                'name' => 'Admin',
+                // 'user_id' => '1',
+                'company_id' => 1,
+                // 'branch_office_id' => 1,
+                // 'duty_station_id' => 1,
+                // 'phone' => '0557553478',
+                // 'deleted_at' => null,
+                // 'role' => 2,
+                'email' => 'admin@test.com',
+                // 'email_verified_at' => now(),
+                'password' => Hash::make('123456789'),
+                'created_at' => now(),
+                'updated_at' => now(),
+                // 'last_logined_at' => null,
+                // 'last_checklist_id' => null,
+            ]
         ]);
     }
 }
