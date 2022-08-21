@@ -12,7 +12,7 @@ export default function Router() {
     const logout = useLogout();
     const { isAuth, setIsAuth } = useAuth();
 
-    const navigation = () => (
+    const Navigation: React.FC = () => (
         <header className="global-head">
             <nav>
                 <ul>
@@ -32,7 +32,7 @@ export default function Router() {
             </nav>
         </header>
     );
-    const loginNavigation = () => (
+    const LoginNavigation: React.FC = () => (
         <header className="global-head">
             <nav>
                 <ul>
@@ -47,8 +47,8 @@ export default function Router() {
     return (
         <BrowserRouter>
             <>
-                {isAuth ? navigation : loginNavigation}
-                {/* A <Switch> looks through its children <Route>s and
+                {isAuth ? <Navigation/> : <LoginNavigation />
+                /* A <Switch> looks through its children <Route>s and
               renders the first one that matches the current URL. */}
                 <Switch>
                     <Route path="/login">

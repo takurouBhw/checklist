@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./hooks/AuthContext";
+import { CookiesProvider } from "react-cookie";
 
 const App = () => {
     const quｆeryClient = new QueryClient({
@@ -18,12 +19,14 @@ const App = () => {
     });
     return (
         <h1>
-            <AuthProvider>
-                <QueryClientProvider client={quｆeryClient}>
-                    <Router />
-                    <ToastContainer hideProgressBar={true} />
-                </QueryClientProvider>
-            </AuthProvider>
+            <CookiesProvider>
+                <AuthProvider>
+                    <QueryClientProvider client={quｆeryClient}>
+                        <Router />
+                        <ToastContainer hideProgressBar={true} />
+                    </QueryClientProvider>
+                </AuthProvider>
+            </CookiesProvider>
         </h1>
     );
 };
