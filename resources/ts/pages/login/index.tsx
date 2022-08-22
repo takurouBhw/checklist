@@ -24,7 +24,6 @@ const LoginPage: React.FC = () => {
                                 className="input"
                                 value={email}
                                 onChange={(e) => {
-                                    alert('aaaa');
                                     setEmail(e.target.value);
                                 }}
                             />

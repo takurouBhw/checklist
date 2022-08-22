@@ -41,6 +41,7 @@ const useLogout = () => {
                 // cookieを削除
                 removeCookie('user_id');
                 removeCookie('user_name');
+                window.location.href = '/login';
             }
             console.log(user);
         },

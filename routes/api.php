@@ -35,6 +35,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
+    // Route::post('/get_checklist_works', [CompanyController::class, 'getChecklistWorks']);
     Route::resource('categories', CategoryController::class);
     Route::apiResource('comapnies', CompanyController::class);
     Route::resource('branchoffice', BranchOfficeController::class);

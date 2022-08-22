@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import CompanyPage from "./pages/company";
 import LoginPage from "./pages/login";
+import NotFoundPage from "./pages/error";
 import CategoryPage from "./pages/category";
 import CheklistWorkPage from "./pages/checklist_work";
 import { useLogout, useUser } from "./queries/AuthQuery";
@@ -74,18 +75,14 @@ export default function Router() {
               renders the first one that matches the current URL. */
                 }
                 <Switch>
-                    <GuardRoute
-                        path="/"
-                        exact
-                    ><h1>ヘロー</h1></GuardRoute>
+                    <GuardRoute path="/" exact>
+                        <h1>ヘロー</h1>
+                    </GuardRoute>
                     <LoginRoute path="/login">
                         <LoginPage />
                     </LoginRoute>
-                    <GuardRoute
-                        path="/company"
-                        exact
-                        component={CompanyPage}
-                    />
+                    <GuardRoute path="/company" exact component={CompanyPage} />
+                    <Route component={NotFoundPage} />
                 </Switch>
             </>
         </BrowserRouter>

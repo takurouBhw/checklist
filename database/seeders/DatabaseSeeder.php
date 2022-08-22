@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
         ]);
-        \App\Models\Company::factory(10)->create();
+        \App\Models\Company::factory(30)->create();
         // \App\Models\Checklist::factory(1)->create();
         // \App\Models\ChecklistTodo::factory(1)->create();
         // \App\Models\ChecklistParticipant::factory(1)->create();

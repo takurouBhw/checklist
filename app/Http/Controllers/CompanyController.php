@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 class CompanyController extends Controller
@@ -17,7 +18,17 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        return Company::all()->toArray();
+        $companies = Company::where('user_id', \Auth::id())->orderByDesc('id')->get();
+        return $companies;
+    }
+
+    public function getChecklistWorks($request)
+    {
+
+        $companies = Company::where('user_id', $request->user_id);
+
+        return $companies;
+        // return Company::all()->toArray();
     }
 
     /**
@@ -39,6 +50,10 @@ class CompanyController extends Controller
     public function store(StoreCompanyRequest $request, Company $company): JsonResponse
     {
         // 作成
+
+        $request->merge([
+            'user_id' => \Auth::id()
+        ]);
         $company = Company::create($request->companyAttributes());
         return $company
             ? response()->json($company, 201)

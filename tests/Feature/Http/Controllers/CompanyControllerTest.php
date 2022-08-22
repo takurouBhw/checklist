@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Hash;
 
 use \Symfony\Component\HttpFoundation\Response;
 
@@ -46,14 +47,14 @@ class CompanyControllerTest extends TestCase
         $data = [
             // "client_key" => hash( "sha256", '1'),
             "name" => 'テスト商事',
-            "email" => 'testshouji@test.com',
+            // "email" => 'testshouji@test.com',
             // "postal_code" => "123-4567",
             // "address" => "神奈川県藤沢市大庭432-20",
             // "email" => "test1@test.com",
             // "phone" => "0466872686"
         ];
 
-        $response = $this->postJson('api/comapnies', $data);
+        $response = $this->postJson('api/companies', $data);
 
         $response->assertStatus(Response::HTTP_CREATED);
     }

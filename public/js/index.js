@@ -2176,6 +2176,8 @@ var company_1 = __importDefault(__webpack_require__(/*! ./pages/company */ "./re
 
 var login_1 = __importDefault(__webpack_require__(/*! ./pages/login */ "./resources/ts/pages/login/index.tsx"));
 
+var error_1 = __importDefault(__webpack_require__(/*! ./pages/error */ "./resources/ts/pages/error/index.tsx"));
+
 var AuthQuery_1 = __webpack_require__(/*! ./queries/AuthQuery */ "./resources/ts/queries/AuthQuery.ts");
 
 var AuthContext_1 = __webpack_require__(/*! ./hooks/AuthContext */ "./resources/ts/hooks/AuthContext.tsx");
@@ -2245,6 +2247,8 @@ function Router() {
     path: "/company",
     exact: true,
     component: company_1["default"]
+  }), react_1["default"].createElement(react_router_dom_1.Route, {
+    component: error_1["default"]
   }))));
 }
 
@@ -3092,6 +3096,37 @@ exports["default"] = CompanyPage;
 
 /***/ }),
 
+/***/ "./resources/ts/pages/error/index.tsx":
+/*!********************************************!*\
+  !*** ./resources/ts/pages/error/index.tsx ***!
+  \********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+
+var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+
+var NotFoundPage = function NotFoundPage() {
+  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
+    className: "align-center"
+  }, react_1["default"].createElement("h1", null, "404 Not Found ")));
+};
+
+exports["default"] = NotFoundPage;
+
+/***/ }),
+
 /***/ "./resources/ts/pages/login/index.tsx":
 /*!********************************************!*\
   !*** ./resources/ts/pages/login/index.tsx ***!
@@ -3195,7 +3230,6 @@ var LoginPage = function LoginPage() {
     className: "input",
     value: email,
     onChange: function onChange(e) {
-      alert('aaaa');
       setEmail(e.target.value);
     }
   })), react_1["default"].createElement("div", {
@@ -3349,6 +3383,7 @@ var useLogout = function useLogout() {
 
         removeCookie('user_id');
         removeCookie('user_name');
+        window.location.href = '/login';
       }
 
       console.log(user);
