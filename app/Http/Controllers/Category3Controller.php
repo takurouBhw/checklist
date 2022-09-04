@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category3;
 use Illuminate\Http\Request;
-use App\Models\ChecklistTodoWork;
-use App\Models\ChecklistWork;
 
-class ChecklistWorkController extends Controller
+class Category3Controller extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($request)
     {
-        return ChecklistWork::all()->toArray();
+        return Category3::where('category1_id', '=',  $request->category1_id)
+        ->where('category2_id', '=', $request->category2_id)
+        ->get()
+        ->toArray();
     }
 
     /**
@@ -28,6 +30,13 @@ class ChecklistWorkController extends Controller
         //
     }
 
+    public function getCategory(Request $request) {
+        $res = Category3::where('category2_id', '=', $request->category2_id)
+        ->where('category1_id', '=', $request->category1_id)
+        ->get();
+
+        return $res->toArray();
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -82,26 +91,5 @@ class ChecklistWorkController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function updateDone(ChecklistWork $checklistWork, Request $request)
-    {
-        $checklistWork->user_id == $request->user_id;
-
-        return $checklistWork->update()
-            ? response()->json()
-            : response()->json([], 500);
-    }
-
-    public function getChecklist(Request $request) {
-
-
-        $checklists = ChecklistWork::
-        where('category1_id', '=', $request->cagegory1_id)
-        ->where('category2_id', '=', $request->cagegory2_id)
-        ->where('category3_id', '=', $request->cagegory3_id)
-        ->get();
-
-        return $checklists->toArray();
     }
 }
