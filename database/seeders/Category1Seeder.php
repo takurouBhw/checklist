@@ -16,13 +16,13 @@ class Category1Seeder extends Seeder
     {
         DB::table('category1s')->insert([
             [
-                "name" => "メイン1",
+                "name" => "入居処理",
             ],
             [
-                "name" => "メイン2",
+                "name" => "退去処理",
             ],
             [
-                "name" => "メイン3",
+                "name" => "その他",
             ]
         ]);
     }

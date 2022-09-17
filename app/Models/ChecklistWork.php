@@ -13,6 +13,12 @@ class ChecklistWork extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'category1_id' => 'integer',
+        'category2_id' => 'integer',
+        'category3_id' => 'integer',
+    ];
+
     public function category()
     {
         return $this->belongsTo(Category::class);

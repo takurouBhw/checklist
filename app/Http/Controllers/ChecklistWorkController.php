@@ -95,12 +95,15 @@ class ChecklistWorkController extends Controller
 
     public function getChecklist(Request $request) {
 
-
+        // dd($request->category1_id);
         $checklists = ChecklistWork::
-        where('category1_id', '=', $request->cagegory1_id)
-        ->where('category2_id', '=', $request->cagegory2_id)
-        ->where('category3_id', '=', $request->cagegory3_id)
-        ->get();
+        // where('category1_id', '=', $request->cagegory1_id)
+        // ->where('category2_id', '=', $request->cagegory2_id)
+        // ->where('category3_id', '=', $request->cagegory3_id)
+        where('category1_id', '=', 1)
+        ->where('category2_id', '=', 1)
+        ->where('category3_id', '=', 1)
+         ->get();
 
         return $checklists->toArray();
     }

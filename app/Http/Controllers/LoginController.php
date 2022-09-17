@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 
 class LoginController extends Controller
@@ -17,6 +18,21 @@ class LoginController extends Controller
     public function login(Request $request)
     {
 
+        // $user = User::where('email', '=', $request->email);
+
+        // // ユーザーの存在チェック
+        // if(is_null($user)) {
+        //     return response()->json([
+        //         'error' => 'emailが間違っています。'
+        //     ], 401);
+        // }
+
+        // return response()->json([
+        //     'user_id' => time(),
+        //     'name' => $user->name,
+        //     'error' => '',
+        // ], 200);
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -27,6 +43,7 @@ class LoginController extends Controller
 
             return response()->json(Auth::user());
         }
+
 
         return response()->json([], 401);
     }

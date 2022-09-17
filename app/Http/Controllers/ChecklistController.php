@@ -3,7 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Checklist;
+use App\Models\User;
+use Attribute;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+use function PHPUnit\Framework\isNull;
+use function PHPUnit\Framework\returnSelf;
 
 class ChecklistController extends Controller
 {
@@ -17,6 +23,56 @@ class ChecklistController extends Controller
         $checklist = Checklist::findAllForAllUsers()->get();
         return $checklist->toArray();
     }
+
+    public function realTimeCheck(Request $request)
+    {
+        $check_items = $request->all();
+        $checklist_id = 0;
+        foreach ($check_items as $check_item) {
+            $checklist_id = $check_item['checklist_id'];
+            break;
+        }
+        $checklist = Checklist::find($checklist_id);
+        $encoded_check_items = json_encode($check_items, JSON_UNESCAPED_UNICODE);
+        $checklist->check_items =  $encoded_check_items;
+        $response = $checklist->save();
+
+        return $response
+            ? response()->json($check_items, 200)
+            : response()->json([
+                'error' => 'JSON構造が不正です。',
+                'checklist_items' => [],
+            ], 419);
+    }
+
+    /**
+     * チェックリスト取得
+     *
+     * @param Request $request
+     * @return Json
+     */
+    public function getChecklist(Request $request)
+    {
+        // 権限チェック
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if(is_null($user)) {
+            return response()->json([
+                'checklists' => [],
+                'error' => 'user_id: 権限エラー',
+            ], 419);
+        }
+
+        // 結果
+        $checklist = Checklist::where('user_id', '=', $request->user_id)
+        ->where('category1_id', '=', $request->category1_id)
+        ->where('category2_id', '=', $request->category2_id)->get();
+        return $checklist
+            ? response()->json([
+                'checklists' => $checklist
+            ], 200)
+            : response()->json([], 500);
+    }
+
 
     /**
      * Show the form for creating a new resource.

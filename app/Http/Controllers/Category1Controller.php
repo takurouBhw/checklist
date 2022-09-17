@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category1;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class Category1Controller extends Controller
 {
@@ -15,15 +16,22 @@ class Category1Controller extends Controller
     public function index()
     {
         $aa = Category1::all();
-        return $aa->toArray();
-    }
 
-    public function getCategory(Request $request)
-    {
-        $request->user_id;
-        $aa = Category1::all()->toArray();
 
         return $aa;
+    }
+
+    public function getCategory(Request $request): JsonResponse
+    {
+        $request->user_id;
+        $categories = Category1::all()->toArray();
+        $res = [
+            'categories' => $categories,
+            'user_id' => '1235',
+            'error' => '',
+        ];
+
+        return response()->json($res, 200);
     }
 
     /**

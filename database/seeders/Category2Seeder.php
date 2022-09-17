@@ -16,16 +16,16 @@ class Category2Seeder extends Seeder
     {
         DB::table('category2s')->insert([
             [
-                "name" => "物件1",
+                "name" => "退去手続き",
                 "category1_id" =>  1,
             ],
             [
-                "name" => "物件2",
-                "category1_id" =>  2,
+                "name" => "入居手続き",
+                "category1_id" =>  1,
             ],
             [
-                "name" => "物件3",
-                "category1_id" =>  3,
+                "name" => "その他手続き",
+                "category1_id" =>  1,
             ]
         ]);
     }

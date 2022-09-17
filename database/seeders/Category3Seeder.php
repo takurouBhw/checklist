@@ -16,19 +16,19 @@ class Category3Seeder extends Seeder
     {
         DB::table('category3s')->insert([
             [
-                "name" => "10q",
+                "name" => "ハイツA101号室",
                 "category1_id" =>  1,
                 "category2_id" =>  1,
             ],
             [
-                "name" => "102",
-                "category1_id" =>  2,
-                "category2_id" =>  2,
+                "name" => "102号室",
+                "category1_id" =>  1,
+                "category2_id" =>  1,
             ],
             [
-                "name" => "103",
-                "category1_id" =>  3,
-                "category2_id" =>  3,
+                "name" => "103号室",
+                "category1_id" =>  1,
+                "category2_id" =>  1,
             ]
         ]);
     }

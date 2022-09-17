@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Category1 extends Model
 {
     use HasFactory;
+    protected $appends = ['user_id'];
+
+    public function getUserIdAttribute()
+    {
+        return '123344445';
+    }
 }

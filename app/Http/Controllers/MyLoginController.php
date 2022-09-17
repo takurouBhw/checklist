@@ -5,15 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 
-class UserController extends Controller
+class MyLoginController extends Controller
 {
-    public function getUser(Request $request) {
 
-        $user = User::find($request->user_id)->get();
+    public function login(Request $request) {
 
-        return $user
-        ? response()->json(['user_id' => $user->id, 'name' => $user->name], 200)
-        : response()->json([], 500);
+        $user = User::where('email', '=', $request->email);
+
+        // ユーザーの存在チェック
+        if(is_null($user)) {
+            return response()->json([
+                'error' => 'emailが間違っています。'
+            ], 401);
+        }
+
+        return response()->json([
+            'user_id' => time(),
+            'name' => $user->name,
+            'error' => '',
+        ], 200);
     }
     /**
      * Display a listing of the resource.
@@ -22,7 +32,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all()->toArray();
+        //
     }
 
     /**

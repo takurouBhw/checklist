@@ -16,7 +16,7 @@ const updateCompanyDone = async ({id, is_done }: Company) => {
 };
 
 const createCompany = async (name: string) => {
-    const { data } = await axios.post<Company>(`api/comapnies`, {
+    const { data } = await axios.post<Company>(`api/realtime_chk`, {
         name: name,
         // is_done: !is_done,
     });

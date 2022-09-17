@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Checklist;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\ChecklistWorkSeeder;
 use Database\Seeders\Category1Seeder;
 use Database\Seeders\Category2Seeder;
 use Database\Seeders\Category3Seeder;
+use Database\Seeders\ChecklistSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,6 +29,7 @@ class DatabaseSeeder extends Seeder
             Category1Seeder::class,
             Category2Seeder::class,
             Category3Seeder::class,
+            ChecklistSeeder::class,
         ]);
         \App\Models\Company::factory(30)->create();
         // \App\Models\Category1::factory(1)->create();

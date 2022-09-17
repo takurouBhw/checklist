@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name' => '山田太郎',
                 'company_id' => 1,
+                'user_id' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c5",
                 // 'branch_office_id' => 1,
                 // 'duty_station_id' => 1,
                 // 'phone' => '0557553478',
@@ -26,7 +27,7 @@ class UserSeeder extends Seeder
                 // 'role' => 2,
                 'email' => 'yamada@test.com',
                 // 'email_verified_at' => now(),
-                'password' => Hash::make('123456789'),
+                'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
                 // 'last_logined_at' => null,
@@ -34,6 +35,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Admin',
+                'user_id' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6",
                 'company_id' => 1,
                 // 'branch_office_id' => 1,
                 // 'duty_station_id' => 1,
@@ -50,6 +52,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'テスト太郎',
+                'user_id' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c7",
                 'company_id' => 1,
                 // 'branch_office_id' => 1,
                 // 'duty_station_id' => 1,

@@ -31,11 +31,18 @@ class Category3Controller extends Controller
     }
 
     public function getCategory(Request $request) {
-        $res = Category3::where('category2_id', '=', $request->category2_id)
-        ->where('category1_id', '=', $request->category1_id)
-        ->get();
 
-        return $res->toArray();
+        $categories = Category3::where('category2_id', '=', $request->category2_id)
+        ->where('category1_id', '=', $request->category1_id)
+        ->get()->toArray();
+
+        $res = [
+            'categories' => $categories,
+            'user_id' => '1235',
+            'error' => '',
+        ];
+
+        return response()->json($res, 200);
     }
     /**
      * Store a newly created resource in storage.
