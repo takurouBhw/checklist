@@ -7,6 +7,7 @@ use App\Models\User;
 use Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\Continue_;
 
 use function PHPUnit\Framework\isNull;
 use function PHPUnit\Framework\returnSelf;
@@ -26,10 +27,12 @@ class ChecklistController extends Controller
 
     public function checkStart(Request $request)
     {
+        // 権限チェック
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if(is_null($user)) {
+        }
 
         $checklist = Checklist::find($request->checklist_id);
-        $user = User::where('user_id', '=', $request->user_id)->first();
-
         $participants = json_decode($checklist->participants, JSON_UNESCAPED_UNICODE);
         $param = $participants[$request->user_id];
         $param['started_at'] = $request->check_time;
@@ -58,6 +61,51 @@ class ChecklistController extends Controller
 
     public function realTimeCheck(Request $request)
     {
+
+        // 権限チェック
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if(is_null($user)) {
+            return response()->json([
+                'error' => '権限エラー',
+                'checklist_items' => [],
+            ], 419);
+        }
+
+        // チェックアイテム抽出と存在チェック
+        $checklist = Checklist::find($request->checklist_id);
+        if(is_null($checklist)) {
+            return response()->json([
+                'error' => 'チェックリストが存在しません。',
+                'checklist_items' => [],
+            ], 419);
+        }
+        $check_items = json_decode($checklist->check_items, JSON_UNESCAPED_UNICODE);
+
+        // チェックアイテムからclient keyに紐付いたアイテムを抽出
+        $new_check_items = null;
+        foreach($check_items as $key => $val) {
+            if($val['key'] !== $request->key) continue;
+
+            $val['check_time'] = $request->check_time;
+            $check_items[$key] = $val;
+            $new_check_items = $check_items;
+            break;
+        }
+
+        // 保存処理
+        $encoded_check_items = json_encode($new_check_items, JSON_UNESCAPED_UNICODE);
+        $checklist->check_items =  $encoded_check_items;
+        $result = $checklist->save();
+
+        // 保存に失敗した場合
+        if(!$result) {
+            return response()->json([
+                'error' => '保存に失敗しました。',
+                'checklist_items' => [],
+            ], 500);
+        }
+
+        // レスポンス生成
         $response = [
             "check_time" => $request->check_time,
             "error" => "",
@@ -65,28 +113,15 @@ class ChecklistController extends Controller
                 [
                     "todo_ids" => 1,
                     "name" => "ユーザー１",
-                    "check_time" => 1663633231,
+                    "check_time" => $request->check_time,
                 ],
             ],
             "progressA" => 80,
             "progressU" => 50,
         ];
 
-        return response()->json($response, 200);
-
-        $check_items = $request->all();
-        $checklist_id = 0;
-        foreach ($check_items as $check_item) {
-            $checklist_id = $check_item['checklist_id'];
-            break;
-        }
-        $checklist = Checklist::find($checklist_id);
-        $encoded_check_items = json_encode($check_items, JSON_UNESCAPED_UNICODE);
-        $checklist->check_items =  $encoded_check_items;
-        $response = $checklist->save();
-
         return $response
-            ? response()->json($check_items, 200)
+            ? response()->json($response, 200)
             : response()->json([
                 'error' => 'JSON構造が不正です。',
                 'checklist_items' => [],
@@ -110,11 +145,12 @@ class ChecklistController extends Controller
             ], 419);
         }
 
-        // 結果
+        // チェックリスト取得
         $checklist = Checklist::where('user_id', '=', $request->user_id)
         ->where('category1_id', '=', $request->category1_id)
         ->where('category2_id', '=', $request->category2_id)->get();
 
+        // 結果
         return $checklist
             ? response()->json([
                 'checklists' => $checklist
