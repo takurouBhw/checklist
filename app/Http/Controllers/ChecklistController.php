@@ -27,7 +27,18 @@ class ChecklistController extends Controller
     public function checkStart(Request $request)
     {
 
+        $checklist = Checklist::find($request->checklist_id);
         $user = User::where('user_id', '=', $request->user_id)->first();
+
+        $participants = json_decode($checklist->participants, JSON_UNESCAPED_UNICODE);
+        $param = $participants[$request->user_id];
+        $param['started_at'] = $request->check_time;
+        $participants[$request->user_id] = $param;
+        $encoded = json_encode($participants, JSON_UNESCAPED_UNICODE);
+        $checklist->participants = $encoded;
+        $checklist->save();
+
+
         $response = [
             "check_time" => $request->check_time,
             "error" => "",
