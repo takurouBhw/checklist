@@ -15,8 +15,8 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('client_key');
             $table->string('user_id');
-            // $table->string('user_id',32)->unique()->comment('ユーザーID UUID');
             // $table->foreignId('user_id',) >string('user_id',32)->unique()->comment('ユーザーID UUID');
             $table->string('name',50)->comment('ユーザー名');
             $table->unsignedBigInteger('company_id')->comment('所属会社');

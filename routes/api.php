@@ -45,6 +45,7 @@ Route::post('/get_category2', [Category2Controller::class, 'getCategory']);
 Route::post('/get_checklist', [ChecklistController::class, 'getChecklist']);
 Route::post('/get_user', [UserController::class, 'getUser']);
 Route::post('/realtime_chk', [ChecklistController::class, 'realTimeCheck']);
+Route::post('/check_start', [ChecklistController::class, 'checkStart']);
 // Route::post('/get_category3', [Category3Controller::class, 'getCategory']);
 // Route::post('/get_checklist_works', [ChecklistWorkController::class, 'getChecklist']);
 Route::get('/user', function (Request $request) {

@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name' => '山田太郎',
                 'company_id' => 1,
+                'client_key' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c5",
                 'user_id' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c5",
                 // 'branch_office_id' => 1,
                 // 'duty_station_id' => 1,
@@ -35,6 +36,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Admin',
+                'client_key' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6",
                 'user_id' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6",
                 'company_id' => 1,
                 // 'branch_office_id' => 1,
@@ -52,6 +54,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'テスト太郎',
+                'client_key' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c7",
                 'user_id' => "5d87d115-7ebb-4d17-adce-4ffe4b39f8c7",
                 'company_id' => 1,
                 // 'branch_office_id' => 1,

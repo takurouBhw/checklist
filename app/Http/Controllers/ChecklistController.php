@@ -24,8 +24,45 @@ class ChecklistController extends Controller
         return $checklist->toArray();
     }
 
+    public function checkStart(Request $request)
+    {
+
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        $response = [
+            "check_time" => $request->check_time,
+            "error" => "",
+            "check_users" => [
+                [
+                    "todo_ids" => 1,
+                    "name" => "ユーザー１",
+                    "check_time" => $request->check_time,
+                ],
+            ],
+            "progressA" => 80,
+            "progressU" => 50,
+        ];
+
+        return response()->json($response, 200);
+    }
+
     public function realTimeCheck(Request $request)
     {
+        $response = [
+            "check_time" => $request->check_time,
+            "error" => "",
+            "check_users" => [
+                [
+                    "todo_ids" => 1,
+                    "name" => "ユーザー１",
+                    "check_time" => 1663633231,
+                ],
+            ],
+            "progressA" => 80,
+            "progressU" => 50,
+        ];
+
+        return response()->json($response, 200);
+
         $check_items = $request->all();
         $checklist_id = 0;
         foreach ($check_items as $check_item) {
@@ -58,7 +95,7 @@ class ChecklistController extends Controller
         if(is_null($user)) {
             return response()->json([
                 'checklists' => [],
-                'error' => 'user_id: 権限エラー',
+                'error' => 'client_key: 権限エラー',
             ], 419);
         }
 
@@ -66,6 +103,7 @@ class ChecklistController extends Controller
         $checklist = Checklist::where('user_id', '=', $request->user_id)
         ->where('category1_id', '=', $request->category1_id)
         ->where('category2_id', '=', $request->category2_id)->get();
+
         return $checklist
             ? response()->json([
                 'checklists' => $checklist

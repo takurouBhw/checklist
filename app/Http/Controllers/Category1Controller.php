@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category1;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -23,11 +24,18 @@ class Category1Controller extends Controller
 
     public function getCategory(Request $request): JsonResponse
     {
-        $request->user_id;
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if(is_null($user)){
+            return response()->json([
+                'error' => '権限エラー',
+                'categories' => [],
+            ], 419);
+        }
         $categories = Category1::all()->toArray();
+        // dd($categories);
         $res = [
             'categories' => $categories,
-            'user_id' => '1235',
+            'client_key' => $user->client_key,
             'error' => '',
         ];
 
@@ -53,7 +61,7 @@ class Category1Controller extends Controller
     public function store($request)
     {
         dd($request);
-        $user_id = $request->user_id;
+        $client_key = $request->client_key;
         $aa = Category1::all();
         return $aa->toArray();
     }

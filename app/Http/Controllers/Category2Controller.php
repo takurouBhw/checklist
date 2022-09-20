@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category2;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class Category2Controller extends Controller
 {
@@ -28,10 +29,18 @@ class Category2Controller extends Controller
     }
     public function getCategory(Request $request) {
 
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if(is_null($user)){
+            return response()->json([
+                'error' => '権限エラー',
+                'categories' => [],
+            ], 419);
+        }
+
         $categories = Category2::where('category1_id', '=', $request->category1_id)->get()->toArray();
         $res = [
             'categories' => $categories,
-            'user_id' => '1235',
+            'client_key' => $user->client_key,
             'error' => '',
         ];
 

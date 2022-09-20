@@ -17,6 +17,7 @@ class CreateChecklistsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('category1_id');
             $table->unsignedBigInteger('category2_id');
+            $table->string('client_key');
             $table->string('user_id');
             $table->tinyInteger('priority', false, true)->comment('0=低い 1=通常 2=高い')->default(1);
             $table->string('title');
