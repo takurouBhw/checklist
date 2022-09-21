@@ -123,10 +123,95 @@ class ChecklistController extends Controller
 
             $check_items[$key] = $val;
             $new_check_items = $check_items;
-            break;
         }
 
         // 保存処理
+        $encoded_check_items = json_encode($new_check_items, JSON_UNESCAPED_UNICODE);
+        $checklist->check_items =  $encoded_check_items;
+        $result = $checklist->save();
+
+        // 保存に失敗した場合
+        if (!$result) {
+            return response()->json([
+                'error' => '保存に失敗しました。',
+                'checklist_items' => [],
+            ], 500);
+        }
+
+        // レスポンス生成
+        $response = [
+            "check_time" => $request->check_time,
+            "error" => "",
+            "check_users" => [
+                [
+                    "todo_ids" => 1,
+                    "name" => "ユーザー１",
+                    "check_time" => $request->check_time,
+                ],
+            ],
+            "progressA" => 80,
+            "progressU" => 50,
+        ];
+
+        return $response
+            ? response()->json($response, 200)
+            : response()->json([
+                'error' => 'JSON構造が不正です。',
+                'checklist_items' => [],
+            ], 419);
+    }
+
+    public function realTimeSave(Request $request)
+    {
+
+        // 権限チェック
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if (is_null($user)) {
+            return response()->json([
+                'error' => '権限エラー',
+                'checklist_items' => [],
+            ], 444);
+        }
+
+        // チェックリスト抽出
+        $checklist = Checklist::find($request->checklist_id);
+
+        // 存在チェック
+        if (is_null($checklist)) {
+            return response()->json([
+                'error' => 'チェックリストが存在しません。',
+                'checklist_items' => [],
+            ], 414);
+        }
+
+        // 変換
+        $check_items = json_decode($checklist->check_items, JSON_UNESCAPED_UNICODE);
+
+        // チェックアイテム抽出
+        $new_check_items = null;
+        foreach ($check_items as $key => $val) {
+
+            // 抽出判定
+            if($val['checklist_works_id'] !== $request->checklist_works_id) continue;
+            if ($val['key'] !== $request->key) continue;
+
+            // 更新
+            $val['check_time'] = $request->check_time;
+            $val['val'] = $request->check_time > 0 ? 1 : 0;
+            $val['memo'] = $request->memo;
+            $check_items[$key] = $val;
+            $new_check_items = $check_items;
+        }
+
+        // チェックアイテム存在チェック
+        if(is_null($new_check_items)) {
+            return response()->json([
+                'error' => 'チェックアイテムのデータが不正です。',
+                'checklist_items' => [],
+            ], 424);
+        }
+
+        // 保存
         $encoded_check_items = json_encode($new_check_items, JSON_UNESCAPED_UNICODE);
         $checklist->check_items =  $encoded_check_items;
         $result = $checklist->save();
@@ -189,10 +274,9 @@ class ChecklistController extends Controller
             return response()->json([
                 'checklists' => [],
                 'error' => '取得できませんでした。',
-            ], 200);
+            ], 414);
         }
 
-        // 結果
         return response()->json([
                 'checklists' => $checklist,
                 'error' => '',
