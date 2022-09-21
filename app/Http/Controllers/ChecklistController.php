@@ -27,21 +27,49 @@ class ChecklistController extends Controller
 
     public function checkStart(Request $request)
     {
+
         // 権限チェック
         $user = User::where('user_id', '=', $request->user_id)->first();
-        if(is_null($user)) {
+        if (is_null($user)) {
+            return response()->json([
+                'error' => '権限エラー',
+                'checklist_items' => [],
+            ], 419);
         }
 
+        // チェックリスト取得
         $checklist = Checklist::find($request->checklist_id);
+
+        // 存在チェック
+        if(is_null($checklist)) {
+            return response()->json([
+                'error' => '未登録です。',
+                'checklist_items' => [],
+            ], 200);
+        }
+
+        // participants抽出
         $participants = json_decode($checklist->participants, JSON_UNESCAPED_UNICODE);
         $param = $participants[$request->user_id];
+
+        // 更新処理
         $param['started_at'] = $request->check_time;
         $participants[$request->user_id] = $param;
+
+        // 保存処理
         $encoded = json_encode($participants, JSON_UNESCAPED_UNICODE);
         $checklist->participants = $encoded;
-        $checklist->save();
+        $result = $checklist->save();
 
+        // 更新・保存に失敗した場合
+        if(!$result) {
+            return response()->json([
+                'error' => '更新に失敗しました。',
+                'checklist_items' => [],
+            ], 500);
+        }
 
+        // レスポンス生成
         $response = [
             "check_time" => $request->check_time,
             "error" => "",
@@ -64,29 +92,35 @@ class ChecklistController extends Controller
 
         // 権限チェック
         $user = User::where('user_id', '=', $request->user_id)->first();
-        if(is_null($user)) {
+        if (is_null($user)) {
             return response()->json([
                 'error' => '権限エラー',
                 'checklist_items' => [],
             ], 419);
         }
 
-        // チェックアイテム抽出と存在チェック
+        // チェックリスト抽出
         $checklist = Checklist::find($request->checklist_id);
-        if(is_null($checklist)) {
+
+        // 存在チェック
+        if (is_null($checklist)) {
             return response()->json([
                 'error' => 'チェックリストが存在しません。',
                 'checklist_items' => [],
             ], 419);
         }
+
+        // 更新処理
         $check_items = json_decode($checklist->check_items, JSON_UNESCAPED_UNICODE);
 
         // チェックアイテムからclient keyに紐付いたアイテムを抽出
         $new_check_items = null;
-        foreach($check_items as $key => $val) {
-            if($val['key'] !== $request->key) continue;
+        foreach ($check_items as $key => $val) {
+            if ($val['key'] !== $request->key) continue;
 
             $val['check_time'] = $request->check_time;
+            $val['val'] = $request->check_time > 0 ? 1 : 0;
+
             $check_items[$key] = $val;
             $new_check_items = $check_items;
             break;
@@ -98,7 +132,7 @@ class ChecklistController extends Controller
         $result = $checklist->save();
 
         // 保存に失敗した場合
-        if(!$result) {
+        if (!$result) {
             return response()->json([
                 'error' => '保存に失敗しました。',
                 'checklist_items' => [],
@@ -138,24 +172,31 @@ class ChecklistController extends Controller
     {
         // 権限チェック
         $user = User::where('user_id', '=', $request->user_id)->first();
-        if(is_null($user)) {
+        if (is_null($user)) {
             return response()->json([
                 'checklists' => [],
-                'error' => 'client_key: 権限エラー',
+                'error' => 'user_id: 権限エラー',
             ], 419);
         }
 
         // チェックリスト取得
         $checklist = Checklist::where('user_id', '=', $request->user_id)
-        ->where('category1_id', '=', $request->category1_id)
-        ->where('category2_id', '=', $request->category2_id)->get();
+            ->where('category1_id', '=', $request->category1_id)
+            ->where('category2_id', '=', $request->category2_id)->get();
+
+        // 存在チェック
+        if(is_null($checklist)) {
+            return response()->json([
+                'checklists' => [],
+                'error' => '取得できませんでした。',
+            ], 200);
+        }
 
         // 結果
-        return $checklist
-            ? response()->json([
-                'checklists' => $checklist
-            ], 200)
-            : response()->json([], 500);
+        return response()->json([
+                'checklists' => $checklist,
+                'error' => '',
+            ], 200);
     }
 
 
