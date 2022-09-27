@@ -13,6 +13,8 @@ use App\Http\Controllers\ChecklistWorkController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DutyStationController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ApiController;
+
 use App\Http\Controllers\MyLoginController;
 use App\Models\Checklist;
 use App\Models\ChecklistWork;
@@ -45,7 +47,8 @@ Route::post('/get_category2', [Category2Controller::class, 'getCategory']);
 Route::post('/get_checklist', [ChecklistController::class, 'getChecklist']);
 Route::post('/get_user', [UserController::class, 'getUser']);
 Route::post('/realtime_chk', [ChecklistController::class, 'realtimeCheck']);
-Route::post('/realtime_save', [ChecklistController::class, 'realtimeSave']);
+Route::post('/realtime_save', [ChecklistController::class, 'realtime_save']);
+Route::post('/get_checklist_works', [ApiController::class, 'get_checklist_works']);
 Route::post('/check_start', [ChecklistController::class, 'checkStart']);
 // Route::post('/get_category3', [Category3Controller::class, 'getCategory']);
 // Route::post('/get_checklist_works', [ChecklistWorkController::class, 'getChecklist']);

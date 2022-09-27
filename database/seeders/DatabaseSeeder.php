@@ -25,11 +25,11 @@ class DatabaseSeeder extends Seeder
         // \App\Models\DutyStation::factory(10)->create();
         $this->call([
             UserSeeder::class,
-            ChecklistWorkSeeder::class,
             Category1Seeder::class,
             Category2Seeder::class,
             Category3Seeder::class,
             ChecklistSeeder::class,
+            ChecklistWorkSeeder::class,
         ]);
         \App\Models\Company::factory(30)->create();
         // \App\Models\Category1::factory(1)->create();
