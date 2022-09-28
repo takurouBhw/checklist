@@ -17,31 +17,33 @@ class ChecklistWorkSeeder extends Seeder
         $check_items = [
             [
             "id"=>1,
+            "no" => 1,
             "title" => "TITLE1",
             "headline" => '見出し1',
             "input" => 0
             ],
             [
                 "id" => 2,
+                "no" => 2,
                 "title" => "TITLE2",
                 "headline" => "見出し2",
                 "input" => 0,
             ],
             [
                 "id" => 3,
+                "no" => 3,
                 "title" => "TITLE3",
                 "headline" => "見出し3",
                 "input" => 0
             ]
         ];
         $participants = [
-            "5d87d115-7ebb-4d17-adce-4ffe4b39f8c5" => [],
             "0adc3121-ab0b-4a1a-9ab6-09ee9d1bb16d" => [
                 "user_name" => "開発者",
                 "started_at" => 1234567890,
                 "finished_at" => 0,
                 "checkeds_time" => [
-                    "1" => 1000000000,
+                    "1" => 0,
                     "2" => 0,
                     "3" => 0,
                     "4" => 0,
@@ -59,7 +61,33 @@ class ChecklistWorkSeeder extends Seeder
                     "7" => 0
                 ],
                 "inputs" => [
-                    "2" => "name",
+                    "2" => "開発者メモ",
+                ],
+            ],
+            "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6" => [
+                "user_name" => "管理者",
+                "started_at" => 0,
+                "finished_at" => 0,
+                "checkeds_time" => [
+                    "1" => 0,
+                    "2" => 0,
+                    "3" => 0,
+                    "4" => 0,
+                    "5" => 0,
+                    "6" => 0,
+                    "7" => 0
+                ],
+                "checkeds" => [
+                    "1" => 1,
+                    "2" => 0,
+                    "3" => 0,
+                    "4" => 0,
+                    "5" => 0,
+                    "6" => 0,
+                    "7" => 0
+                ],
+                "inputs" => [
+                    "2" => "管理者メモ",
                 ],
             ]
         ];
