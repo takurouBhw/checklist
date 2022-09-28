@@ -34,61 +34,7 @@ class ChecklistController extends Controller
     public function checkStart(Request $request)
     {
 
-        // // 権限チェック
-        // $user = User::where('user_id', '=', $request->user_id)->first();
-        // if (is_null($user)) {
-        //     return response()->json([
-        //         'error' => '権限エラー',
-        //         'checklist_items' => [],
-        //     ], 400);
-        // }
 
-        // // チェックリスト取得
-        // $checklist = Checklist::find($request->checklist_id);
-
-        // // 存在チェック
-        // if (is_null($checklist)) {
-        //     return response()->json([
-        //         'error' => '未登録です。',
-        //         'checklist_items' => [],
-        //     ], 200);
-        // }
-
-        // // participantsからユーザー情報抽出
-        // $participants = json_decode($checklist->participants, JSON_UNESCAPED_UNICODE);
-        // $param = $participants[$request->user_id];
-
-        // // 更新処理
-        // $param['started_at'] = $request->check_time;
-        // $participants[$request->user_id] = $param;
-
-        // // 保存処理
-        // $encoded = json_encode($participants, JSON_UNESCAPED_UNICODE);
-        // $checklist->participants = $encoded;
-        // $result = $checklist->save();
-
-        // // 更新・保存に失敗した場合
-        // if (!$result) {
-        //     return response()->json([
-        //         'error' => '更新に失敗しました。',
-        //         'checklist_items' => [],
-        //     ], 500);
-        // }
-
-        // // レスポンス生成
-        // $response = [
-        //     "check_time" => $request->check_time,
-        //     "error" => "",
-        //     "check_users" => [
-        //         [
-        //             "todo_ids" => 1,
-        //             "name" => "ユーザー１",
-        //             "check_time" => $request->check_time,
-        //         ],
-        //     ],
-        //     "progressA" => 80,
-        //     "progressU" => 50,
-        // ];
 
         // return response()->json($response, 200);
     }
@@ -262,28 +208,28 @@ class ChecklistController extends Controller
         2秒以内の場合は1秒待機して続行。
         */
         // 疑似ロックファイル存在チェック
-        $lockfie_path = "public/works/{$request->checklist_id}.lock";
-        $is_lockedfile = Storage::exists($lockfie_path);
+        // $lockfie_path = "public/works/{$request->checklist_id}.lock";
+        // $is_lockedfile = Storage::exists($lockfie_path);
 
-        // ロック中の場合
-        $now = new Carbon();
-        $timestamp = 0;
-        if ($is_lockedfile) {
-            $timestamp = Storage::get($lockfie_path);
-        }
-        // ロック中でなければファイル内容にタイムスタンプを記述
-        else {
-            $timestamp = $now->timestamp;
-            Storage::put($lockfie_path, $timestamp);
-        }
+        // // ロック中の場合
+        // $now = new Carbon();
+        // $timestamp = 0;
+        // if ($is_lockedfile) {
+        //     $timestamp = Storage::get($lockfie_path);
+        // }
+        // // ロック中でなければファイル内容にタイムスタンプを記述
+        // else {
+        //     $timestamp = $now->timestamp;
+        //     Storage::put($lockfie_path, $timestamp);
+        // }
 
-        // ロック待機処理
-        $processing_time = 3;
-        if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
-            Storage::put($lockfie_path, ((new Carbon())->timestamp));
-        } else {
-            sleep(2);
-        }
+        // // ロック待機処理
+        // $processing_time = 3;
+        // if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
+        //     Storage::put($lockfie_path, ((new Carbon())->timestamp));
+        // } else {
+        //     sleep(2);
+        // }
 
         //　チェックリスト取得
         $checlist = Checklist::find($request->checklist_id)
@@ -409,8 +355,7 @@ class ChecklistController extends Controller
         }
 
         // チェックリスト取得
-        $checklist = Checklist::where('user_id', '=', $request->user_id)
-            ->where('category1_id', '=', $request->category1_id)
+        $checklist = Checklist::where('category1_id', '=', $request->category1_id)
             ->where('category2_id', '=', $request->category2_id)
             ->select('id', 'title')->get();
 
