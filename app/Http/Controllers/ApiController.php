@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\ChecklistWork;
@@ -23,7 +22,6 @@ class ApiController extends Controller
         $user_id = '';
         $user_name = '';
 
-        // バリデーション
         $validator = Validator::make(
             $request->all(),
             [
@@ -53,14 +51,13 @@ class ApiController extends Controller
                     $user_id = $user->user_id;
                     $user_name = $user->name;
                     $user->last_logined_at = $now->format('Y-m-d H:i:s');
-                    // $user->save();
+                    $user->save();
                 }
             }
         }
 
-        // header("Access-Control-Allow-Origin: *");
-        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
-        // dd('aaa');
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => $error,
@@ -165,15 +162,36 @@ class ApiController extends Controller
 
     public function get_checklist_works(Request $request)
     {
-        list($client_key, $user_name) = Self::isLogin($request->user_id ?? '');
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+            ],
+        );
 
+        if($validator->fails()){
+            return response()->json([
+                'error' => $validator->errors(),
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'checklist_works' => [],
+            ], 400);
+        }
+
+        // 権限チェック
+        $user_name = '';
+        $now = new Carbon();
+        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
         if (is_null($user_name)) {
             return response()->json([
-                'error' => 'チェック作業閲覧の権限がありません。',
-                'started_at' => $request->started_at,
-                'finished_at' => $request->finished_at,
+                'error' => 'チェック操作する権限がありません。',
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
                 'checklist_works' => [],
-            ], 200);
+            ], 403);
         }
 
         //　チェックリスト取得
@@ -187,7 +205,10 @@ class ApiController extends Controller
         // チェックリスト存在チェック
         if (is_null($checklist)) {
             return response()->json([
-                'error' => '',
+                'error' => 'チェックリストが存在しません',
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
                 'checklist_works' => [],
             ]);
         }
@@ -199,17 +220,23 @@ class ApiController extends Controller
         // チェック作業リストに表示する項目が存在しない場合
         if (empty($check_items)) {
             return response()->json([
-                'error' => '',
+                'error' => 'チェックリストの作業項目が存在しません。',
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
                 'checklist_works' => [],
             ]);
         }
 
         // partipants抽出
-        // 自身の参加者情報が存在しない場合は権限がないとみなす
+        // 自身がチェック作業の参加者でない場合
         $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : null;
         if (is_null($self_participant)) {
-            response()->json([
-                'error' => 'チェック作業権限がありません。',
+            return response()->json([
+                'error' => 'チェック作業を操作する権限がありません。',
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
                 'checklist_works' => [],
             ]);
         }
@@ -246,9 +273,8 @@ class ApiController extends Controller
             }
         }
 
-        // ヘッダ設定
-        // header("Access-Control-Allow-Origin: *");
-        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => '',
@@ -261,29 +287,36 @@ class ApiController extends Controller
 
     public function check_start(Request $request)
     {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'key' => ['bail', 'required', 'string'],
+                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'check_time' => ['bail', 'required', 'integer', 'min:1']
+            ],
+        );
 
-        // 権限チェック
-        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id ?? '');
-        if (is_null($user_name)) {
+        if($validator->fails()){
             return response()->json([
-                'error' => 'チェック操作する権限がありません。',
-                'checklist_items' => [],
-            ]);
+                'error' => $validator->errors(),
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
+            ], 400);
         }
 
-        $checklists = [];
-        $error = 0;
-        $user_id = '';
+        // 権限チェック
         $user_name = '';
         $now = new Carbon();
-
-        // 権限チェック
-        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id ?? '');
+        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
-                'checklist_items' => [],
-            ]);
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
+            ], 403);
         }
 
         /*
@@ -335,8 +368,10 @@ class ApiController extends Controller
         // チェック作業に表示する項目自体が存在しない場合
         if (empty($check_items)) {
             return response()->json([
-                'error' => '',
-                'checklist_works' => $check_items,
+                'error' => 'チェック作業する項目が存在しません。',
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
             ]);
         }
 
@@ -416,130 +451,265 @@ class ApiController extends Controller
 
             DB::commit();
 
-            // ヘッダ設定
-            // header("Access-Control-Allow-Origin: *");
-            // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+            header("Access-Control-Allow-Origin: *");
+            header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
             return response()->json([
                 "check_users" => $_participants,
                 "error" => "",
                 "progressA" => $progressA,
                 "progressU" => $progressU,
-            ]);
+            ], 200);
 
         } catch (Exception $exception) {
             DB::rollBack();
-            // dd($exception->getMessage());
             return response()->json([
-                'error' => '保存に失敗しました。',
-                'started_at' => $request->started_at,
-                'finished_at' => $request->finished_at,
-                'checklist_works' => $request->checklist_works
+                'error' => 'データの保存に失敗しました。',
+                'check_users' => [],
+                'progressA' =>  0,
+                'progressU' => 0,
+            ], 500);
+        }
+
+    }
+    public function realtime_chk(Request $request)
+    {
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'key' => ['bail', 'required', 'string'],
+                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'check_time' => ['bail', 'required', 'integer', 'min:1']
+            ],
+        );
+
+        if($validator->fails()){
+            return response()->json([
+                'error' => $validator->errors(),
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
+            ], 400);
+        }
+
+        // 権限チェック
+        $user_name = '';
+        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
+        if (is_null($user_name)) {
+            return response()->json([
+                'error' => 'チェック操作する権限がありません。',
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
+            ], 403);
+        }
+
+        // チェックリスト抽出
+        $now = new Carbon();
+        $checklist = ChecklistWork::find($request->checklist_id)
+            ->select('participants', 'check_items')
+            ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+            ->Where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))->first();
+
+        // 存在チェック
+        if (is_null($checklist)) {
+            return response()->json([
+                'error' => 'チェックリストが存在しません。',
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
             ]);
         }
 
-    }
+        // チェック作業中なのに自身を含める参加者が存在しない場合
+        // サーバー側でデータ整合性エラーが発生している可能あり
+        if(!isset($checklist->participants)){
+            return response()->json([
+                'error' => 'チェック作業者のデータが存在しません。',
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
+            ],500);
+        }
 
-    public function realtime_chk(Request $request)
-    {
-        $checklists = [];
+        // JSONデコードに失敗した場合
+        // サーバー側のJSONデータ登録に問題が発生している可能性あり
+        $participants = json_decode($checklist->participants, true);
+        if(is_null($participants)){
+            return response()->json([
+                'error' => '参加者のデータ取得に失敗しました。',
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
+            ],500);
+        }
 
-        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
-        $check_time = 0;
-        $check_users = [];
-        $progressA = 0;
-        $progressU = 0;
+        // 自分以外の参加者情報を抽出
+        $_participants = [];
+        // 全参加者のチェック数
         $chkA = 0;
+        // 自身のチェック数
         $chkU = 0;
 
-        if ($user_name != '') {
-            $now = new Carbon();
+        // レスポンス生成処理
+        foreach ($participants as $_user_id => $payload) {
+            if(empty($payload)) continue;
 
-            $checklists = DB::select(
-                "SELECT `checklist_works`.`id`, `checklist_works`.`title`
-				FROM `checklist_works`
-				WHERE `id`=?
-				ANS `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL) ",
-                [$request->checklist_id, $nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
-            )->first();
-
-            if (isset($checklist->participants)) {
-                $checklist->participants = json_decode($checklist->participants, true);
-
-                if (!isset($checklist->participants[$request->user_id])) {
-                    foreach ($checklist->participants as $loop_user_id => $items) {
-                        if ($loop_user_id == $request->user_id) {
-                            $check_time = $items['timestamp'];
-
-                            foreach ($items['checkeds'] as $key => $val) {
-                                if ($val == 1) $chkU++;
-                            }
-                        } else {
-                            $check_users[] = $loop_user_id;
-
-                            foreach ($items['checkeds'] as $key => $val) {
-                                if ($val == 1) $chkA++;
-                            }
-                        }
-                    }
+            $index = 0;
+            foreach($payload['checkeds_time'] as $checklist_work_id => $check_time) {
+                // 自身のチェック数処理
+                if($_user_id === $request->user_id){
+                    $chkU = $check_time > 0 ? $chkU + 1 : $chkU;
+                    continue;
                 }
-            }
 
-            $checklist->check_items = json_decode($checklist->check_items, true);
-
-            // 総項目数
-            $total_count = count($checklist->check_items);
-
-            // 参加人数
-            $user_count = count($check_users) + 1;
-
-            if ($total_count === 0 || $user_count === 0) {
-            } else {
-                $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
-            }
-
-            if ($total_count === 0) {
-            } else {
-                $progressU = round($chkU / $total_count);
+                // 参加者のチェック数処理
+                $chkA = $check_time > 0 ? $chkA + 1 : $chkA;
+                $_participan = [
+                    'check_time' => $check_time,
+                    'user_name' => $payload['user_name'],
+                ];
+                $_participants[$checklist_work_id] = [];
+                array_push($_participants[$checklist_work_id], $_participan);
+                $index++;
             }
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // Progress作成処理
+        // 総項目数
+        $total_count = count(json_decode($checklist->check_items, true));
+        // 参加人数
+        $user_count = count(json_decode($checklist->participants, true));
 
+        if ($total_count !== 0 || $user_count !== 0) {
+            $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
+        }
+        if ($total_count !== 0) {
+            $progressU = round($chkU / $total_count);
+        }
+
+        // レスポンス生成
         return response()->json([
-            'error' => $error,
-            'check_time' => $check_time,
-            'check_users' => $check_users,
-            'progressA' => $progressA,
-            'progressU' => $progressU,
-        ]);
+            "check_users" => $_participants,
+            "error" => "",
+            "progressA" => $progressA,
+            "progressU" => $progressU,
+        ],200);
     }
+
+    // public function realtime_chk(Request $request)
+    // {
+    //     $checklists = [];
+
+    //     list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
+    //     $check_time = 0;
+    //     $check_users = [];
+    //     $progressA = 0;
+    //     $progressU = 0;
+    //     $chkA = 0;
+    //     $chkU = 0;
+
+    //     if ($user_name != '') {
+    //         $now = new Carbon();
+
+    //         $checklists = DB::select(
+    //             "SELECT `checklist_works`.`id`, `checklist_works`.`title`
+	// 			FROM `checklist_works`
+	// 			WHERE `id`=?
+	// 			ANS `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL) ",
+    //             [$request->checklist_id, $nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
+    //         )->first();
+
+    //         if (isset($checklist->participants)) {
+    //             $checklist->participants = json_decode($checklist->participants, true);
+
+    //             if (!isset($checklist->participants[$request->user_id])) {
+    //                 foreach ($checklist->participants as $loop_user_id => $items) {
+    //                     if ($loop_user_id == $request->user_id) {
+    //                         $check_time = $items['timestamp'];
+
+    //                         foreach ($items['checkeds'] as $key => $val) {
+    //                             if ($val == 1) $chkU++;
+    //                         }
+    //                     } else {
+    //                         $check_users[] = $loop_user_id;
+
+    //                         foreach ($items['checkeds'] as $key => $val) {
+    //                             if ($val == 1) $chkA++;
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         $checklist->check_items = json_decode($checklist->check_items, true);
+
+    //         // 総項目数
+    //         $total_count = count($checklist->check_items);
+
+    //         // 参加人数
+    //         $user_count = count($check_users) + 1;
+
+    //         if ($total_count === 0 || $user_count === 0) {
+    //         } else {
+    //             $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
+    //         }
+
+    //         if ($total_count === 0) {
+    //         } else {
+    //             $progressU = round($chkU / $total_count);
+    //         }
+    //     }
+
+    //     header("Access-Control-Allow-Origin: *");
+    //     header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+
+    //     return response()->json([
+    //         'error' => $error,
+    //         'check_time' => $check_time,
+    //         'check_users' => $check_users,
+    //         'progressA' => $progressA,
+    //         'progressU' => $progressU,
+    //     ]);
+    // }
 
     // 保存キュー処理にも対応
     // チェックリストは配列でやってくる
     public function realtime_save(Request $request)
     {
-        // バリデーション
-        // $validated = $request->validate([
-        //     'user_id' => 'required|string|max:32',
-        //     'checklist_id' =>'required|integer',
-        //     'checklist_works' => 'required|array',
-        // ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'key' => ['bail', 'required', 'string'],
+                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'checklist_works' => ['bail', 'required', 'array'],
+            ],
+        );
 
-        $checklists = [];
-        $error = 0;
-        $user_id = '';
-        $user_name = '';
-        $now = new Carbon();
+        if($validator->fails()){
+            return response()->json([
+                'error' => $validator->errors(),
+                'started_at' => 0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'checklist_works' => [],
+            ], 400);
+        }
 
         // 権限チェック
-        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id ?? '');
+        $user_name = '';
+        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
-                'checklist_items' => [],
-            ]);
+                'started_at' => 0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'checklist_works' => [],
+            ], 403);
         }
 
         /*
@@ -549,6 +719,7 @@ class ApiController extends Controller
         2秒以内の場合は1秒待機して続行。
         */
         // 疑似ロックファイル存在チェック
+        $now = new Carbon();
         $lockfie_path = "public/works/{$request->checklist_id}.lock";
         $is_lockedfile = Storage::exists($lockfie_path);
 
@@ -564,17 +735,18 @@ class ApiController extends Controller
         }
 
         // ロック待機処理
-        $processing_time = 2;
-        if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
+        $wait_time = 4;
+        if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
             Storage::put($lockfie_path, ((new Carbon())->timestamp));
         } else {
-            sleep(1);
+            sleep(3);
         }
 
         //　チェックリスト取得
         $checklist = ChecklistWork::find($request->checklist_id)
             ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
             ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+            ->select('check_items', 'participants', 'deadline_at')
             ->first();
         // 作業中チェックリストが存在しない場合
         if (is_null($checklist)) {
@@ -653,7 +825,6 @@ class ApiController extends Controller
                     if ($_user_id === $request->user_id) continue;
                     $item['participants'][$_index]['user_name'] = $info['user_name'];
                     $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
-                    // dd($item);
 
                     // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
                     if ((int)$info['checkeds_time'][$item['id']] > 0) {
@@ -683,26 +854,27 @@ class ApiController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'error' => '保存に失敗しました。',
-                'started_at' => $request->started_at,
-                'finished_at' => $request->finished_at,
-                'checklist_works' => $request->checklist_works
-            ]);
+                'error' => 'データの保存に失敗しました。',
+                'started_at' => 0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'checklist_works' => [],
+            ], 500);
         }
-        // ヘッダ設定
-        // header("Access-Control-Allow-Origin: *");
-        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
-        // dd($tmp_checklist_works);
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+
+        $deadline_at = isset($checklist->deadline_at) ? (new Carbon($checklist->deadline_at))->timestamp : 0;
         return response()->json([
             'error' => '',
             'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
             'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
-            'deadline_at' => $checklist->deadline_at,
+            'deadline_at' => $deadline_at,
             'checklist_works' => $tmp_checklist_works,
             'progressA' => $progressA,
             'progressU' => $progressU,
-        ]);
+        ],200);
     }
 
 
@@ -746,7 +918,7 @@ class ApiController extends Controller
 
     private static function isLogin($user_id)
     {
-        $lifetime = is_null(config('myconfig.SESSION_LIFETIME')) ? 100000 : 1000000;
+        $lifetime = is_null(config('myconfig.SESSION_LIFETIME')) ? 1000 : 1000;
         $user = User::where('user_id', '=', $user_id)->first();
 
         if (!isset($user->id)) {
@@ -757,7 +929,7 @@ class ApiController extends Controller
             $target->addMinutes($lifetime);
 
             if ($now->timestamp <= $target->timestamp) {
-                // $user->last_logined_at = $now->format('Y-m-d H:i:s');
+                $user->last_logined_at = $now->format('Y-m-d H:i:s');
                 // $user->save();
 
                 $user_name = $user->name;
