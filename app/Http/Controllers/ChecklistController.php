@@ -136,17 +136,12 @@ class ChecklistController extends Controller
                     'check_time' => $check_time,
                     'user_name' =>  $payload['user_name'],
                 ];
-                // $_participants[$index][$index]['check_time'] = $check_time;
-                // $_participants[$index][$index]['user_name'] =  $payload['user_name'];
                 $p = [
                     'check_time' => $check_time,
                     'user_name' => $payload['user_name'],
                 ];
                 $_participants[$checklist_work_id] = [];
                 array_push($_participants[$checklist_work_id], $p);
-                // $_participants[$checklist_work_id][$index]['id'] = $checklist_work_id;
-                // $_participants[$checklist_work_id][$index]['check_time'] = $check_time;
-                // $_participants[$checklist_work_id][$index]['user_name'] =  $payload['user_name'];
                 $index++;
             }
         }
