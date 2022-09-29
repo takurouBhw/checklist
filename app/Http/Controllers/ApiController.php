@@ -181,6 +181,7 @@ class ApiController extends Controller
         $checklist = ChecklistWork::find($request->checklist_id)
             ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
             ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+            ->select('deadline_at', 'check_items', 'participants')
             ->first();
 
         // チェックリスト存在チェック
@@ -253,6 +254,7 @@ class ApiController extends Controller
             'error' => '',
             'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
             'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
+            'deadline_at' => isset($checklist->deadline_at) ? (new Carbon($checklist->deadline_at))->timestamp : 0,
             'checklist_works' => $check_items,
         ], 200);
     }
@@ -696,6 +698,7 @@ class ApiController extends Controller
             'error' => '',
             'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
             'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
+            'deadline_at' => $checklist->deadline_at,
             'checklist_works' => $tmp_checklist_works,
             'progressA' => $progressA,
             'progressU' => $progressU,
