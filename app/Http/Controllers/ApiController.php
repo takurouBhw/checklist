@@ -60,7 +60,7 @@ class ApiController extends Controller
 
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
-            // dd('aaa');
+        // dd('aaa');
 
         return response()->json([
             'error' => $error,
@@ -552,11 +552,11 @@ class ApiController extends Controller
         }
 
         // ロック待機処理
-        $processing_time = 3;
+        $processing_time = 2;
         if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
             Storage::put($lockfie_path, ((new Carbon())->timestamp));
         } else {
-            sleep(2);
+            sleep(1);
         }
 
         //　チェックリスト取得
@@ -618,6 +618,54 @@ class ApiController extends Controller
         try {
             DB::beginTransaction();
             $checklist->save();
+            // レスポンスチェック作業リストの生成処理
+            $tmp_checklist_works = $check_items;
+            // 自身のチェック数
+            $chkA = 0;
+            // 全参加者のチェック数
+            $chkU = 0;
+            foreach ($tmp_checklist_works as $index => $item) {
+
+                // チェック済み加算
+                if ((int)$self_participant['checkeds'][$item['id']] == 1) {
+                    $chkU++;
+                    $chkA++;
+                }
+                $item['checked'] = $self_participant['checkeds'][$item['id']];
+                $item['input'] = $self_participant['inputs'][$item['id']];
+                $item['check_time'] = $self_participant['checkeds_time'][$item['id']];
+
+                // 自分以外の参加者情報のチェック時間と名前を追加
+                $_index = 0;
+                foreach ($participants as $_user_id => $info) {
+                    if ($_user_id === $request->user_id) continue;
+                    $item['participants'][$_index]['user_name'] = $info['user_name'];
+                    $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
+                    // dd($item);
+
+                    // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
+                    if ((int)$info['checkeds_time'][$item['id']] > 0) {
+                        $chkA++;
+                    }
+                    $tmp_checklist_works[$index] = $item;
+                    $_index++;
+                }
+            }
+
+            // Progress作成処理
+            // 総項目数
+            $total_count = count(json_decode($checklist->check_items, true));
+            // 参加人数
+            $user_count = count($tmp_checklist_works[0]['participants'] ?? []) + 1;
+            if ($total_count !== 0 || $user_count !== 0) {
+                // progressA: 全体の進捗値。0～100を返す。※式 = (参加者の全チェック数) ／ (参加人数 ＊ 項目数)　小数点以下四捨五入。
+                $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
+            }
+            if ($total_count !== 0) {
+                // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
+                $progressU = round($chkU / $total_count);
+            }
+
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();
@@ -629,55 +677,6 @@ class ApiController extends Controller
                 'checklist_works' => $request->checklist_works
             ]);
         }
-
-        // レスポンスチェック作業リストの生成処理
-        $tmp_checklist_works = $check_items;
-        // 自身のチェック数
-        $chkA = 0;
-        // 全参加者のチェック数
-        $chkU = 0;
-        foreach ($tmp_checklist_works as $index => $item) {
-
-            // チェック済み加算
-            if ((int)$self_participant['checkeds'][$item['id']] == 1) {
-                $chkU++;
-                $chkA++;
-            }
-            $item['checked'] = $self_participant['checkeds'][$item['id']];
-            $item['input'] = $self_participant['inputs'][$item['id']];
-            $item['check_time'] = $self_participant['checkeds_time'][$item['id']];
-
-            // 自分以外の参加者情報のチェック時間と名前を追加
-            $_index = 0;
-            foreach ($participants as $_user_id => $info) {
-                if ($_user_id === $request->user_id) continue;
-                $item['participants'][$_index]['user_name'] = $info['user_name'];
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
-                // dd($item);
-
-                // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
-                if ((int)$info['checkeds_time'][$item['id']] > 0) {
-                    $chkA++;
-                }
-                $tmp_checklist_works[$index] = $item;
-                $_index++;
-            }
-        }
-
-        // Progress作成処理
-        // 総項目数
-        $total_count = count(json_decode($checklist->check_items, true));
-        // 参加人数
-        $user_count = count($tmp_checklist_works[0]['participants'] ?? []) + 1;
-        if ($total_count !== 0 || $user_count !== 0) {
-            // progressA: 全体の進捗値。0～100を返す。※式 = (参加者の全チェック数) ／ (参加人数 ＊ 項目数)　小数点以下四捨五入。
-            $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
-        }
-        if ($total_count !== 0) {
-            // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
-            $progressU = round($chkU / $total_count);
-        }
-
         // ヘッダ設定
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
