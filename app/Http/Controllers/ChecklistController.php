@@ -43,15 +43,15 @@ class ChecklistController extends Controller
     {
 
         // リクエスト開始日時
-        // $requested_begin_date = new Carbon();
-        // // 認証チェック
-        // $user = User::where('user_id', '=', $request->user_id)->first();
-        // if (is_null($user)) {
-        //     return response()->json([
-        //         'error' => '権限エラー',
-        //         'checklist_items' => [],
-        //     ], 419);
-        // }
+        $now = new Carbon();
+        // 認証チェック
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if (is_null($user)) {
+            return response()->json([
+                'error' => '権限エラー',
+                'checklist_items' => [],
+            ], 419);
+        }
         /*
         テーブルロックを使用しない、期待の大きい代案。
         同じチェックリストについてのみの疑似ロック処理。
@@ -60,130 +60,119 @@ class ChecklistController extends Controller
         */
 
         // 疑似ロックファイル存在チェック
-        // $lockfie_path = "public/works/{$request->checklist_id}.lock";
-        // $is_lockedfile = Storage::exists($lockfile_path);
+        $lockfie_path = "public/works/{$request->checklist_id}.lock";
+        $is_lockedfile = Storage::exists($lockfie_path);
 
-        // // ロック中の場合
-        // $timestamp = 0;
-        // if ($is_lockedfile) {
-        //     $timestamp = Storage::get($lockfie_path);
-        // }
-        // // ロック中でなければファイル内容にタイムスタンプを記述
-        // else {
-        //     Storage::put($lockfie_path, ($timestamp = (new Carbon())->timestamp));
-        // }
+        // ロック中の場合
+        $timestamp = 0;
+        if ($is_lockedfile) {
+            $timestamp = Storage::get($lockfie_path);
+        }
+        // ロック中でなければファイル内容にタイムスタンプを記述
+        else {
+            Storage::put($lockfie_path, ($timestamp = (new Carbon())->timestamp));
+        }
 
-        // // ロック処理
-        // $processing_time = 3;
-        // if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
-        //     Storage::put($lockfie_path, ((new Carbon())->timestamp));
-        // } else {
-        //     sleep(2);
-        // }
+        // ロック待機処理
+        $wait_time = 3;
+        if ($wait_time <= $timestamp - $now->timestamp) {
+            Storage::put($lockfie_path, ((new Carbon())->timestamp));
+        } else {
+            sleep(2);
+        }
 
-        // // チェックリスト抽出
-        // $checklist = Checklist::find($request->checklist_id)
-        //     ->select([['id', 'title']])
-        //     ->where('opened_at', '<=', $requested_begin_date->format('Y-m-d 00:00:00'))
-        //     ->Where('colsed_at', '>=', $requested_begin_date->format('Y-m-d 23:59:59'))->first();
+        // チェックリスト抽出
+        $checklist = ChecklistWork::find($request->checklist_id)
+            ->select('participants', 'check_items')
+            ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+            ->Where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))->first();
+        // 存在チェック
+        if (is_null($checklist)) {
+            return response()->json([
+                'error' => 'チェックリストが存在しません。',
+                'checklist_items' => [],
+            ]);
+        }
 
-        // // 存在チェック
-        // if (is_null($checklist)) {
-        //     return response()->json([
-        //         'error' => '該当するチェックリストが存在しません。',
-        //         'checklist_items' => [],
-        //     ], 419);
-        // }
+        // 参加者が存在しない場合
+        if(!isset($checklist->participants)){
+            return response()->json([
+                'error' => '',
+                'participants' => [],
+            ]);
+        }
 
-        // // チェック時間更新処理
-        // $check_items = $request->check_items;
-        // $colmuns = [];
-        // foreach ($check_items as $post) {
-        //     $checkeds[$post['checklist_work_id']] = [
-        //         'no' => $post['no'],
-        //         'title' => $post['titile'],
-        //         'headline' => $post['headline'],
-        //         'memo' => $post['memo'],
-        //         'checked' => $post['val'],
-        //         'check_time' => (int)$post['val'] === 1 ? $post['check_time'] : 0,
-        //     ];
-        // }
+        // JSONデコードチェック
+        $participants = json_decode($checklist->participants, true);
+        if(is_null($participants)){
+            return response()->json([
+                'error' => 'JSONデコードエラー',
+                'participants' => [],
+            ]);
+        }
 
-        // // 保存処理
-        // $checklist->items[$request->user_id] = [
-        //     'user_name' => $user_name,
-        //     'started_at' => $checklist->check_items[$user_id]['started_at'],
-        //     'finished_at' => 0,
-        //     'columns' =>  $columns,
-        // ];
+        // 自分以外の参加者情報を抽出
+        $_participants = [];
+        // 全参加者のチェック数
+        $chkA = 0;
+        // 自身のチェック数
+        $chkU = 0;
 
-        // // 保存に失敗した場合
-        // if (!$checklist->save()) {
-        //     return [
-        //         'error' => '更新に失敗しました。',
-        //         'participants' => $checklist->participants,
-        //         'user_id' => $request->user_id,
-        //     ];
-        // }
+        // レスポンス生成処理
+        foreach ($participants as $_user_id => $payload) {
+            if(empty($payload)) continue;
 
-        // // 返却するときは自分以外の参加者のチェック情報を返却
-        // $participants = $checklist->participants;
-        // unset($participants[$request->user_id]);
+            $index = 0;
+            foreach($payload['checkeds_time'] as $checklist_work_id => $check_time) {
+                // 自身のチェック数処理
+                if($_user_id === $request->user_id){
+                    $chkU = $check_time > 0 ? $chkU + 1 : $chkU;
+                    continue;
+                }
 
-        // return [
-        //     'check_items' => $checklist->check_items,
-        //     'user_id' => $user_id,
-        //     'error' => '',
-        // ];
+                $chkA = $check_time > 0 ? $chkA + 1 : $chkA;
+                $item = [
+                    'id' => $checklist_work_id,
+                    'check_time' => $check_time,
+                    'user_name' =>  $payload['user_name'],
+                ];
+                // $_participants[$index][$index]['check_time'] = $check_time;
+                // $_participants[$index][$index]['user_name'] =  $payload['user_name'];
+                $p = [
+                    'check_time' => $check_time,
+                    'user_name' => $payload['user_name'],
+                ];
+                $_participants[$checklist_work_id] = [];
+                array_push($_participants[$checklist_work_id], $p);
+                // $_participants[$checklist_work_id][$index]['id'] = $checklist_work_id;
+                // $_participants[$checklist_work_id][$index]['check_time'] = $check_time;
+                // $_participants[$checklist_work_id][$index]['user_name'] =  $payload['user_name'];
+                $index++;
+            }
+        }
 
-        // 更新処理
-        // $check_items = json_decode($checklist->check_items, JSON_UNESCAPED_UNICODE);
-        // // チェックアイテムからclient keyに紐付いたアイテムを抽出
-        // $new_check_items = null;
-        // foreach ($check_items as $key => $val) {
-        //     if ($val['key'] !== $request->key) continue;
+        // Progress作成処理
+        // 総項目数
+        $total_count = count(json_decode($checklist->check_items, true));
+        // 参加人数
+        $user_count = count(json_decode($checklist->participants, true));
 
-        //     $val['check_time'] = $request->check_time;
-        //     $val['val'] = $request->check_time > 0 ? 1 : 0;
-
-        //     $check_items[$key] = $val;
-        //     $new_check_items = $check_items;
-        // }
-
-        // // 保存処理
-        // $encoded_check_items = json_encode($new_check_items, JSON_UNESCAPED_UNICODE);
-        // $checklist->check_items =  $encoded_check_items;
-        // $result = $checklist->save();
-
-        // // 保存に失敗した場合
-        // if (!$result) {
-        //     return response()->json([
-        //         'error' => '保存に失敗しました。',
-        //         'checklist_items' => [],
-        //     ], 500);
-        // }
+        if ($total_count !== 0 || $user_count !== 0) {
+            // progressA: 全体の進捗値。0～100を返す。※式 = (参加者の全チェック数) ／ (参加人数 ＊ 項目数)　小数点以下四捨五入。
+            $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
+        }
+        if ($total_count !== 0) {
+            // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
+            $progressU = round($chkU / $total_count);
+        }
 
         // レスポンス生成
-        // $response = [
-        //     "check_time" => $request->check_time,
-        //     "error" => "",
-        //     "check_users" => [
-        //         [
-        //             "todo_ids" => 1,
-        //             "name" => "ユーザー１",
-        //             "check_time" => $request->check_time,
-        //         ],
-        //     ],
-        //     "progressA" => 80,
-        //     "progressU" => 50,
-        // ];
-
-        // return $response
-        //     ? response()->json($response, 200)
-        //     : response()->json([
-        //         'error' => 'JSON構造が不正です。',
-        //         'checklist_items' => [],
-        //     ], 419);
+        return response()->json([
+            "check_users" => $_participants,
+            "error" => "",
+            "progressA" => $progressA,
+            "progressU" => $progressU,
+        ]);
     }
 
     public function realtime_save(Request $request)
@@ -208,28 +197,28 @@ class ChecklistController extends Controller
         2秒以内の場合は1秒待機して続行。
         */
         // 疑似ロックファイル存在チェック
-        // $lockfie_path = "public/works/{$request->checklist_id}.lock";
-        // $is_lockedfile = Storage::exists($lockfie_path);
+        $lockfie_path = "public/works/{$request->checklist_id}.lock";
+        $is_lockedfile = Storage::exists($lockfie_path);
 
-        // // ロック中の場合
-        // $now = new Carbon();
-        // $timestamp = 0;
-        // if ($is_lockedfile) {
-        //     $timestamp = Storage::get($lockfie_path);
-        // }
-        // // ロック中でなければファイル内容にタイムスタンプを記述
-        // else {
-        //     $timestamp = $now->timestamp;
-        //     Storage::put($lockfie_path, $timestamp);
-        // }
+        // ロック中の場合
+        $now = new Carbon();
+        $timestamp = 0;
+        if ($is_lockedfile) {
+            $timestamp = Storage::get($lockfie_path);
+        }
+        // ロック中でなければファイル内容にタイムスタンプを記述
+        else {
+            $timestamp = $now->timestamp;
+            Storage::put($lockfie_path, $timestamp);
+        }
 
-        // // ロック待機処理
-        // $processing_time = 3;
-        // if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
-        //     Storage::put($lockfie_path, ((new Carbon())->timestamp));
-        // } else {
-        //     sleep(2);
-        // }
+        // ロック待機処理
+        $processing_time = 3;
+        if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
+            Storage::put($lockfie_path, ((new Carbon())->timestamp));
+        } else {
+            sleep(2);
+        }
 
         //　チェックリスト取得
         $checlist = Checklist::find($request->checklist_id)

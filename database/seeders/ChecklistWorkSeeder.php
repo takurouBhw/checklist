@@ -38,6 +38,32 @@ class ChecklistWorkSeeder extends Seeder
             ]
         ];
         $participants = [
+            "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6" => [
+                "user_name" => "管理者",
+                "started_at" => 0,
+                "finished_at" => 0,
+                "checkeds_time" => [
+                    "1" => 0,
+                    "2" => 0,
+                    "3" => 0,
+                    "4" => 0,
+                    "5" => 0,
+                    "6" => 0,
+                    "7" => 0
+                ],
+                "checkeds" => [
+                    "1" => 1,
+                    "2" => 0,
+                    "3" => 0,
+                    "4" => 0,
+                    "5" => 0,
+                    "6" => 0,
+                    "7" => 0
+                ],
+                "inputs" => [
+                    "2" => "管理者メモ",
+                ],
+            ],
             "0adc3121-ab0b-4a1a-9ab6-09ee9d1bb16d" => [
                 "user_name" => "開発者",
                 "started_at" => 1234567890,
@@ -64,32 +90,6 @@ class ChecklistWorkSeeder extends Seeder
                     "2" => "開発者メモ",
                 ],
             ],
-            "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6" => [
-                "user_name" => "管理者",
-                "started_at" => 0,
-                "finished_at" => 0,
-                "checkeds_time" => [
-                    "1" => 0,
-                    "2" => 0,
-                    "3" => 0,
-                    "4" => 0,
-                    "5" => 0,
-                    "6" => 0,
-                    "7" => 0
-                ],
-                "checkeds" => [
-                    "1" => 1,
-                    "2" => 0,
-                    "3" => 0,
-                    "4" => 0,
-                    "5" => 0,
-                    "6" => 0,
-                    "7" => 0
-                ],
-                "inputs" => [
-                    "2" => "管理者メモ",
-                ],
-            ]
         ];
         DB::table('checklist_works')->insert([
             [

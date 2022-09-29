@@ -166,8 +166,6 @@ class ApiController extends Controller
     public function get_checklist_works(Request $request)
     {
         list($client_key, $user_name) = Self::isLogin($request->user_id ?? '');
-        // $user_name = 'ホゲ';
-        $client_key = 0;
 
         if (is_null($user_name)) {
             return response()->json([
@@ -250,7 +248,6 @@ class ApiController extends Controller
         // ヘッダ設定
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
-
 
         return response()->json([
             'error' => '',
@@ -540,27 +537,27 @@ class ApiController extends Controller
         2秒以内の場合は1秒待機して続行。
         */
         // 疑似ロックファイル存在チェック
-        // $lockfie_path = "public/works/{$request->checklist_id}.lock";
-        // $is_lockedfile = Storage::exists($lockfie_path);
+        $lockfie_path = "public/works/{$request->checklist_id}.lock";
+        $is_lockedfile = Storage::exists($lockfie_path);
 
-        // // ロック中の場合
-        // $timestamp = 0;
-        // if ($is_lockedfile) {
-        //     $timestamp = Storage::get($lockfie_path);
-        // }
-        // // ロック中でなければファイル内容にタイムスタンプを記述
-        // else {
-        //     $timestamp = $now->timestamp;
-        //     Storage::put($lockfie_path, $timestamp);
-        // }
+        // ロック中の場合
+        $timestamp = 0;
+        if ($is_lockedfile) {
+            $timestamp = Storage::get($lockfie_path);
+        }
+        // ロック中でなければファイル内容にタイムスタンプを記述
+        else {
+            $timestamp = $now->timestamp;
+            Storage::put($lockfie_path, $timestamp);
+        }
 
-        // // ロック待機処理
-        // $processing_time = 3;
-        // if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
-        //     Storage::put($lockfie_path, ((new Carbon())->timestamp));
-        // } else {
-        //     sleep(2);
-        // }
+        // ロック待機処理
+        $processing_time = 3;
+        if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
+            Storage::put($lockfie_path, ((new Carbon())->timestamp));
+        } else {
+            sleep(2);
+        }
 
         //　チェックリスト取得
         $checklist = ChecklistWork::find($request->checklist_id)
@@ -595,6 +592,7 @@ class ApiController extends Controller
             foreach ($check_items as $index => $item) {
                 // check itmeのidが存在しない場合
                 if (!isset($item['id'])) continue;
+
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
