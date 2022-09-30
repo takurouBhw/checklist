@@ -56,8 +56,8 @@ class ApiController extends Controller
             }
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => $error,
@@ -83,7 +83,6 @@ class ApiController extends Controller
         $categories = [];
 
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
-
         if ($user_name != '') {
             $now = new Carbon();
 
@@ -93,12 +92,12 @@ class ApiController extends Controller
 				LEFT JOIN `checklist_works` ON `category1s`.`id` = `checklist_works`.`category1_id`
 				WHERE `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
 				GROUP BY `category1s`.`id`, `category1s`.`category1_name`",
-                [$nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
+                [$now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
             );
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'categories' => $categories,
@@ -119,14 +118,14 @@ class ApiController extends Controller
 				FROM `category2s`
 				LEFT JOIN `checklist_works` ON `category2s`.`id` = `checklist_works`.`category2_id`
 				WHERE `checklist_works`.`category1_id`=?
-				ANS `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+				AND `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
 				GROUP BY `category2s`.`id`, `category2s`.`category2_name`",
-                [$request->category1_id, $nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
+                [$request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
             );
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'categories' => $categories,
@@ -146,14 +145,14 @@ class ApiController extends Controller
                 "SELECT `checklist_works`.`id`, `checklist_works`.`title`
 				FROM `checklist_works`
 				WHERE `category1_id`=? AND `category2_id`=?
-				ANS `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+				AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
 				ORDER BY `deadline_at` ASC",
-                [$request->category1_id, $request->category1_id, $nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
+                [$request->category1_id, $request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
             );
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'checklists' => $checklists,
@@ -273,8 +272,8 @@ class ApiController extends Controller
             }
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => '',
@@ -357,7 +356,9 @@ class ApiController extends Controller
         if (is_null($checklist)) {
             return [
                 'error' => "checklist_id: {$request->checklist_id}: チェックリストが存在しません。",
-                'checklist_works' => [],
+                'check_users' => [],
+                'progressA' => 0,
+                'progressU' => 0,
             ];
         }
 
@@ -451,8 +452,8 @@ class ApiController extends Controller
 
             DB::commit();
 
-            header("Access-Control-Allow-Origin: *");
-            header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+            // header("Access-Control-Allow-Origin: *");
+            // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
             return response()->json([
                 "check_users" => $_participants,
@@ -619,7 +620,7 @@ class ApiController extends Controller
 	// 			FROM `checklist_works`
 	// 			WHERE `id`=?
 	// 			ANS `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL) ",
-    //             [$request->checklist_id, $nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
+    //             [$request->checklist_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
     //         )->first();
 
     //         if (isset($checklist->participants)) {
@@ -692,9 +693,6 @@ class ApiController extends Controller
         if($validator->fails()){
             return response()->json([
                 'error' => $validator->errors(),
-                'started_at' => 0,
-                'finished_at' => 0,
-                'deadline_at' => 0,
                 'checklist_works' => [],
             ], 400);
         }
@@ -705,9 +703,6 @@ class ApiController extends Controller
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
-                'started_at' => 0,
-                'finished_at' => 0,
-                'deadline_at' => 0,
                 'checklist_works' => [],
             ], 403);
         }
@@ -746,7 +741,7 @@ class ApiController extends Controller
         $checklist = ChecklistWork::find($request->checklist_id)
             ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
             ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-            ->select('check_items', 'participants', 'deadline_at')
+            ->select('check_items', 'participants')
             ->first();
         // 作業中チェックリストが存在しない場合
         if (is_null($checklist)) {
@@ -786,8 +781,6 @@ class ApiController extends Controller
         }
 
         // 更新処理
-        $self_participant['started_at'] = $request->started_at;
-        $self_participant['finished_at'] = $request->finished_at;
         $self_participant['user_name'] = $user_name;
         foreach ($request->checklist_works as $item) {
             $cheked = $item['checked'];
@@ -859,22 +852,15 @@ class ApiController extends Controller
 
             return response()->json([
                 'error' => $exception->getMessage(),
-                'started_at' => 0,
-                'finished_at' => 0,
-                'deadline_at' => 0,
                 'checklist_works' => [],
             ], 500);
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
-        $deadline_at = isset($checklist->deadline_at) ? (new Carbon($checklist->deadline_at))->timestamp : 0;
         return response()->json([
             'error' => '',
-            'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
-            'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
-            'deadline_at' => $deadline_at,
             'checklist_works' => $tmp_checklist_works,
             'progressA' => $progressA,
             'progressU' => $progressU,
@@ -896,7 +882,7 @@ class ApiController extends Controller
 				FROM `checklist_works`
 				WHERE `id`=?
 				ANS `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL) ",
-                [$request->checklist_id, $nw->format('Y-m-d 00:00:00'), $nw->format('Y-m-d 23:59:59')]
+                [$request->checklist_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
             )->first();
 
             if (isset($checklist->participants)) {
@@ -912,8 +898,8 @@ class ApiController extends Controller
             }
         }
 
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => $error,
@@ -922,7 +908,7 @@ class ApiController extends Controller
 
     private static function isLogin($user_id)
     {
-        $lifetime = is_null(config('myconfig.SESSION_LIFETIME')) ? 100 : 100;
+        $lifetime = config('myconfig.SESSION_LIFETIME');
         $user = User::where('user_id', '=', $user_id)->first();
 
         if (!isset($user->id)) {
@@ -934,7 +920,7 @@ class ApiController extends Controller
 
             if ($now->timestamp <= $target->timestamp) {
                 $user->last_logined_at = $now->format('Y-m-d H:i:s');
-                // $user->save();
+                $user->save();
 
                 $user_name = $user->name;
                 return [$user->client_key, $user_name];

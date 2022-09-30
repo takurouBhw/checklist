@@ -17,7 +17,7 @@ class CreateCategory2sTable extends Migration
             $table->id();
             $table->unsignedBigInteger('category1_id');
             $table->integer('sort_num')->default(0);
-            $table->string('name');
+            $table->string('category2_name');
             $table->timestamps();
         });
     }

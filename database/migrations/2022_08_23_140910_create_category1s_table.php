@@ -15,7 +15,7 @@ class CreateCategory1sTable extends Migration
     {
         Schema::create('category1s', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('category1_name');
             $table->integer('sort_num')->default(0);
             $table->timestamps();
         });
