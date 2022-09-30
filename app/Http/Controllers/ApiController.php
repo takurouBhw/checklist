@@ -424,12 +424,12 @@ class ApiController extends Controller
                         'check_time' => $check_time,
                         'user_name' =>  $payload['user_name'],
                     ];
-                    $p = [
+                    $_participant = [
                         'check_time' => $check_time,
                         'user_name' => $payload['user_name'],
                     ];
                     $_participants[$checklist_work_id] = [];
-                    array_push($_participants[$checklist_work_id], $p);
+                    array_push($_participants[$checklist_work_id], $_participant);
                     $index++;
                 }
             }
@@ -682,7 +682,7 @@ class ApiController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'key' => ['bail', 'required', 'string'],
+                'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
                 'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
                 'checklist_works' => ['bail', 'required', 'array'],
@@ -810,28 +810,32 @@ class ApiController extends Controller
             $chkU = 0;
             foreach ($tmp_checklist_works as $index => $item) {
 
+                try {
                 // チェック済み加算
                 if ((int)$self_participant['checkeds'][$item['id']] == 1) {
                     $chkU++;
                     $chkA++;
                 }
-                $item['checked'] = $self_participant['checkeds'][$item['id']];
-                $item['input'] = $self_participant['inputs'][$item['id']];
-                $item['check_time'] = $self_participant['checkeds_time'][$item['id']];
+                $item['checked'] = $self_participant['checkeds'][$item['id']] ?? 0;
+                $item['input'] = $self_participant['inputs'][$item['id']] ?? '';
+                $item['check_time'] = $self_participant['checkeds_time'][$item['id']] ?? 0;
 
                 // 自分以外の参加者情報のチェック時間と名前を追加
                 $_index = 0;
                 foreach ($participants as $_user_id => $info) {
                     if ($_user_id === $request->user_id) continue;
                     $item['participants'][$_index]['user_name'] = $info['user_name'];
-                    $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
+                    $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
 
                     // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
                     if ((int)$info['checkeds_time'][$item['id']] > 0) {
                         $chkA++;
                     }
-                    $tmp_checklist_works[$index] = $item;
+                    $tmp_checklist_works[$_index] = $item;
                     $_index++;
+                }
+                }catch(Exception $exception) {
+                    dd($exception->getMessage());
                 }
             }
 
@@ -854,7 +858,7 @@ class ApiController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'error' => 'データの保存に失敗しました。',
+                'error' => $exception->getMessage(),
                 'started_at' => 0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
@@ -918,7 +922,7 @@ class ApiController extends Controller
 
     private static function isLogin($user_id)
     {
-        $lifetime = is_null(config('myconfig.SESSION_LIFETIME')) ? 1000 : 1000;
+        $lifetime = is_null(config('myconfig.SESSION_LIFETIME')) ? 100 : 100;
         $user = User::where('user_id', '=', $user_id)->first();
 
         if (!isset($user->id)) {

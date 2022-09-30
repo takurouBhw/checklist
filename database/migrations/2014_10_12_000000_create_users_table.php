@@ -28,7 +28,7 @@ class CreateUsersTable extends Migration
             // $table->tinyInteger('role')->unsigned()->default(0)
             // ->comment('権限: 0=開発者 1=所有者 2=管理者 5=ユーザー');
             $table->timestamp('email_verified_at')->nullable();
-            // $table->dateTime('last_logined_at')->nullable()->comment('最終ログイン日時');
+            $table->dateTime('last_logined_at')->nullable()->comment('最終ログイン日時');
             // $table->bigInteger('last_checklist_id')->nullable()->comment('最終チェック作業ID');
             $table->string('password');
             $table->rememberToken();
