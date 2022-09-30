@@ -741,7 +741,6 @@ class ApiController extends Controller
         $checklist = ChecklistWork::find($request->checklist_id)
             ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
             ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-            ->select('check_items', 'participants')
             ->first();
         // 作業中チェックリストが存在しない場合
         if (is_null($checklist)) {
@@ -803,7 +802,6 @@ class ApiController extends Controller
             $chkU = 0;
             foreach ($tmp_checklist_works as $index => $item) {
 
-                try {
                 // チェック済み加算
                 if ((int)$self_participant['checkeds'][$item['id']] == 1) {
                     $chkU++;
@@ -824,12 +822,9 @@ class ApiController extends Controller
                     if ((int)$info['checkeds_time'][$item['id']] > 0) {
                         $chkA++;
                     }
-                    $tmp_checklist_works[$_index] = $item;
                     $_index++;
                 }
-                }catch(Exception $exception) {
-                    dd($exception->getMessage());
-                }
+                $tmp_checklist_works[$index] = $item;
             }
 
             // Progress作成処理
