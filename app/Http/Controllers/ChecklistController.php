@@ -171,24 +171,24 @@ class ChecklistController extends Controller
         ]);
     }
 
-    // public function realtime_save(Request $request)
-    // {
-    //     $validator = Validator::make(
-    //         $request->all(),
-    //         [
-    //             'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
-    //             'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
-    //             'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
-    //             'checklist_works' => ['bail', 'required', 'array'],
-    //         ],
-    //     );
+    public function realtime_save(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'checklist_works' => ['bail', 'required', 'array'],
+            ],
+        );
 
-    //     if($validator->fails()){
-    //         return response()->json([
-    //             'error' => $validator->errors(),
-    //             'checklist_works' => [],
-    //         ], 400);
-    //     }
+        if($validator->fails()){
+            return response()->json([
+                'error' => $validator->errors(),
+                'checklist_works' => [],
+            ], 400);
+        }
 
         // 権限チェック
         // $user_name = '';
@@ -207,207 +207,11 @@ class ChecklistController extends Controller
         2秒以内の場合は1秒待機して続行。
         */
         // 疑似ロックファイル存在チェック
-    //     $now = new Carbon();
-    //     $lockfie_path = "public/works/{$request->checklist_id}.lock";
-    //     $is_lockedfile = Storage::exists($lockfie_path);
-
-    //     // ロック中の場合
-    //     $timestamp = 0;
-    //     if ($is_lockedfile) {
-    //         $timestamp = Storage::get($lockfie_path);
-    //     }
-    //     // ロック中でなければファイル内容にタイムスタンプを記述
-    //     else {
-    //         $timestamp = $now->timestamp;
-    //         Storage::put($lockfie_path, $timestamp);
-    //     }
-
-    //     // ロック待機処理
-    //     $wait_time = 4;
-    //     if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
-    //         Storage::put($lockfie_path, ((new Carbon())->timestamp));
-    //     } else {
-    //         sleep(3);
-    //     }
-
-    //     //　チェックリスト取得
-    //     $checklist = ChecklistWork::find($request->checklist_id)
-    //         ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
-    //         ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-    //         ->select('check_items', 'participants')
-    //         ->first();
-    //     // 作業中チェックリストが存在しない場合
-    //     if (is_null($checklist)) {
-    //         return [
-    //             'error' => "checklist_id: {$request->checklist_id}: チェックリストが存在しません。",
-    //             'checklist_works' => [],
-    //         ];
-    //     }
-
-    //     // check_items partipants抽出
-    //     $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
-    //     $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
-
-    //     // チェック作業に表示する項目自体が存在しない場合
-    //     if (empty($check_items)) {
-    //         return response()->json([
-    //             'error' => '',
-    //             'checklist_works' => $check_items,
-    //         ]);
-    //     }
-
-    //     // partipants抽出
-    //     $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : [];
-    //     // []の場合は参加者は初チェック作業とみなしカラムcheck_itmes内の作業IDに紐付く,
-    //     // カラムparticipantパラメータ生成と初期化処理を実施
-    //     if (empty($self_participant)) {
-    //         foreach ($check_items as $index => $item) {
-    //             // check itmeのidが存在しない場合
-    //             if (!isset($item['id'])) continue;
-
-    //             $self_participant['checkeds'][$item['id']] = 0;
-    //             $self_participant['checkeds_time'][$item['id']] = 0;
-    //             $self_participant['inputs'][$item['id']] = '';
-    //         }
-    //         $self_participant['started_at'] = 0;
-    //         $self_participant['finished_at'] = 0;
-    //     }
-
-    //     // 更新処理
-    //     // $self_participant['user_name'] = $user_name;
-    //     foreach ($request->checklist_works as $item) {
-    //         $cheked = $item['checked'];
-    //         $self_participant['checkeds'][$item['id']] = $cheked;
-    //         $self_participant['checkeds_time'][$item['id']] =  $cheked == 1 ? $item['check_time'] : 0;
-    //         $self_participant['inputs'][$item['id']] = $item['input'];
-
-    //     }
-
-    //     // 保存処理
-    //     $participants[$request->user_id] = $self_participant;
-    //     $checklist->participants = json_encode($participants, true);
-    //     try {
-    //         DB::beginTransaction();
-
-    //     	// dd($checklist->participants);
-    //         $checklist->save();
-    //         // dd($res);
-    //         // $checklist = ChecklistWork::find($request->checklist_id)
-    //         // ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
-    //         // ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-    //         // ->select('check_items', 'participants')
-    //         // ->first();
-    //         // dd($checklist->participants);
-    //         // レスポンスチェック作業リストの生成処理
-    //         $tmp_checklist_works = $check_items;
-    //         // 自身のチェック数
-    //         $chkA = 0;
-    //         // 全参加者のチェック数
-    //         $chkU = 0;
-    //         foreach ($tmp_checklist_works as $index => $item) {
-
-    //             // チェック済み加算
-    //             if ((int)$self_participant['checkeds'][$item['id']] == 1) {
-    //                 $chkU++;
-    //                 $chkA++;
-    //             }
-    //             $item['checked'] = $self_participant['checkeds'][$item['id']] ?? 0;
-    //             $item['input'] = $self_participant['inputs'][$item['id']] ?? '';
-    //             $item['check_time'] = $self_participant['checkeds_time'][$item['id']] ?? 0;
-
-    //             // 自分以外の参加者情報のチェック時間と名前を追加
-    //             $_index = 0;
-    //             foreach ($participants as $_user_id => $info) {
-    //                 if ($_user_id === $request->user_id) continue;
-    //                 $item['participants'][$_index]['user_name'] = $info['user_name'];
-    //                 $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
-
-    //                 // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
-    //                 if ((int)$info['checkeds_time'][$item['id']] > 0) {
-    //                     $chkA++;
-    //                 }
-    //                 $_index++;
-    //             }
-    //             $tmp_checklist_works[$index] = $item;
-    //         }
-
-    //         // Progress作成処理
-    //         // 総項目数
-    //         $total_count = count(json_decode($checklist->check_items, true));
-    //         // 参加人数
-    //         $user_count = count($tmp_checklist_works[0]['participants'] ?? []) + 1;
-    //         if ($total_count !== 0 || $user_count !== 0) {
-    //             // progressA: 全体の進捗値。0～100を返す。※式 = (参加者の全チェック数) ／ (参加人数 ＊ 項目数)　小数点以下四捨五入。
-    //             $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
-    //         }
-    //         if ($total_count !== 0) {
-    //             // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
-    //             $progressU = round($chkU / $total_count);
-    //         }
-
-    //         DB::commit();
-    //     } catch (Exception $exception) {
-    //         DB::rollBack();
-
-    //         return response()->json([
-    //             'error' => $exception->getMessage(),
-    //             'checklist_works' => [],
-    //         ], 500);
-    //     }
-
-    //     // header("Access-Control-Allow-Origin: *");
-    //     // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
-
-    //     return response()->json([
-    //         'error' => '',
-    //         'checklist_works' => $tmp_checklist_works,
-    //         'progressA' => $progressA,
-    //         'progressU' => $progressU,
-    //     ],200);
-    // }
-
-    public function realtime_save(Request $request)
-    {
-
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
-                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
-                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
-                'checklist_works' => ['bail', 'required', 'array'],
-            ],
-        );
-
-        if($validator->fails()){
-            return response()->json([
-                'error' => $validator->errors(),
-                'checklist_works' => [],
-            ], 400);
-        }
-        $user_id = $request->user_id;
-
-        // 認証チェック
-        $user = User::where('user_id', '=', $request->user_id)->first();
-        if (is_null($user)) {
-            return response()->json([
-                'error' => '権限エラー',
-                'checklist_items' => [],
-            ]);
-        }
-
-        /*
-        テーブルロックを使用しない、期待の大きい代案。
-        同じチェックリストについてのみの疑似ロック処理。
-        本処理に3秒もかからないと予測。前回操作から3秒経過分はそのまま続行。
-        2秒以内の場合は1秒待機して続行。
-        */
-        // 疑似ロックファイル存在チェック
+        $now = new Carbon();
         $lockfie_path = "public/works/{$request->checklist_id}.lock";
         $is_lockedfile = Storage::exists($lockfie_path);
 
         // ロック中の場合
-        $now = new Carbon();
         $timestamp = 0;
         if ($is_lockedfile) {
             $timestamp = Storage::get($lockfie_path);
@@ -419,34 +223,32 @@ class ChecklistController extends Controller
         }
 
         // ロック待機処理
-        $processing_time = 3;
-        if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
+        $wait_time = 4;
+        if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
             Storage::put($lockfie_path, ((new Carbon())->timestamp));
         } else {
-            sleep(2);
+            sleep(3);
         }
 
         //　チェックリスト取得
-        $checlist = ChecklistWork::find($request->checklist_id)
-        ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
-        ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-        // ->select('check_items', 'participants')
-        ->first();
-
+        $checklist = ChecklistWork::find($request->checklist_id)
+            ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+            ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+            ->first();
         // 作業中チェックリストが存在しない場合
-        if(is_null($checlist)){
+        if (is_null($checklist)) {
             return [
-                'error' => "checklist_id: {$request->checklist_id}: チェックリスト取得できないエラー",
+                'error' => "checklist_id: {$request->checklist_id}: チェックリストが存在しません。",
                 'checklist_works' => [],
             ];
         }
 
         // check_items partipants抽出
-        $check_items = isset($checlist->check_items) ? json_decode($checlist->check_items, true) : [];
-        $participants = isset($checlist->participants) ? json_decode($checlist->participants, true) : [];
+        $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
+        $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
 
-        // チェック作業に表示する項目が存在しない場合
-        if(empty($check_items)) {
+        // チェック作業に表示する項目自体が存在しない場合
+        if (empty($check_items)) {
             return response()->json([
                 'error' => '',
                 'checklist_works' => $check_items,
@@ -454,20 +256,14 @@ class ChecklistController extends Controller
         }
 
         // partipants抽出
-        // 自身の参加者情報が存在しない場合は権限がないとみなす
-        $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : null;
-        if(is_null($self_participant)){
-            return [
-                'error' => 'チェック作業権限がありません。',
-                'check_items' => [],
-            ];
-        }
-
-        // 参加者が初チェック作業({})の場合はカラムcheck_itmesのJSON作業IDに紐付くカラムparticipant JSONの初期化をする
-        if(empty($self_participant)) {
-            foreach($check_items as $index => $item) {
+        $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : [];
+        // []の場合は参加者は初チェック作業とみなしカラムcheck_itmes内の作業IDに紐付く,
+        // カラムparticipantパラメータ生成と初期化処理を実施
+        if (empty($self_participant)) {
+            foreach ($check_items as $index => $item) {
                 // check itmeのidが存在しない場合
-                if(!isset($item['id'])) continue;
+                if (!isset($item['id'])) continue;
+
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
@@ -477,56 +273,258 @@ class ChecklistController extends Controller
         }
 
         // 更新処理
-        foreach($request->checklist_works as $item) {
-            $self_participant['checkeds'][$item['id']] = $item['checked'];
+        foreach ($request->checklist_works as $item) {
+            $cheked = $item['checked'];
+            $self_participant['checkeds'][$item['id']] = $cheked;
+            $self_participant['checkeds_time'][$item['id']] =  $cheked == 1 ? $item['check_time'] : 0;
             $self_participant['inputs'][$item['id']] = $item['input'];
-            $self_participant['checkeds_time'][$item['id']] = $item['check_time'];
+
         }
 
         // 保存処理
         $participants[$request->user_id] = $self_participant;
-        $checlist->participants = json_encode($participants, true);
+        $checklist->participants = json_encode($participants, true);
         try {
             DB::beginTransaction();
-            $checlist->save();
+
+        	// dd($checklist->participants);
+            $checklist->save();
+            // dd($res);
+            // $checklist = ChecklistWork::find($request->checklist_id)
+            // ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+            // ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+            // ->select('check_items', 'participants')
+            // ->first();
+            // dd($checklist->participants);
+            // レスポンスチェック作業リストの生成処理
+            $tmp_checklist_works = $check_items;
+            // 自身のチェック数
+            $chkA = 0;
+            // 全参加者のチェック数
+            $chkU = 0;
+            foreach ($tmp_checklist_works as $index => $item) {
+
+                // チェック済み加算
+                if ((int)$self_participant['checkeds'][$item['id']] == 1) {
+                    $chkU++;
+                    $chkA++;
+                }
+                $item['checked'] = $self_participant['checkeds'][$item['id']] ?? 0;
+                $item['input'] = $self_participant['inputs'][$item['id']] ?? '';
+                $item['check_time'] = $self_participant['checkeds_time'][$item['id']] ?? 0;
+
+                // 自分以外の参加者情報のチェック時間と名前を追加
+                $_index = 0;
+                foreach ($participants as $_user_id => $info) {
+                    if ($_user_id === $request->user_id) continue;
+                    $item['participants'][$_index]['user_name'] = $info['user_name'];
+                    $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
+
+                    // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
+                    if ((int)$info['checkeds_time'][$item['id']] > 0) {
+                        $chkA++;
+                    }
+                    $_index++;
+                }
+                $tmp_checklist_works[$index] = $item;
+            }
+
+            // Progress作成処理
+            // 総項目数
+            $total_count = count(json_decode($checklist->check_items, true));
+            // 参加人数
+            $user_count = count($tmp_checklist_works[0]['participants'] ?? []) + 1;
+            if ($total_count !== 0 || $user_count !== 0) {
+                // progressA: 全体の進捗値。0～100を返す。※式 = (参加者の全チェック数) ／ (参加人数 ＊ 項目数)　小数点以下四捨五入。
+                $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
+            }
+            if ($total_count !== 0) {
+                // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
+                $progressU = round($chkU / $total_count);
+            }
+
             DB::commit();
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollBack();
 
             return response()->json([
-                'error' => '',
-                'started_at' => $request->started_at,
-                'finished_at' => $request->finished_at,
-                'checklist_works' => $request->checklist_works
-            ], 200);
+                'error' => $exception->getMessage(),
+                'checklist_works' => [],
+            ], 500);
         }
 
-        // レスポンスチェック作業リストの生成処理
-        $tmp_check_items = $request->checklist_works;
-        foreach($tmp_check_items as $index => $item) {
-            $item['checked'] = $self_participant['checkeds'][$item['id']];
-            $item['input'] = $self_participant['inputs'][$item['id']];
-            // 自分以外の参加者情報のチェック時間と名前を追加
-            $_index = 0;
-            foreach($participants as $_user_id => $info) {
-                if($_user_id === $request->user_id) continue;
-                $item['participants'][$_index]['user_name'] = $info['user_name'];
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
-                $tmp_check_items[$index] = $item;
-                $_index++;
-            }
-        }
-        // ヘッダ設定
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => '',
-            'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
-            'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
-            'checklist_works' => $tmp_check_items
-        ], 200);
+            'checklist_works' => $tmp_checklist_works,
+            'progressA' => $progressA,
+            'progressU' => $progressU,
+        ],200);
     }
+
+    // public function realtime_save(Request $request)
+    // {
+
+    //     $validator = Validator::make(
+    //         $request->all(),
+    //         [
+    //             'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+    //             'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+    //             'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+    //             'checklist_works' => ['bail', 'required', 'array'],
+    //         ],
+    //     );
+
+    //     if($validator->fails()){
+    //         return response()->json([
+    //             'error' => $validator->errors(),
+    //             'checklist_works' => [],
+    //         ], 400);
+    //     }
+    //     $user_id = $request->user_id;
+
+    //     // 認証チェック
+    //     $user = User::where('user_id', '=', $request->user_id)->first();
+    //     if (is_null($user)) {
+    //         return response()->json([
+    //             'error' => '権限エラー',
+    //             'checklist_items' => [],
+    //         ]);
+    //     }
+
+    //     /*
+    //     テーブルロックを使用しない、期待の大きい代案。
+    //     同じチェックリストについてのみの疑似ロック処理。
+    //     本処理に3秒もかからないと予測。前回操作から3秒経過分はそのまま続行。
+    //     2秒以内の場合は1秒待機して続行。
+    //     */
+    //     // 疑似ロックファイル存在チェック
+    //     $lockfie_path = "public/works/{$request->checklist_id}.lock";
+    //     $is_lockedfile = Storage::exists($lockfie_path);
+
+    //     // ロック中の場合
+    //     $now = new Carbon();
+    //     $timestamp = 0;
+    //     if ($is_lockedfile) {
+    //         $timestamp = Storage::get($lockfie_path);
+    //     }
+    //     // ロック中でなければファイル内容にタイムスタンプを記述
+    //     else {
+    //         $timestamp = $now->timestamp;
+    //         Storage::put($lockfie_path, $timestamp);
+    //     }
+
+    //     // ロック待機処理
+    //     $processing_time = 3;
+    //     if ($processing_time <= (new Carbon())->timestamp - $timestamp) {
+    //         Storage::put($lockfie_path, ((new Carbon())->timestamp));
+    //     } else {
+    //         sleep(2);
+    //     }
+
+    //     //　チェックリスト取得
+    //     $checlist = ChecklistWork::find($request->checklist_id)
+    //     ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+    //     ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+    //     // ->select('check_items', 'participants')
+    //     ->first();
+
+    //     // 作業中チェックリストが存在しない場合
+    //     if(is_null($checlist)){
+    //         return [
+    //             'error' => "checklist_id: {$request->checklist_id}: チェックリスト取得できないエラー",
+    //             'checklist_works' => [],
+    //         ];
+    //     }
+
+    //     // check_items partipants抽出
+    //     $check_items = isset($checlist->check_items) ? json_decode($checlist->check_items, true) : [];
+    //     $participants = isset($checlist->participants) ? json_decode($checlist->participants, true) : [];
+
+    //     // チェック作業に表示する項目が存在しない場合
+    //     if(empty($check_items)) {
+    //         return response()->json([
+    //             'error' => '',
+    //             'checklist_works' => $check_items,
+    //         ]);
+    //     }
+
+    //     // partipants抽出
+    //     // 自身の参加者情報が存在しない場合は権限がないとみなす
+    //     $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : null;
+    //     if(is_null($self_participant)){
+    //         return [
+    //             'error' => 'チェック作業権限がありません。',
+    //             'check_items' => [],
+    //         ];
+    //     }
+
+    //     // 参加者が初チェック作業({})の場合はカラムcheck_itmesのJSON作業IDに紐付くカラムparticipant JSONの初期化をする
+    //     if(empty($self_participant)) {
+    //         foreach($check_items as $index => $item) {
+    //             // check itmeのidが存在しない場合
+    //             if(!isset($item['id'])) continue;
+    //             $self_participant['checkeds'][$item['id']] = 0;
+    //             $self_participant['checkeds_time'][$item['id']] = 0;
+    //             $self_participant['inputs'][$item['id']] = '';
+    //         }
+    //         $self_participant['started_at'] = 0;
+    //         $self_participant['finished_at'] = 0;
+    //     }
+
+    //     // 更新処理
+    //     foreach($request->checklist_works as $item) {
+    //         $self_participant['checkeds'][$item['id']] = $item['checked'];
+    //         $self_participant['inputs'][$item['id']] = $item['input'];
+    //         $self_participant['checkeds_time'][$item['id']] = $item['check_time'];
+    //     }
+
+    //     // 保存処理
+    //     $participants[$request->user_id] = $self_participant;
+    //     $checlist->participants = json_encode($participants, true);
+    //     try {
+    //         DB::beginTransaction();
+    //         $checlist->save();
+    //         DB::commit();
+    //     } catch(Exception $exception) {
+    //         DB::rollBack();
+
+    //         return response()->json([
+    //             'error' => '',
+    //             'started_at' => $request->started_at,
+    //             'finished_at' => $request->finished_at,
+    //             'checklist_works' => $request->checklist_works
+    //         ], 200);
+    //     }
+
+    //     // レスポンスチェック作業リストの生成処理
+    //     $tmp_check_items = $request->checklist_works;
+    //     foreach($tmp_check_items as $index => $item) {
+    //         $item['checked'] = $self_participant['checkeds'][$item['id']];
+    //         $item['input'] = $self_participant['inputs'][$item['id']];
+    //         // 自分以外の参加者情報のチェック時間と名前を追加
+    //         $_index = 0;
+    //         foreach($participants as $_user_id => $info) {
+    //             if($_user_id === $request->user_id) continue;
+    //             $item['participants'][$_index]['user_name'] = $info['user_name'];
+    //             $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
+    //             $tmp_check_items[$index] = $item;
+    //             $_index++;
+    //         }
+    //     }
+    //     // ヘッダ設定
+    //     header("Access-Control-Allow-Origin: *");
+    //     header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+
+    //     return response()->json([
+    //         'error' => '',
+    //         'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
+    //         'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
+    //         'checklist_works' => $tmp_check_items
+    //     ], 200);
+    // }
 
     /**
      * チェックリスト取得

@@ -35,25 +35,18 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
 // Route::group(['middleware' => 'auth:sanctum'], function(){
-// Route::post('/get_checklist_works', [CompanyController::class, 'getChecklistWorks']);
-// Route::resource('categories', CategoryController::class);
 Route::apiResource('comapnies', CompanyController::class);
 Route::apiResource('checklists', ChecklistWorkController::class);
-// Route::resource('branchoffice', BranchOfficeController::class);
-// Route::resource('dutystation', DutyStationController::class);
-// Route::apiResource('category2', Category2Controller::class);
 Route::post('/get_category1', [ApiController::class, 'get_category1']);
 Route::post('/get_category2', [ApiController::class, 'get_category2']);
 Route::post('/get_checklist', [ApiController::class, 'get_checklist']);
 Route::post('/get_user', [UserController::class, 'getUser']);
 Route::post('/realtime_chk', [ApiController::class, 'realtime_chk']);
-// Route::post('/realtime_save', [ChecklistController::class, 'realtime_save']);
+
 Route::post('/realtime_save', [ApiController::class, 'realtime_save']);
 Route::post('/login', [ApiController::class, 'login']);
 Route::post('/get_checklist_works', [ApiController::class, 'get_checklist_works']);
 Route::post('/check_start', [ApiController::class, 'check_start']);
-// Route::post('/get_category3', [Category3Controller::class, 'getCategory']);
-// Route::post('/get_checklist_works', [ChecklistWorkController::class, 'getChecklist']);
 Route::get('/user', function (Request $request) {
     return $request->user();
     });
