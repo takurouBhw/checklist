@@ -169,7 +169,7 @@ class ApiController extends Controller
             ],
         );
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
                 'started_at' =>  0,
@@ -248,6 +248,7 @@ class ApiController extends Controller
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
+                $self_participant['elapsed_time'][$item['id']] = 0;
             }
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
@@ -296,7 +297,7 @@ class ApiController extends Controller
             ],
         );
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
                 'check_users' => [],
@@ -387,6 +388,7 @@ class ApiController extends Controller
 
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
+                $self_participant['elapsed_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
             }
             $self_participant['started_at'] = 0;
@@ -410,11 +412,11 @@ class ApiController extends Controller
 
             // レスポンス生成処理
             foreach ($participants as $_user_id => $payload) {
-                if(empty($payload)) continue;
+                if (empty($payload)) continue;
                 $index = 0;
-                foreach($payload['checkeds_time'] as $checklist_work_id => $check_time) {
+                foreach ($payload['checkeds_time'] as $checklist_work_id => $check_time) {
                     // 自身のチェック数処理
-                    if($_user_id === $request->user_id){
+                    if ($_user_id === $request->user_id) {
                         $chkU = $check_time > 0 ? $chkU + 1 : $chkU;
                         continue;
                     }
@@ -486,7 +488,7 @@ class ApiController extends Controller
             ],
         );
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
                 'check_users' => [],
@@ -526,25 +528,25 @@ class ApiController extends Controller
 
         // チェック作業中なのに自身を含める参加者が存在しない場合
         // サーバー側でデータ整合性エラーが発生している可能あり
-        if(!isset($checklist->participants)){
+        if (!isset($checklist->participants)) {
             return response()->json([
                 'error' => 'チェック作業者のデータが存在しません。',
                 'check_users' => [],
                 'progressA' => 0,
                 'progressU' => 0,
-            ],500);
+            ], 500);
         }
 
         // JSONデコードに失敗した場合
         // サーバー側のJSONデータ登録に問題が発生している可能性あり
         $participants = json_decode($checklist->participants, true);
-        if(is_null($participants)){
+        if (is_null($participants)) {
             return response()->json([
                 'error' => '参加者のデータ取得に失敗しました。',
                 'check_users' => [],
                 'progressA' => 0,
                 'progressU' => 0,
-            ],500);
+            ], 500);
         }
 
         // 自分以外の参加者情報を抽出
@@ -556,12 +558,12 @@ class ApiController extends Controller
 
         // レスポンス生成処理
         foreach ($participants as $_user_id => $payload) {
-            if(empty($payload)) continue;
+            if (empty($payload)) continue;
 
             $index = 0;
-            foreach($payload['checkeds_time'] as $checklist_work_id => $check_time) {
+            foreach ($payload['checkeds_time'] as $checklist_work_id => $check_time) {
                 // 自身のチェック数処理
-                if($_user_id === $request->user_id){
+                if ($_user_id === $request->user_id) {
                     $chkU = $check_time > 0 ? $chkU + 1 : $chkU;
                     continue;
                 }
@@ -597,7 +599,7 @@ class ApiController extends Controller
             "error" => "",
             "progressA" => $progressA,
             "progressU" => $progressU,
-        ],200);
+        ], 200);
     }
 
     // 保存キュー処理にも対応
@@ -614,7 +616,7 @@ class ApiController extends Controller
             ],
         );
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
                 'checklist_works' => [],
@@ -697,6 +699,7 @@ class ApiController extends Controller
 
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
+                $self_participant['elapsed_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
             }
             $self_participant['started_at'] = 0;
@@ -706,10 +709,11 @@ class ApiController extends Controller
         // 更新処理
         $self_participant['user_name'] = $user_name;
         foreach ($request->checklist_works as $item) {
-            $cheked = $item['checked'];
+            $cheked = $item['checked'] ?? 0;
             $self_participant['checkeds'][$item['id']] = $cheked;
             $self_participant['checkeds_time'][$item['id']] =  $cheked == 1 ? $item['check_time'] : 0;
-            $self_participant['inputs'][$item['id']] = $item['input'];
+            $self_participant['elapsed_time'][$item['id']] = $item['elapsed_time'] ?? 0;
+            $self_participant['inputs'][$item['id']] = $item['input'] ?? '';
         }
 
         // 保存処理
@@ -783,7 +787,7 @@ class ApiController extends Controller
             'checklist_works' => $tmp_checklist_works,
             'progressA' => $progressA,
             'progressU' => $progressU,
-        ],200);
+        ], 200);
     }
 
 
