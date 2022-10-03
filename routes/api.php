@@ -42,6 +42,7 @@ Route::post('/get_category2', [ApiController::class, 'get_category2']);
 Route::post('/get_checklist', [ApiController::class, 'get_checklist']);
 Route::post('/get_user', [UserController::class, 'getUser']);
 Route::post('/realtime_chk', [ApiController::class, 'realtime_chk']);
+Route::post('/check_finish', [ApiController::class, 'check_finish']);
 
 Route::post('/realtime_save', [ApiController::class, 'realtime_save']);
 Route::post('/login', [ApiController::class, 'login']);

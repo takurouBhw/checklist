@@ -198,7 +198,6 @@ class ApiController extends Controller
         $checklist = ChecklistWork::find($request->checklist_id)
             ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
             ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-            ->select('deadline_at', 'check_items', 'participants')
             ->first();
 
         // チェックリスト存在チェック
@@ -228,20 +227,14 @@ class ApiController extends Controller
         }
 
         // partipants抽出
-        // 自身がチェック作業の参加者でない場合
-        $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : null;
-        if (is_null($self_participant)) {
-            return response()->json([
-                'error' => 'チェック作業を操作する権限がありません。',
-                'started_at' =>  0,
-                'finished_at' => 0,
-                'deadline_at' => 0,
-                'checklist_works' => [],
-            ]);
-        }
+        // 自身がチェック作業初参加の場合
+        $is_first_participation = isset($participants[$request->user_id]) ? false : true;
+        // dd($is_first_participation);
+        $self_participant = $participants[$request->user_id] ?? [];
 
         // 参加者が初チェック作業({})の場合はカラムcheck_itmesのJSON作業IDに紐付くカラムparticipant JSONの初期化をする
-        if (empty($self_participant)) {
+        // 初参加者判定
+        if ($is_first_participation) {
             foreach ($check_items as $index => $item) {
                 // check itmeのidが存在しない場合
                 if (!isset($item['id'])) continue;
@@ -254,12 +247,21 @@ class ApiController extends Controller
             $self_participant['finished_at'] = 0;
         }
 
+        // 参加者が初参加の場合のみparticipan保存
+        if($is_first_participation) {
+            // 保存処理
+            $participants[$request->user_id] = $self_participant;
+            $checklist->participants = json_encode($participants, true);
+            $checklist->save();
+        }
+
         // レスポンスチェック作業リストの生成処理
         foreach ($check_items as $index => $item) {
             $item['checked'] = isset($self_participant['checkeds'][$item['id']]) ? $self_participant['checkeds'][$item['id']] : 0;
             $item['input'] = isset($self_participant['inputs'][$item['id']]) ? $self_participant['inputs'][$item['id']] : "";
             $item['check_time'] = isset($self_participant['checkeds_time'][$item['id']]) ? $self_participant['checkeds_time'][$item['id']] : 0;
             $item['elapsed_time'] = isset($self_participant['elapsed_time'][$item['id']]) ? $self_participant['elapsed_time'][$item['id']] : 0;
+            $check_items[$index] = $item;
 
             // 自分以外の参加者情報のチェック時間と名前を取得処理
             $_index = 0;
@@ -267,14 +269,15 @@ class ApiController extends Controller
                 if ($_user_id === $request->user_id) continue;
 
                 $item['participants'][$_index]['user_name'] = $info['user_name'];
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
+                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
+                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
                 //
                 $check_items[$index] = $item;
                 $_index++;
             }
-        }
 
+        }
+        // dd($check_items);
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
@@ -694,19 +697,58 @@ class ApiController extends Controller
         $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : [];
         // []の場合は参加者は初チェック作業とみなしカラムcheck_itmes内の作業IDに紐付く,
         // カラムparticipantパラメータ生成と初期化処理を実施
-        if (empty($self_participant)) {
-            foreach ($check_items as $index => $item) {
-                // check itmeのidが存在しない場合
-                if (!isset($item['id'])) continue;
+        // if (empty($self_participant)) {
+        //     foreach ($check_items as $index => $item) {
+        //         // check itmeのidが存在しない場合
+        //         if (!isset($item['id'])) continue;
 
-                $self_participant['checkeds'][$item['id']] = 0;
-                $self_participant['checkeds_time'][$item['id']] = 0;
-                $self_participant['elapsed_time'][$item['id']] = 0;
-                $self_participant['inputs'][$item['id']] = '';
+        //         $self_participant['checkeds'][$item['id']] = 0;
+        //         $self_participant['checkeds_time'][$item['id']] = 0;
+        //         $self_participant['elapsed_time'][$item['id']] = 0;
+        //         $self_participant['inputs'][$item['id']] = '';
+        //     }
+        //     $self_participant['started_at'] = 0;
+        //     $self_participant['finished_at'] = 0;
+        // }
+               // 参加者が初チェック作業({})の場合はカラムcheck_itmesのJSON作業IDに紐付くカラムparticipant JSONの初期化をする
+            if (empty($self_participant)) {
+                foreach ($check_items as $index => $item) {
+                    // check itmeのidが存在しない場合
+                    if (!isset($item['id'])) continue;
+                    $self_participant['checkeds'][$item['id']] = 0;
+                    $self_participant['checkeds_time'][$item['id']] = 0;
+                    $self_participant['inputs'][$item['id']] = '';
+                    $self_participant['elapsed_time'][$item['id']] = 0;
+                }
+                $self_participant['started_at'] = 0;
+                $self_participant['finished_at'] = 0;
             }
-            $self_participant['started_at'] = 0;
-            $self_participant['finished_at'] = 0;
-        }
+            else {
+                foreach ($check_items as $index => $item) {
+                    // check itmeのidが存在しない場合
+                    if (!isset($item['id'])) continue;
+
+                    // item項目に対応するIDが存在しない場合は新規作成
+                    if(!isset($self_participant['checkeds'][$item['id']])){
+                        $self_participant['checkeds'][$item['id']] = 0;
+                    }
+                    if(!isset( $self_participant['checkeds_time'][$item['id']])) {
+                        $self_participant['checkeds_time'][$item['id']] = 0;
+                    }
+                    if(!isset( $self_participant['inputs'][$item['id']])) {
+                        $self_participant['inputs'][$item['id']] = '';
+                    }
+                    if(!isset( $self_participant['elapsed_time'][$item['id']])) {
+                        $self_participant['elapsed_time'][$item['id']] = 0;
+                    }
+                }
+                if(isset($self_participant['started_at'])) {
+                    $self_participant['started_at'] = 0;
+                }
+                if(isset($self_participant['finished_at'])) {
+                    $self_participant['finished_at'] = 0;
+                }
+            }
 
         // 更新処理
         $self_participant['user_name'] = $user_name;
@@ -797,40 +839,115 @@ class ApiController extends Controller
     public function check_finish(Request $request)
     {
         $error = '';
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
+                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+            ],
+        );
 
+        // 権限チェック
+        $user_name = '';
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
+        if (is_null($user_name)) {
+            return response()->json([
+                'error' => 'チェック操作する権限がありません。',
+                'checklist_works' => [],
+            ], 403);
+        }
 
-        if ($user_name != '') {
-            $now = new Carbon();
+        $now = new Carbon();
+        //　チェックリスト取得
+        $checklist = ChecklistWork::find($request->checklist_id)
+            ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+            ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+            ->first();
+        // 作業中チェックリストが存在しない場合
+        if (is_null($checklist)) {
+            return [
+                'error' => "checklist_id: {$request->checklist_id}: チェックリストが存在しません。",
+            ];
+        }
 
-            $checklists = DB::select(
-                "SELECT `checklist_works`.`id`, `checklist_works`.`title`
-				FROM `checklist_works`
-				WHERE `id`=?
-				ANS `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL) ",
-                [$request->checklist_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
-            )->first();
+        // partipants抽出
+        $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
+        $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : [];
 
-            if (isset($checklist->participants)) {
-                $checklist->participants = json_decode($checklist->participants, true);
+        // 自身のチェック項目が存在しない場合
+        if(empty($self_participant)) {
+            return response()->json([
+                'error' =>  'チェック項目が存在しません。',
+            ]);
+        }
 
-                if (!isset($checklist->participants[$request->user_id])) {
-                    $error = '終了する条件が整っていません、';
-                } else {
-                    $checklist->participants[$request->user_id]['finished_at'] = $now->format('Y-m-d- H:i:s');
-                }
+        // // []の場合は参加者は初チェック作業とみなしカラムcheck_itmes内の作業IDに紐付く,
+        // // カラムparticipantパラメータ生成と初期化処理を実施
+        // if (empty($self_participant)) {
+        //     foreach ($check_items as $index => $item) {
+        //         // check itmeのidが存在しない場合
+        //         if (!isset($item['id'])) continue;
 
-                DB::update("UPDATE `checklist_works` SET `participants`=? WHERE `id`=?", [$checklist->participants, $request->checklist_id]);
+        //         $self_participant['checkeds'][$item['id']] = 0;
+        //         $self_participant['checkeds_time'][$item['id']] = 0;
+        //         $self_participant['elapsed_time'][$item['id']] = 0;
+        //         $self_participant['inputs'][$item['id']] = '';
+        //     }
+        //     $self_participant['started_at'] = 0;
+        //     $self_participant['finished_at'] = 0;
+        // }
+
+        // 全チェック済みか
+        $is_check_complete = true;
+        foreach ($self_participant['checkeds'] as $_id => $val ) {
+            if($val !== 1) {
+                $is_check_complete = false;
+                break;
+            }
+        }
+
+        // 完了条件チェック
+        if(!$is_check_complete) {
+            return response()->json([
+                'error' => '終了する条件が整っていません、'
+            ]);
+        }
+
+        // $checklist = DB::select(
+        //     "SELECT `checklist_works`.`id`, `checklist_works`.`title`
+        //     FROM `checklist_works`
+        //     WHERE `id`=?
+        //     AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL) ",
+        //     [$request->checklist_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+        // )->first();
+
+            $checklist->participants[$request->user_id]['finished_at'] = (new Carbon())->timestamp;
+            try {
+                DB::beginTransaction();
+                $checklist->save();
+                // header("Access-Control-Allow-Origin: *");
+                // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+
+                DB::commit();
+                return response()->json([
+                    'error' => '',
+                ]);
+
+            } catch(Exception $e) {
+                return response()->json(([
+                    'error' => $e->getMessage(),
+                ]));
             }
         }
 
         // header("Access-Control-Allow-Origin: *");
+
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
-        return response()->json([
-            'error' => $error,
-        ]);
-    }
+        // return response()->json([
+        //     'error' => $error,
+        // ]);
 
     private static function isLogin($user_id)
     {
