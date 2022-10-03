@@ -102,7 +102,7 @@ class ChecklistWorkSeeder extends Seeder
                     'title' => 'ハイツA101号室',
                     "opened_at" => '2001-12-6 00:00:00',
                     "colsed_at" => '2025-10-6 23:59:59',
-                    'deadline_at' => '2025-10-30 23:59:59',
+                    'deadline_at' => '2025-9-30 23:59:59',
                     "check_items" => json_encode($check_items, true),
                     'participants' => json_encode($participants, true),
             ],

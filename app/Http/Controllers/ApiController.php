@@ -56,7 +56,7 @@ class ApiController extends Controller
             }
         }
 
-        // header("Access-Control-Allow-Origin: *");
+        // // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -259,6 +259,7 @@ class ApiController extends Controller
             $item['checked'] = isset($self_participant['checkeds'][$item['id']]) ? $self_participant['checkeds'][$item['id']] : 0;
             $item['input'] = isset($self_participant['inputs'][$item['id']]) ? $self_participant['inputs'][$item['id']] : "";
             $item['check_time'] = isset($self_participant['checkeds_time'][$item['id']]) ? $self_participant['checkeds_time'][$item['id']] : 0;
+            $item['elapsed_time'] = isset($self_participant['elapsed_time'][$item['id']]) ? $self_participant['elapsed_time'][$item['id']] : 0;
 
             // 自分以外の参加者情報のチェック時間と名前を取得処理
             $_index = 0;
@@ -266,6 +267,7 @@ class ApiController extends Controller
                 if ($_user_id === $request->user_id) continue;
 
                 $item['participants'][$_index]['user_name'] = $info['user_name'];
+                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
                 $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']];
                 //
                 $check_items[$index] = $item;
@@ -287,12 +289,13 @@ class ApiController extends Controller
 
     public function check_start(Request $request)
     {
+
         $validator = Validator::make(
             $request->all(),
             [
                 'key' => ['bail', 'required', 'string'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
-                'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'user_id' => ['bail', 'required', 'string'],
                 'check_time' => ['bail', 'required', 'integer', 'min:1']
             ],
         );
@@ -484,7 +487,6 @@ class ApiController extends Controller
                 'key' => ['bail', 'required', 'string'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
                 'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
-                'check_time' => ['bail', 'required', 'integer', 'min:1']
             ],
         );
 
@@ -745,6 +747,7 @@ class ApiController extends Controller
                     if ($_user_id === $request->user_id) continue;
                     $item['participants'][$_index]['user_name'] = $info['user_name'];
                     $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
+                    $item['participants'][$_index]['elapsed_time'] = $info['elapsed_time'][$item['id']] ?? 0;
 
                     // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
                     if ((int)$info['checkeds_time'][$item['id']] > 0) {
