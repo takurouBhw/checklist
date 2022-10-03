@@ -229,7 +229,6 @@ class ApiController extends Controller
         // partipants抽出
         // 自身がチェック作業初参加の場合
         $is_first_participation = isset($participants[$request->user_id]) ? false : true;
-        // dd($is_first_participation);
         $self_participant = $participants[$request->user_id] ?? [];
 
         // 参加者が初チェック作業({})の場合はカラムcheck_itmesのJSON作業IDに紐付くカラムparticipant JSONの初期化をする
@@ -246,8 +245,18 @@ class ApiController extends Controller
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
         }
+        // 参加者が作業完了している場合は空で返却
+        if($self_participant['finished_at'] > 0) {
+            return response()->json([
+                'error' => '',
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'checklist_works' => [],
+            ], 200);
+        }
 
-        // 参加者が初参加の場合のみparticipan保存
+        // 参加者が初参加の場合のみparticipanカラムが生成されているので保存
         if($is_first_participation) {
             // 保存処理
             $participants[$request->user_id] = $self_participant;
@@ -277,7 +286,6 @@ class ApiController extends Controller
             }
 
         }
-        // dd($check_items);
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
@@ -871,6 +879,7 @@ class ApiController extends Controller
             ];
         }
 
+
         // partipants抽出
         $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
         $self_participant = isset($participants[$request->user_id]) ? $participants[$request->user_id] : [];
@@ -882,26 +891,10 @@ class ApiController extends Controller
             ]);
         }
 
-        // // []の場合は参加者は初チェック作業とみなしカラムcheck_itmes内の作業IDに紐付く,
-        // // カラムparticipantパラメータ生成と初期化処理を実施
-        // if (empty($self_participant)) {
-        //     foreach ($check_items as $index => $item) {
-        //         // check itmeのidが存在しない場合
-        //         if (!isset($item['id'])) continue;
-
-        //         $self_participant['checkeds'][$item['id']] = 0;
-        //         $self_participant['checkeds_time'][$item['id']] = 0;
-        //         $self_participant['elapsed_time'][$item['id']] = 0;
-        //         $self_participant['inputs'][$item['id']] = '';
-        //     }
-        //     $self_participant['started_at'] = 0;
-        //     $self_participant['finished_at'] = 0;
-        // }
-
-        // 全チェック済みか
+        // 全チェック済みか判定
         $is_check_complete = true;
-        foreach ($self_participant['checkeds'] as $_id => $val ) {
-            if($val !== 1) {
+        foreach ($self_participant['checkeds_time'] as $_id => $val ) {
+            if($val < 1) {
                 $is_check_complete = false;
                 break;
             }
@@ -922,7 +915,12 @@ class ApiController extends Controller
         //     [$request->checklist_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
         // )->first();
 
-            $checklist->participants[$request->user_id]['finished_at'] = (new Carbon())->timestamp;
+        	// 保存処理
+            $self_participant['finished_at'] =  (new Carbon())->timestamp;
+            $participants = [];
+            $participants[$request->user_id] = $self_participant;
+            $checklist->participants = json_encode($participants, true);
+
             try {
                 DB::beginTransaction();
                 $checklist->save();
@@ -930,6 +928,7 @@ class ApiController extends Controller
                 // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
                 DB::commit();
+
                 return response()->json([
                     'error' => '',
                 ]);
