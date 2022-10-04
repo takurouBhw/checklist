@@ -37,26 +37,33 @@ class ApiController extends Controller
 
         if ($validator->fails()) {
             $error = $validator->messages();
-        } else {
-            $user = User::where('email', '=', $request->email)->first();
-
-            if (!isset($user->id)) {
-                $error = 'ログイン情報が登録されていません。';
-            } else {
-                if (!Hash::check($request->password, $user->password)) {
-                    $error = 'メールアドレスまたはパスワードが一致しません。';
-                } else {
-                    $now = new Carbon();
-                    $client_key = $user->client_key;
-                    $user_id = $user->user_id;
-                    $user_name = $user->name;
-                    $user->last_logined_at = $now->format('Y-m-d H:i:s');
-                    $user->save();
-                }
-            }
+            return response()->json([
+                'error' => $error,
+            ],400);
         }
 
-        // // header("Access-Control-Allow-Origin: *");
+        $user = User::where('email', '=', $request->email)->first();
+        if (!isset($user->id)) {
+            $error = 'ログイン情報が登録されていません。';
+            return response()->json([
+                'error' => $error,
+            ],401);
+        }
+        if (!Hash::check($request->password, $user->password)) {
+            $error = 'メールアドレスまたはパスワードが一致しません。';
+            return response()->json([
+                'error' => $error,
+            ],401);
+        }
+
+        $now = new Carbon();
+        $client_key = $user->client_key;
+        $user_id = $user->user_id;
+        $user_name = $user->name;
+        $user->last_logined_at = $now->format('Y-m-d H:i:s');
+        $user->save();
+
+        // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -83,18 +90,23 @@ class ApiController extends Controller
         $categories = [];
 
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
-        if ($user_name != '') {
-            $now = new Carbon();
 
-            $categories = DB::select(
-                "SELECT `category1s`.`id`, `category1s`.`category1_name`, COUNT(`checklist_works`.`id`) AS `cnt`
-				FROM `category1s`
-				LEFT JOIN `checklist_works` ON `category1s`.`id` = `checklist_works`.`category1_id`
-				WHERE `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
-				GROUP BY `category1s`.`id`, `category1s`.`category1_name`",
-                [$now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
-            );
+        // 権限チェック
+        if (is_null($user_name)) {
+            return response()->json([
+                'error' => 'チェック操作する権限がありません。',
+            ], 403);
         }
+
+        $now = new Carbon();
+        $categories = DB::select(
+            "SELECT `category1s`.`id`, `category1s`.`category1_name`, COUNT(`checklist_works`.`id`) AS `cnt`
+            FROM `category1s`
+            LEFT JOIN `checklist_works` ON `category1s`.`id` = `checklist_works`.`category1_id`
+            WHERE `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            GROUP BY `category1s`.`id`, `category1s`.`category1_name`",
+            [$now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+        );
 
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
@@ -110,19 +122,23 @@ class ApiController extends Controller
 
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
 
-        if ($user_name != '') {
-            $now = new Carbon();
-
-            $categories = DB::select(
-                "SELECT `category2s`.`id`, `category2s`.`category2_name`, COUNT(`checklist_works`.`id`) AS `cnt`
-				FROM `category2s`
-				LEFT JOIN `checklist_works` ON `category2s`.`id` = `checklist_works`.`category2_id`
-				WHERE `checklist_works`.`category1_id`=?
-				AND `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
-				GROUP BY `category2s`.`id`, `category2s`.`category2_name`",
-                [$request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
-            );
+        // 権限チェック
+        if (is_null($user_name)) {
+            return response()->json([
+                'error' => 'チェック操作する権限がありません。',
+            ], 403);
         }
+
+        $now = new Carbon();
+        $categories = DB::select(
+            "SELECT `category2s`.`id`, `category2s`.`category2_name`, COUNT(`checklist_works`.`id`) AS `cnt`
+            FROM `category2s`
+            LEFT JOIN `checklist_works` ON `category2s`.`id` = `checklist_works`.`category2_id`
+            WHERE `checklist_works`.`category1_id`=?
+            AND `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            GROUP BY `category2s`.`id`, `category2s`.`category2_name`",
+            [$request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+        );
 
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
@@ -135,21 +151,23 @@ class ApiController extends Controller
     public function get_checklist(Request $request)
     {
         $checklists = [];
-
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
-
-        if ($user_name != '') {
-            $now = new Carbon();
-
-            $checklists = DB::select(
-                "SELECT `checklist_works`.`id`, `checklist_works`.`title`
-				FROM `checklist_works`
-				WHERE `category1_id`=? AND `category2_id`=?
-				AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
-				ORDER BY `deadline_at` ASC",
-                [$request->category1_id, $request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
-            );
+        // 権限チェック
+        if (is_null($user_name)) {
+            return response()->json([
+                'error' => 'チェック操作する権限がありません。',
+            ], 403);
         }
+
+        $now = new Carbon();
+        $checklists = DB::select(
+            "SELECT `checklist_works`.`id`, `checklist_works`.`title`
+            FROM `checklist_works`
+            WHERE `category1_id`=? AND `category2_id`=?
+            AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            ORDER BY `deadline_at` ASC",
+            [$request->category1_id, $request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+        );
 
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
@@ -669,11 +687,11 @@ class ApiController extends Controller
         }
 
         // ロック待機処理
-        $wait_time = 4;
+        $wait_time = 2;
         if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
             Storage::put($lockfie_path, ((new Carbon())->timestamp));
         } else {
-            sleep(3);
+            sleep(1);
         }
 
         //　チェックリスト取得
@@ -904,7 +922,7 @@ class ApiController extends Controller
         if(!$is_check_complete) {
             return response()->json([
                 'error' => '終了する条件が整っていません、'
-            ]);
+            ], 406);
         }
 
         // $checklist = DB::select(

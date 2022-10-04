@@ -31,8 +31,8 @@ use App\Models\ChecklistWork;
 */
 
 
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout']);
+Route::post('/login', [ApiController::class, 'login']);
+Route::post('/logout', [ApiController::class, 'logout']);
 
 // Route::group(['middleware' => 'auth:sanctum'], function(){
 Route::apiResource('comapnies', CompanyController::class);
