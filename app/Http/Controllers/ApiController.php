@@ -193,6 +193,7 @@ class ApiController extends Controller
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
+                'elapsed_time' => 0,
                 'checklist_works' => [],
             ], 400);
         }
@@ -207,6 +208,7 @@ class ApiController extends Controller
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
+                'elapsed_time' => 0,
                 'checklist_works' => [],
             ], 403);
         }
@@ -225,6 +227,7 @@ class ApiController extends Controller
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
+                'elapsed_time' => 0,
                 'checklist_works' => [],
             ]);
         }
@@ -240,6 +243,7 @@ class ApiController extends Controller
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
+                'elapsed_time' => 0,
                 'checklist_works' => [],
             ]);
         }
@@ -258,10 +262,10 @@ class ApiController extends Controller
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
-                $self_participant['elapsed_time'][$item['id']] = 0;
             }
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
+            $self_participant['elapsed_time'] = 0;
         }
         // 参加者が作業完了している場合は空で返却
         if ($self_participant['finished_at'] > 0) {
@@ -270,6 +274,7 @@ class ApiController extends Controller
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
+                'elapsed_time' => 0,
                 'checklist_works' => [],
             ], 200);
         }
@@ -287,7 +292,6 @@ class ApiController extends Controller
             $item['checked'] = isset($self_participant['checkeds'][$item['id']]) ? $self_participant['checkeds'][$item['id']] : 0;
             $item['input'] = isset($self_participant['inputs'][$item['id']]) ? $self_participant['inputs'][$item['id']] : "";
             $item['check_time'] = isset($self_participant['checkeds_time'][$item['id']]) ? $self_participant['checkeds_time'][$item['id']] : 0;
-            $item['elapsed_time'] = isset($self_participant['elapsed_time'][$item['id']]) ? $self_participant['elapsed_time'][$item['id']] : 0;
             $check_items[$index] = $item;
 
             // 自分以外の参加者情報のチェック時間と名前を取得処理
@@ -297,8 +301,6 @@ class ApiController extends Controller
 
                 $item['participants'][$_index]['user_name'] = $info['user_name'];
                 $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
-                //
                 $check_items[$index] = $item;
                 $_index++;
             }
@@ -311,6 +313,7 @@ class ApiController extends Controller
             'started_at' => isset($self_participant['started_at']) ? $self_participant['started_at'] : 0,
             'finished_at' => isset($self_participant['finished_at']) ? $self_participant['finished_at'] : 0,
             'deadline_at' => isset($checklist->deadline_at) ? (new Carbon($checklist->deadline_at))->timestamp : 0,
+            'elapsed_time' => isset($checklist->elapsed_time) ? $self_participant['elapsed_time'] : 0,
             'checklist_works' => $check_items,
         ], 200);
     }
@@ -419,11 +422,11 @@ class ApiController extends Controller
 
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
-                $self_participant['elapsed_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
             }
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
+            $self_participant['elapsed_time'] = 0;
         }
 
         // 更新処理
@@ -640,6 +643,7 @@ class ApiController extends Controller
                 'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
                 'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'elapsed_time' =>  ['bail', 'required', 'integer', 'min:1'],
                 'checklist_works' => ['bail', 'required', 'array'],
             ],
         );
@@ -726,10 +730,10 @@ class ApiController extends Controller
                 $self_participant['checkeds'][$item['id']] = 0;
                 $self_participant['checkeds_time'][$item['id']] = 0;
                 $self_participant['inputs'][$item['id']] = '';
-                $self_participant['elapsed_time'][$item['id']] = 0;
             }
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
+            $self_participant['elapsed_time'] = 0;
         } else {
             foreach ($check_items as $index => $item) {
                 // check itmeのidが存在しない場合
@@ -745,9 +749,6 @@ class ApiController extends Controller
                 if (!isset($self_participant['inputs'][$item['id']])) {
                     $self_participant['inputs'][$item['id']] = '';
                 }
-                if (!isset($self_participant['elapsed_time'][$item['id']])) {
-                    $self_participant['elapsed_time'][$item['id']] = 0;
-                }
             }
             if (isset($self_participant['started_at'])) {
                 $self_participant['started_at'] = 0;
@@ -755,15 +756,17 @@ class ApiController extends Controller
             if (isset($self_participant['finished_at'])) {
                 $self_participant['finished_at'] = 0;
             }
-        }
+            if (isset($self_participant['elapsed_time'])) {
+                $self_participant['elapsed_time'] = 0;
+            }}
 
         // 更新処理
         $self_participant['user_name'] = $user_name;
+        $self_participant['elapsed_time'] = $request->elapsed_time;
         foreach ($request->checklist_works as $item) {
             $cheked = $item['checked'] ?? 0;
             $self_participant['checkeds'][$item['id']] = $cheked;
             $self_participant['checkeds_time'][$item['id']] =  $cheked == 1 ? $item['check_time'] : 0;
-            $self_participant['elapsed_time'][$item['id']] = $item['elapsed_time'] ?? 0;
             $self_participant['inputs'][$item['id']] = $item['input'] ?? '';
         }
 
@@ -805,7 +808,6 @@ class ApiController extends Controller
                 if ($_user_id === $request->user_id) continue;
                 $item['participants'][$_index]['user_name'] = $info['user_name'];
                 $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
-                $item['participants'][$_index]['elapsed_time'] = $info['elapsed_time'][$item['id']] ?? 0;
 
                 // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
                 if ((int)$info['checkeds_time'][$item['id']] > 0) {
@@ -836,6 +838,7 @@ class ApiController extends Controller
         return response()->json([
             'error' => '',
             'checklist_works' => $tmp_checklist_works,
+            'elapsed_time' => $request->elapsed_time,
             'progressA' => $progressA,
             'progressU' => $progressU,
         ], 200);
