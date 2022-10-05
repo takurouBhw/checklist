@@ -305,6 +305,11 @@ class ApiController extends Controller
                 $_index++;
             }
         }
+
+        // ソート
+        // id 昇順に並び替え
+        $ids = array_column($check_items, 'id');
+        array_multisort($ids, SORT_ASC, $check_items);
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
@@ -831,6 +836,10 @@ class ApiController extends Controller
             // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
             $progressU = round($chkU / $total_count);
         }
+        // ソート
+        // id 昇順に並び替え
+        $ids = array_column($tmp_checklist_works, 'id');
+        array_multisort($ids, SORT_ASC, $tmp_checklist_works);
 
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
