@@ -64,7 +64,7 @@ class ApiController extends Controller
         $user->save();
 
         // header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => $error,
@@ -109,7 +109,7 @@ class ApiController extends Controller
         );
 
         // header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'categories' => $categories,
@@ -141,7 +141,7 @@ class ApiController extends Controller
         );
 
         // header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'categories' => $categories,
@@ -170,7 +170,7 @@ class ApiController extends Controller
         );
 
         // header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'checklists' => $checklists,
@@ -318,7 +318,7 @@ class ApiController extends Controller
         $ids = array_column($check_items, 'id');
         array_multisort($ids, SORT_ASC, $check_items);
         // header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => '',
@@ -501,7 +501,7 @@ class ApiController extends Controller
             DB::commit();
 
             // header("Access-Control-Allow-Origin: *");
-            header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+            // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
             return response()->json([
                 "check_users" => $_participants,
@@ -700,7 +700,7 @@ class ApiController extends Controller
         // }
 
         // // ロック待機処理
-        // $wait_time = 2;
+        // $wait_time = 1;
         // if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
         //     Storage::put($lockfie_path, ((new Carbon())->timestamp));
         // } else {
@@ -849,7 +849,7 @@ class ApiController extends Controller
         array_multisort($ids, SORT_ASC, $tmp_checklist_works);
 
         // header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
             'error' => '',
@@ -943,7 +943,7 @@ class ApiController extends Controller
             DB::beginTransaction();
             $checklist->save();
             // header("Access-Control-Allow-Origin: *");
-            header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+            // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
             DB::commit();
 
