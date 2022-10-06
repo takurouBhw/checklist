@@ -63,7 +63,7 @@ class ApiController extends Controller
         $user->last_logined_at = $now->format('Y-m-d H:i:s');
         $user->save();
 
-        header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -108,7 +108,7 @@ class ApiController extends Controller
             [$now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
         );
 
-        header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -140,7 +140,7 @@ class ApiController extends Controller
             [$request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
         );
 
-        header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -169,7 +169,7 @@ class ApiController extends Controller
             [$request->category1_id, $request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
         );
 
-        header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -198,8 +198,15 @@ class ApiController extends Controller
             ], 400);
         }
 
-        // 権限チェック
         $user_name = '';
+        list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
+        // 権限チェック
+        if (is_null($user_name)) {
+            return response()->json([
+                'error' => 'チェック操作する権限がありません。',
+            ], 403);
+        }
+        // 権限チェック
         $now = new Carbon();
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
         if (is_null($user_name)) {
@@ -214,7 +221,6 @@ class ApiController extends Controller
         }
 
         //　チェックリスト取得
-        $now = new Carbon();
         $checklist = ChecklistWork::find($request->checklist_id)
             ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
             ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
@@ -266,6 +272,7 @@ class ApiController extends Controller
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
             $self_participant['elapsed_time'] = 0;
+            $self_participant['user_name'] = $user_name;
         }
         // 参加者が作業完了している場合は空で返却
         if ($self_participant['finished_at'] > 0) {
@@ -310,7 +317,7 @@ class ApiController extends Controller
         // id 昇順に並び替え
         $ids = array_column($check_items, 'id');
         array_multisort($ids, SORT_ASC, $check_items);
-        header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -380,7 +387,7 @@ class ApiController extends Controller
         }
 
         // ロック待機処理
-        $wate_time = 2;
+        $wate_time = 1;
         if ($wate_time <= (new Carbon())->timestamp - $timestamp) {
             Storage::put($lockfie_path, ((new Carbon())->timestamp));
         } else {
@@ -493,7 +500,7 @@ class ApiController extends Controller
 
             DB::commit();
 
-            header("Access-Control-Allow-Origin: *");
+            // header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
             return response()->json([
@@ -678,27 +685,27 @@ class ApiController extends Controller
         */
         // 疑似ロックファイル存在チェック
         $now = new Carbon();
-        $lockfie_path = "public/works/{$request->checklist_id}.lock";
-        $is_lockedfile = Storage::exists($lockfie_path);
+        // $lockfie_path = "public/works/{$request->checklist_id}.lock";
+        // $is_lockedfile = Storage::exists($lockfie_path);
 
-        // ロック中の場合
-        $timestamp = 0;
-        if ($is_lockedfile) {
-            $timestamp = Storage::get($lockfie_path);
-        }
-        // ロック中でなければファイル内容にタイムスタンプを記述
-        else {
-            $timestamp = $now->timestamp;
-            Storage::put($lockfie_path, $timestamp);
-        }
+        // // ロック中の場合
+        // $timestamp = 0;
+        // if ($is_lockedfile) {
+        //     $timestamp = Storage::get($lockfie_path);
+        // }
+        // // ロック中でなければファイル内容にタイムスタンプを記述
+        // else {
+        //     $timestamp = $now->timestamp;
+        //     Storage::put($lockfie_path, $timestamp);
+        // }
 
-        // ロック待機処理
-        $wait_time = 2;
-        if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
-            Storage::put($lockfie_path, ((new Carbon())->timestamp));
-        } else {
-            sleep(1);
-        }
+        // // ロック待機処理
+        // $wait_time = 2;
+        // if ($wait_time <= (new Carbon())->timestamp - $timestamp) {
+        //     Storage::put($lockfie_path, ((new Carbon())->timestamp));
+        // } else {
+        //     sleep(1);
+        // }
 
         //　チェックリスト取得
         $checklist = ChecklistWork::find($request->checklist_id)
@@ -841,7 +848,7 @@ class ApiController extends Controller
         $ids = array_column($tmp_checklist_works, 'id');
         array_multisort($ids, SORT_ASC, $tmp_checklist_works);
 
-        header("Access-Control-Allow-Origin: *");
+        // header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
@@ -863,6 +870,7 @@ class ApiController extends Controller
                 'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
                 'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                'elapsed_time' => ['bail', 'required', 'integer', 'min:1'],
             ],
         );
 
@@ -934,7 +942,7 @@ class ApiController extends Controller
         try {
             DB::beginTransaction();
             $checklist->save();
-            header("Access-Control-Allow-Origin: *");
+            // header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
             DB::commit();
