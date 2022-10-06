@@ -166,7 +166,7 @@ class ApiController extends Controller
             WHERE `category1_id`=? AND `category2_id`=?
             AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
             ORDER BY `deadline_at` ASC",
-            [$request->category1_id, $request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+            [$request->category1_id, $request->category2_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
         );
 
         // header("Access-Control-Allow-Origin: *");

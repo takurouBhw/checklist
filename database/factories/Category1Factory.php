@@ -13,8 +13,9 @@ class Category1Factory extends Factory
      */
     public function definition()
     {
+
         return [
-            'name' => 'テスト' . random_int(1, 10) . 'カテゴリ1',
+            'category1_name' => 'カテゴリ１: ' . $this->faker->company,
             'sort_num' => 0,
         ];
     }

@@ -20,22 +20,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $num = 150;
         // \App\Models\Category::factory(10)->create();
         // \App\Models\BranchOffice::factory(10)->create();
         // \App\Models\DutyStation::factory(10)->create();
         $this->call([
             UserSeeder::class,
-            Category1Seeder::class,
-            Category2Seeder::class,
-            Category3Seeder::class,
-            ChecklistSeeder::class,
-            ChecklistWorkSeeder::class,
+            // Category1Seeder::class,
+            // Category2Seeder::class,
+            // Category3Seeder::class,
+            // ChecklistSeeder::class,
+            // ChecklistWorkSeeder::class,
         ]);
-        \App\Models\Company::factory(30)->create();
-        // \App\Models\Category1::factory(1)->create();
-        // \App\Models\Category2::factory(1)->create();
+        \App\Models\Company::factory($num)->create();
+        \App\Models\Category1::factory($num)->create();
+        \App\Models\Category2::factory($num)->create();
         // \App\Models\Category3::factory(1)->create();
-        // \App\Models\Checklist::factory(1)->create();
+        \App\Models\Checklist::factory($num)->create();
+        \App\Models\ChecklistWork::factory($num)->create();
+
         // \App\Models\ChecklistTodo::factory(1)->create();
         // \App\Models\ChecklistParticipant::factory(1)->create();
         // \App\Models\ChecklistWork::factory(1)->create();

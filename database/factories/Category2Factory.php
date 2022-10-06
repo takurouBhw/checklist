@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 
 class Category2Factory extends Factory
 {
@@ -13,10 +15,11 @@ class Category2Factory extends Factory
      */
     public function definition()
     {
-        $category_id = $this->faker->numberBetween(1, 3);
+        $max_num = 150;
+        $category_id = $this->faker->numberBetween(1, $max_num);
         return [
             'category1_id' => $category_id,
-            'name' => $this->faker->company(),
+            'category2_name' => '親カテゴリ' . $category_id . ': ' . $this->faker->company,
         ];
     }
 }

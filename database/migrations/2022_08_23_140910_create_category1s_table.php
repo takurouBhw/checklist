@@ -17,7 +17,11 @@ class CreateCategory1sTable extends Migration
             $table->id();
             $table->string('category1_name');
             $table->integer('sort_num')->default(0);
+            $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
+
+            $table->index('category1_name');
+			$table->index('sort_num');
         });
     }
 
