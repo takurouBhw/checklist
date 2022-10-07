@@ -15,7 +15,7 @@ class Category1Factory extends Factory
     {
 
         return [
-            'category1_name' => 'カテゴリ１: ' . $this->faker->company,
+            'category1_name' => 'カテゴリ１: ' . $this->faker->title(),
             'sort_num' => 0,
         ];
     }

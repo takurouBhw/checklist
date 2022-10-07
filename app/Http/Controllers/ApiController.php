@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\ChecklistWork;
@@ -70,7 +71,7 @@ class ApiController extends Controller
             'error' => $error,
             'client_key' => $client_key,
             'user_id' => $user_id,
-            'user_name' => $user_name,
+            'user_name' =>   Crypt::decryptString($user_name),
         ]);
     }
 
@@ -103,9 +104,10 @@ class ApiController extends Controller
             "SELECT `category1s`.`id`, `category1s`.`category1_name`, COUNT(`checklist_works`.`id`) AS `cnt`
             FROM `category1s`
             LEFT JOIN `checklist_works` ON `category1s`.`id` = `checklist_works`.`category1_id`
-            WHERE `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            -- WHERE `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            WHERE `checklist_works`.`colsed_at`>=? OR (`checklist_works`.`colsed_at` IS NULL)
             GROUP BY `category1s`.`id`, `category1s`.`category1_name`",
-            [$now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+            [$now->format('Y-m-d 23:59:59')]
         );
 
         // header("Access-Control-Allow-Origin: *");
@@ -135,9 +137,10 @@ class ApiController extends Controller
             FROM `category2s`
             LEFT JOIN `checklist_works` ON `category2s`.`id` = `checklist_works`.`category2_id`
             WHERE `checklist_works`.`category1_id`=?
-            AND `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            -- AND `checklist_works`.`opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+            AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
             GROUP BY `category2s`.`id`, `category2s`.`category2_name`",
-            [$request->category1_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+            [$request->category1_id, $now->format('Y-m-d 23:59:59')]
         );
 
         // header("Access-Control-Allow-Origin: *");
