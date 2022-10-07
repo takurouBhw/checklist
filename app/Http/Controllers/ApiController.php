@@ -170,7 +170,7 @@ class ApiController extends Controller
         ->where('category2_id', '=', $request->category2_id)
         ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
         ->orderBy('deadline_at', 'asc')
-        ->first();
+        ->get();
         // $checklists = DB::select(
         //     "SELECT `checklist_works`.`id`, `checklist_works`.`checklist_title`
         //     FROM `checklist`
@@ -232,8 +232,9 @@ class ApiController extends Controller
         }
 
         //　チェックリスト取得
-        // $checklist = DB::table('checklist_works')->where('id', '=', $request->checklist_id)->first();
-        $checklist = ChecklistWork::find($request->checklist_id)->first();
+        $checklist = DB::table('checklist_works')->where('id', '=', $request->checklist_id)->first();
+        // $checklist = DB::table('checklist_works')->find($request->checklist_id)->first();
+
         // チェックリスト存在チェック
         if (is_null($checklist)) {
             return response()->json([
@@ -246,14 +247,31 @@ class ApiController extends Controller
             ]);
         }
 
-        // check_items partipants抽出
-        $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
+
+
+        /***************** check_items取得処理 *********************************************/
+        // JSONファイル存在チェック
+        $json_file_path = "public/works/{$request->checklist_id}_checkitem.dat";
+        $is_json_file_path = Storage::exists($json_file_path);
+        if(!$is_json_file_path) {
+            return;
+        }
+
+        // 取得
+        $json_content = Storage::get($json_file_path);
+        $check_items = json_decode($json_content, true);
+        // dd($check_items);
+        /****************************************************************/
+
+        // 変換
+        // $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
+        // $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
         $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
 
         // チェック作業リストに表示する項目が存在しない場合
         if (empty($check_items)) {
             return response()->json([
-                'error' => 'チェックリストの作業項目が存在しません。',
+                'error' => [],
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
@@ -272,10 +290,9 @@ class ApiController extends Controller
         if ($is_first_participation) {
             foreach ($check_items as $index => $item) {
                 // check itmeのidが存在しない場合
-                if (!isset($item['id'])) continue;
-                $self_participant['checkeds'][$item['id']] = 0;
-                $self_participant['checkeds_time'][$item['id']] = 0;
-                $self_participant['inputs'][$item['id']] = '';
+                $self_participant['checkeds'][$index] = 0;
+                $self_participant['checkeds_time'][$index] = 0;
+                $self_participant['inputs'][$index] = '';
             }
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
@@ -299,15 +316,32 @@ class ApiController extends Controller
             // 保存処理
             $participants[$request->user_id] = $self_participant;
             $checklist->participants = json_encode($participants, true);
-            $checklist->save();
+            // 保存に失敗した場合
+            // $checklist->update([
+            //     'participants' => json_encode($participants, true),
+            // ]);
+            DB::table('checklist_works')->where('id', $request->checklist_id)->update([
+                'participants' => json_encode($participants, true),
+            ]);
+            // if(!$checklist->save()) {
+            //     return response()->json(
+            //         [
+            //             'error' => 'データの取得に失敗しました。',
+            //             'started_at' =>  0,
+            //             'finished_at' => 0,
+            //             'deadline_at' => 0,
+            //             'elapsed_time' => 0,
+            //             'checklist_works' => [],
+            //         ],500,
+            //     );
+            // }
         }
-                // dd('aaa');
 
         // レスポンスチェック作業リストの生成処理
         foreach ($check_items as $index => $item) {
-            $item['checked'] = isset($self_participant['checkeds'][$item['id']]) ? $self_participant['checkeds'][$item['id']] : 0;
-            $item['input'] = isset($self_participant['inputs'][$item['id']]) ? $self_participant['inputs'][$item['id']] : "";
-            $item['check_time'] = isset($self_participant['checkeds_time'][$item['id']]) ? $self_participant['checkeds_time'][$item['id']] : 0;
+            $item['checked'] = isset($self_participant['checkeds'][$index]) ? $self_participant['checkeds'][$index] : 0;
+            $item['input'] = isset($self_participant['inputs'][$index]) ? $self_participant['inputs'][$index] : "";
+            $item['check_time'] = isset($self_participant['checkeds_time'][$index]) ? $self_participant['checkeds_time'][$index] : 0;
             $check_items[$index] = $item;
 
             // 自分以外の参加者情報のチェック時間と名前を取得処理
@@ -316,16 +350,16 @@ class ApiController extends Controller
                 if ($_user_id === $request->user_id) continue;
 
                 $item['participants'][$_index]['user_name'] = $info['user_name'];
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
+                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$index] ?? 0;
                 $check_items[$index] = $item;
                 $_index++;
             }
         }
-
         // ソート
         // id 昇順に並び替え
-        $ids = array_column($check_items, 'id');
-        array_multisort($ids, SORT_ASC, $check_items);
+        // sort($check_items);
+        // $ids = array_column($check_items, 'id');
+        // array_multisort($ids, SORT_ASC, $check_items);
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
@@ -419,13 +453,29 @@ class ApiController extends Controller
         }
 
         // check_items partipants抽出
+        $check_item_json_path = "public/templates/1_checkitem.dat";
+        $is_check_item_json = Storage::exists($check_item_json_path);
+
+        // ロック中の場合
+        $timestamp = 0;
+        $json_contents = [];
+        if ($is_check_item_json) {
+            $json_contents = Storage::get($check_item_json_path);
+            $json_contents = mb_convert_encoding($json_contents, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+            dd($json_contents);
+        }
+        // ロック中でなければファイル内容にタイムスタンプを記述
+        else {
+            $timestamp = $now->timestamp;
+            Storage::put($lockfie_path, $timestamp);
+        }
         $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
         $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
 
         // チェック作業に表示する項目自体が存在しない場合
         if (empty($check_items)) {
             return response()->json([
-                'error' => 'チェック作業する項目が存在しません。',
+                'error' => '',
                 'check_users' => [],
                 'progressA' => 0,
                 'progressU' => 0,
@@ -717,10 +767,15 @@ class ApiController extends Controller
         // }
 
         //　チェックリスト取得
-        $checklist = ChecklistWork::find($request->checklist_id)
-            ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
-            ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-            ->first();
+        $checklist = DB::table('checklist_works')->where('id', '=', $request->checklist_id)
+        ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+        ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+        ->first();
+        //　チェックリスト取得
+        // $checklist = ChecklistWork::find($request->checklist_id)
+        //     ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
+        //     ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+        //     ->first();
         // 作業中チェックリストが存在しない場合
         if (is_null($checklist)) {
             return [
@@ -729,8 +784,21 @@ class ApiController extends Controller
             ];
         }
 
-        // check_items partipants抽出
-        $check_items = isset($checklist->check_items) ? json_decode($checklist->check_items, true) : [];
+         /***************** check_items取得処理 *********************************************/
+        // JSONファイル存在チェック
+        $json_file_path = "public/works/{$request->checklist_id}_checkitem.dat";
+        $is_json_file_path = Storage::exists($json_file_path);
+        if(!$is_json_file_path) {
+            return;
+        }
+
+        // 取得
+        $json_content = Storage::get($json_file_path);
+        $check_items = json_decode($json_content, true);
+        // dd($check_items);
+        /****************************************************************/
+
+        // partipants抽出
         $participants = isset($checklist->participants) ? json_decode($checklist->participants, true) : [];
 
         // チェック作業に表示する項目自体が存在しない場合
@@ -757,18 +825,15 @@ class ApiController extends Controller
             $self_participant['elapsed_time'] = 0;
         } else {
             foreach ($check_items as $index => $item) {
-                // check itmeのidが存在しない場合
-                if (!isset($item['id'])) continue;
-
                 // item項目に対応するIDが存在しない場合は新規作成
-                if (!isset($self_participant['checkeds'][$item['id']])) {
-                    $self_participant['checkeds'][$item['id']] = 0;
+                if (!isset($self_participant['checkeds'][$index])) {
+                    $self_participant['checkeds'][$index] = 0;
                 }
-                if (!isset($self_participant['checkeds_time'][$item['id']])) {
-                    $self_participant['checkeds_time'][$item['id']] = 0;
+                if (!isset($self_participant['checkeds_time'][$index])) {
+                    $self_participant['checkeds_time'][$index] = 0;
                 }
-                if (!isset($self_participant['inputs'][$item['id']])) {
-                    $self_participant['inputs'][$item['id']] = '';
+                if (!isset($self_participant['inputs'][$index])) {
+                    $self_participant['inputs'][$index] = '';
                 }
             }
             if (isset($self_participant['started_at'])) {
@@ -786,17 +851,19 @@ class ApiController extends Controller
         $self_participant['elapsed_time'] = $request->elapsed_time;
         foreach ($request->checklist_works as $item) {
             $cheked = $item['checked'] ?? 0;
-            $self_participant['checkeds'][$item['id']] = $cheked;
-            $self_participant['checkeds_time'][$item['id']] =  $cheked == 1 ? $item['check_time'] : 0;
-            $self_participant['inputs'][$item['id']] = $item['input'] ?? '';
+            $self_participant['checkeds'][$index] = $cheked;
+            $self_participant['checkeds_time'][$index] =  $cheked == 1 ? $item['check_time'] : 0;
+            $self_participant['inputs'][$index] = $item['input'] ?? '';
         }
 
         // 保存処理
         $participants[$request->user_id] = $self_participant;
-        $checklist->participants = json_encode($participants, true);
+        // $checklist->participants = json_encode($participants, true);
         try {
             DB::beginTransaction();
-            $checklist->save();
+            DB::table('checklist_works')->where('id', $request->checklist_id)->update([
+                'participants' => json_encode($participants, true),
+            ]);
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();
@@ -815,23 +882,24 @@ class ApiController extends Controller
         foreach ($tmp_checklist_works as $index => $item) {
 
             // チェック済み加算
-            if ((int)$self_participant['checkeds'][$item['id']] == 1) {
+            if ((int)$self_participant['checkeds'][$index] == 1) {
                 $chkU++;
                 $chkA++;
             }
-            $item['checked'] = $self_participant['checkeds'][$item['id']] ?? 0;
-            $item['input'] = $self_participant['inputs'][$item['id']] ?? '';
-            $item['check_time'] = $self_participant['checkeds_time'][$item['id']] ?? 0;
+            $item['checked'] = $self_participant['checkeds'][$index] ?? 0;
+            $item['input'] = $self_participant['inputs'][$index] ?? '';
+            $item['check_time'] = $self_participant['checkeds_time'][$index] ?? 0;
 
             // 自分以外の参加者情報のチェック時間と名前を追加
             $_index = 0;
             foreach ($participants as $_user_id => $info) {
+
                 if ($_user_id === $request->user_id) continue;
                 $item['participants'][$_index]['user_name'] = $info['user_name'];
-                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$item['id']] ?? 0;
+                $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$_index] ?? 0;
 
                 // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
-                if ((int)$info['checkeds_time'][$item['id']] > 0) {
+                if ((int)$info['checkeds_time'][$index] > 0) {
                     $chkA++;
                 }
                 $_index++;
@@ -855,8 +923,6 @@ class ApiController extends Controller
         // ソート
         // id 昇順に並び替え
         $ids = array_column($tmp_checklist_works, 'id');
-        array_multisort($ids, SORT_ASC, $tmp_checklist_works);
-
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
