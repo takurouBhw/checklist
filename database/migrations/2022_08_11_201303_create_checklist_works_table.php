@@ -26,7 +26,7 @@ class CreateChecklistWorksTable extends Migration
             $table->unsignedBigInteger('category2_id');
             $table->unsignedBigInteger('category3_id')->nullable();
             $table->unsignedBigInteger('category4_id')->nullable();
-            $table->string('title', 100);
+            $table->string('checklist_title', 100);
             $table->unsignedInteger('year');
             $table->unsignedInteger('month');
             $table->dateTime('drafted_at')->nullable();

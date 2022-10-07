@@ -24,7 +24,7 @@ class ChecklistWorkFactory extends Factory
             $item = [
                 "id"=> (string)$i,
                 "no" => (string)$i,
-                "title" => $this->faker->title() . $i,
+                "checklist_title" => $this->faker->title() . $i,
                 "headline" => '見出し' . $i,
                 "input" => 0
             ];
@@ -40,7 +40,7 @@ class ChecklistWorkFactory extends Factory
             'user_id' => 1,
             'year' => 2023,
             'month' => 12,
-            'title' => 'チェックリスト' . 'カテゴリ' . $category1_id . ' : カテゴリ' . $category2_id,
+            'checklist_title' => 'チェックリスト' . 'カテゴリ' . $category1_id . ' : カテゴリ' . $category2_id,
             "opened_at" => $this->faker->dateTimeThisDecade('now'),
             "colsed_at" => $this->faker->dateTimeThisDecade(1696639442),
             'deadline_at' => $this->faker->dateTimeThisDecade(1696639442),

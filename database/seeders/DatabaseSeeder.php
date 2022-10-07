@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Category1::factory($num)->create();
         \App\Models\Category2::factory($num)->create();
         // \App\Models\Category3::factory(1)->create();
-        \App\Models\Checklist::factory($num)->create();
+        // \App\Models\Checklist::factory($num)->create();
         \App\Models\ChecklistWork::factory($num)->create();
 
         // \App\Models\ChecklistTodo::factory(1)->create();

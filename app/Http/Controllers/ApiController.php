@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\CheckList;
 use App\Models\ChecklistWork;
 use Exception;
 
@@ -163,20 +164,27 @@ class ApiController extends Controller
         }
 
         $now = new Carbon();
-        $checklists = DB::select(
-            "SELECT `checklist_works`.`id`, `checklist_works`.`title`
-            FROM `checklist_works`
-            WHERE `category1_id`=? AND `category2_id`=?
-            AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
-            ORDER BY `deadline_at` ASC",
-            [$request->category1_id, $request->category2_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
-        );
+        $checklists = DB::table('checklist_works')
+        ->select('id', 'checklist_title')
+        ->where('category1_id', '=', $request->category1_id)
+        ->where('category2_id', '=', $request->category2_id)
+        ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
+        ->orderBy('deadline_at', 'asc')
+        ->first();
+        // $checklists = DB::select(
+        //     "SELECT `checklist_works`.`id`, `checklist_works`.`checklist_title`
+        //     FROM `checklist`
+        //     WHERE `category1_id`=? AND `category2_id`=?
+        //     AND `opened_at`<=? AND (`checklist_works`.`colsed_at`>=? OR `checklist_works`.`colsed_at` IS NULL)
+        //     ORDER BY `deadline_at` ASC",
+        //     [$request->category1_id, $request->category2_id, $now->format('Y-m-d 00:00:00'), $now->format('Y-m-d 23:59:59')]
+        // );
 
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
         return response()->json([
-            'checklists' => $checklists,
+            'checklists' => is_null($checklists) ? [] : $checklists,
         ]);
     }
 
@@ -224,11 +232,8 @@ class ApiController extends Controller
         }
 
         //　チェックリスト取得
-        $checklist = ChecklistWork::find($request->checklist_id)
-            ->where('opened_at', '<=', $now->format('Y-m-d 00:00:00'))
-            ->where('colsed_at', '>=', $now->format('Y-m-d 23:59:59'))
-            ->first();
-
+        // $checklist = DB::table('checklist_works')->where('id', '=', $request->checklist_id)->first();
+        $checklist = ChecklistWork::find($request->checklist_id)->first();
         // チェックリスト存在チェック
         if (is_null($checklist)) {
             return response()->json([
@@ -296,6 +301,7 @@ class ApiController extends Controller
             $checklist->participants = json_encode($participants, true);
             $checklist->save();
         }
+                // dd('aaa');
 
         // レスポンスチェック作業リストの生成処理
         foreach ($check_items as $index => $item) {
