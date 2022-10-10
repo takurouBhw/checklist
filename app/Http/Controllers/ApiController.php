@@ -97,7 +97,8 @@ class ApiController extends Controller
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
-            ], 403);
+                'status' => 403,
+            ]);
         }
 
         $now = new Carbon();
@@ -129,7 +130,8 @@ class ApiController extends Controller
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
-            ], 403);
+                'status' => 403,
+            ]);
         }
 
         $now = new Carbon();
@@ -160,7 +162,8 @@ class ApiController extends Controller
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
-            ], 403);
+                'status' => 403,
+            ]);
         }
 
         $now = new Carbon();
@@ -206,17 +209,12 @@ class ApiController extends Controller
                 'deadline_at' => 0,
                 'elapsed_time' => 0,
                 'checklist_works' => [],
-            ], 400);
+                'status' => 400,
+            ]);
         }
 
         $user_name = '';
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
-        // 権限チェック
-        if (is_null($user_name)) {
-            return response()->json([
-                'error' => 'チェック操作する権限がありません。',
-            ], 403);
-        }
         // 権限チェック
         $now = new Carbon();
         list($client_key, $user_name) = $user_name = Self::isLogin($request->user_id);
@@ -228,7 +226,8 @@ class ApiController extends Controller
                 'deadline_at' => 0,
                 'elapsed_time' => 0,
                 'checklist_works' => [],
-            ], 403);
+                'status' => 403,
+            ]);
         }
 
         //　チェックリスト取得
@@ -238,7 +237,7 @@ class ApiController extends Controller
         // チェックリスト存在チェック
         if (is_null($checklist)) {
             return response()->json([
-                'error' => 'チェックリストが存在しません',
+                'error' => '',
                 'started_at' =>  0,
                 'finished_at' => 0,
                 'deadline_at' => 0,
@@ -247,14 +246,19 @@ class ApiController extends Controller
             ]);
         }
 
-
-
         /***************** check_items取得処理 *********************************************/
         // JSONファイル存在チェック
         $json_file_path = "public/works/{$request->checklist_id}_checkitem.dat";
         $is_json_file_path = Storage::exists($json_file_path);
         if(!$is_json_file_path) {
-            return;
+            return response()->json([
+                'error' => [],
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'elapsed_time' => 0,
+                'checklist_works' => [],
+            ]);
         }
 
         // 取得
@@ -297,7 +301,7 @@ class ApiController extends Controller
             $self_participant['started_at'] = 0;
             $self_participant['finished_at'] = 0;
             $self_participant['elapsed_time'] = 0;
-            $self_participant['user_name'] = $user_name;
+            $self_participant['user_name'] =  $user_name;
         }
         // 参加者が作業完了している場合は空で返却
         if ($self_participant['finished_at'] > 0) {
@@ -338,10 +342,14 @@ class ApiController extends Controller
         }
 
         // レスポンスチェック作業リストの生成処理
+        $new_items = [];
         foreach ($check_items as $index => $item) {
+            $item['id'] = $index;
+            $item['no'] = $index;
             $item['checked'] = isset($self_participant['checkeds'][$index]) ? $self_participant['checkeds'][$index] : 0;
             $item['input'] = isset($self_participant['inputs'][$index]) ? $self_participant['inputs'][$index] : "";
             $item['check_time'] = isset($self_participant['checkeds_time'][$index]) ? $self_participant['checkeds_time'][$index] : 0;
+            // array_push($new_items, $item);
             $check_items[$index] = $item;
 
             // 自分以外の参加者情報のチェック時間と名前を取得処理
@@ -349,17 +357,20 @@ class ApiController extends Controller
             foreach ($participants as $_user_id => $info) {
                 if ($_user_id === $request->user_id) continue;
 
-                $item['participants'][$_index]['user_name'] = $info['user_name'];
+                $item['participants'][$_index]['user_name'] =  Crypt::decryptString($info['user_name']);
                 $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$index] ?? 0;
+            // array_push($new_items, $item);
                 $check_items[$index] = $item;
                 $_index++;
             }
         }
+        // dd($new_items);
         // ソート
         // id 昇順に並び替え
         // sort($check_items);
-        // $ids = array_column($check_items, 'id');
-        // array_multisort($ids, SORT_ASC, $check_items);
+        // $ids = array_column($new_items, 'id');
+        $ids = array_column($check_items, 'id');
+        array_multisort($ids, SORT_ASC, $check_items);
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
 
@@ -370,6 +381,7 @@ class ApiController extends Controller
             'deadline_at' => isset($checklist->deadline_at) ? (new Carbon($checklist->deadline_at))->timestamp : 0,
             'elapsed_time' => isset($checklist->elapsed_time) ? $self_participant['elapsed_time'] : 0,
             'checklist_works' => $check_items,
+            // 'checklist_works' => $new_items,
         ], 200);
     }
 
@@ -389,10 +401,11 @@ class ApiController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
+                'status' => 400,
                 'check_users' => [],
                 'progressA' => 0,
                 'progressU' => 0,
-            ], 400);
+            ]);
         }
 
         // 権限チェック
@@ -402,10 +415,11 @@ class ApiController extends Controller
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
+                'status' => 403,
                 'check_users' => [],
                 'progressA' => 0,
                 'progressU' => 0,
-            ], 403);
+            ]);
         }
 
         /*
@@ -584,7 +598,7 @@ class ApiController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'key' => ['bail', 'required', 'string'],
+                // 'key' => ['bail', 'required', 'string'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
                 'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
             ],
@@ -593,10 +607,11 @@ class ApiController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
+                'status' => 400,
                 'check_users' => [],
                 'progressA' => 0,
                 'progressU' => 0,
-            ], 400);
+            ]);
         }
 
         // 権限チェック
@@ -674,7 +689,7 @@ class ApiController extends Controller
                 $chkA = $check_time > 0 ? $chkA + 1 : $chkA;
                 $_participan = [
                     'check_time' => $check_time,
-                    'user_name' => $payload['user_name'],
+                    'user_name' => Crypt::decryptString($payload['user_name']),
                 ];
                 $_participants[$checklist_work_id] = [];
                 array_push($_participants[$checklist_work_id], $_participan);
@@ -684,14 +699,16 @@ class ApiController extends Controller
 
         // Progress作成処理
         // 総項目数
+        $progressA = 1;
+        $progressU = 1;
         $total_count = count(json_decode($checklist->check_items, true));
         // 参加人数
         $user_count = count(json_decode($checklist->participants, true));
 
-        if ($total_count !== 0 || $user_count !== 0) {
+        if (($total_count * $user_count) !== 0) {
             $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
         }
-        if ($total_count !== 0) {
+        if ($total_count !== 0 && $total_count !== 0) {
             $progressU = round($chkU / $total_count);
         }
 
@@ -711,7 +728,7 @@ class ApiController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
+                // 'key' => ['bail', 'required', 'string', 'min:36', 'max:36'],
                 'checklist_id' => ['bail', 'required', 'integer', 'min:1'],
                 'user_id' => ['bail', 'required', 'string', 'min:36', 'max:36'],
                 'elapsed_time' =>  ['bail', 'required', 'integer', 'min:1'],
@@ -719,11 +736,13 @@ class ApiController extends Controller
             ],
         );
 
+
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors(),
+                'status' => 400,
                 'checklist_works' => [],
-            ], 400);
+            ]);
         }
 
         // 権限チェック
@@ -733,7 +752,8 @@ class ApiController extends Controller
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
                 'checklist_works' => [],
-            ], 403);
+                'status' => 403,
+            ]);
         }
 
         /*
@@ -789,9 +809,15 @@ class ApiController extends Controller
         $json_file_path = "public/works/{$request->checklist_id}_checkitem.dat";
         $is_json_file_path = Storage::exists($json_file_path);
         if(!$is_json_file_path) {
-            return;
+            return response()->json([
+                'error' => [],
+                'started_at' =>  0,
+                'finished_at' => 0,
+                'deadline_at' => 0,
+                'elapsed_time' => 0,
+                'checklist_works' => [],
+            ]);
         }
-
         // 取得
         $json_content = Storage::get($json_file_path);
         $check_items = json_decode($json_content, true);
@@ -844,21 +870,22 @@ class ApiController extends Controller
             }
             if (isset($self_participant['elapsed_time'])) {
                 $self_participant['elapsed_time'] = 0;
-            }}
+            }
+        }
 
         // 更新処理
         $self_participant['user_name'] = $user_name;
         $self_participant['elapsed_time'] = $request->elapsed_time;
         foreach ($request->checklist_works as $item) {
             $cheked = $item['checked'] ?? 0;
-            $self_participant['checkeds'][$index] = $cheked;
-            $self_participant['checkeds_time'][$index] =  $cheked == 1 ? $item['check_time'] : 0;
-            $self_participant['inputs'][$index] = $item['input'] ?? '';
+            $id = $item['id'];
+            $self_participant['checkeds'][$id] = $cheked;
+            $self_participant['checkeds_time'][$id] =  $cheked == 1 ? $item['check_time'] : 0;
+            $self_participant['inputs'][$id] = $item['input'] ?? '';
         }
 
         // 保存処理
         $participants[$request->user_id] = $self_participant;
-        // $checklist->participants = json_encode($participants, true);
         try {
             DB::beginTransaction();
             DB::table('checklist_works')->where('id', $request->checklist_id)->update([
@@ -879,6 +906,7 @@ class ApiController extends Controller
         $chkA = 0;
         // 全参加者のチェック数
         $chkU = 0;
+        $new_items = [];
         foreach ($tmp_checklist_works as $index => $item) {
 
             // チェック済み加算
@@ -886,6 +914,8 @@ class ApiController extends Controller
                 $chkU++;
                 $chkA++;
             }
+            $item['id'] = $index;
+            $item['no'] = $index;
             $item['checked'] = $self_participant['checkeds'][$index] ?? 0;
             $item['input'] = $self_participant['inputs'][$index] ?? '';
             $item['check_time'] = $self_participant['checkeds_time'][$index] ?? 0;
@@ -895,7 +925,7 @@ class ApiController extends Controller
             foreach ($participants as $_user_id => $info) {
 
                 if ($_user_id === $request->user_id) continue;
-                $item['participants'][$_index]['user_name'] = $info['user_name'];
+                $item['participants'][$_index]['user_name'] = Crypt::decryptString($info['user_name']);
                 $item['participants'][$_index]['check_time'] = $info['checkeds_time'][$_index] ?? 0;
 
                 // チェックタイム0より上ならチェック済みなので全参加のチェック数を加算
@@ -904,30 +934,39 @@ class ApiController extends Controller
                 }
                 $_index++;
             }
+            // array_push($new_items, $item);
             $tmp_checklist_works[$index] = $item;
         }
 
         // Progress作成処理
         // 総項目数
         $total_count = count(json_decode($checklist->check_items, true));
+        $progressA = 1;
+        $progressU = 1;
         // 参加人数
         $user_count = count($tmp_checklist_works[0]['participants'] ?? []) + 1;
-        if ($total_count !== 0 || $user_count !== 0) {
+        if (($total_count * $user_count) !== 0) {
             // progressA: 全体の進捗値。0～100を返す。※式 = (参加者の全チェック数) ／ (参加人数 ＊ 項目数)　小数点以下四捨五入。
             $progressA = round(($chkU + $chkA) / ($total_count * $user_count));
         }
-        if ($total_count !== 0) {
+        if ($total_count !== 0 && $$chkU !== 0) {
             // progressU: 個人の進捗値。0～100を返す。※式 = (チェック数) ／ (項目数)　小数点以下四捨五入。
             $progressU = round($chkU / $total_count);
         }
         // ソート
         // id 昇順に並び替え
+        // $ids = array_column($new_items, 'id');
+        // dd('aaa');
+        // array_multisort($ids, SORT_ASC, $new_items);
         $ids = array_column($tmp_checklist_works, 'id');
+        array_multisort($ids, SORT_ASC, $tmp_checklist_works);
+
+
         // header("Access-Control-Allow-Origin: *");
         // header("Access-Control-Allow-Headers: Origin, X-Requested-With");
-
         return response()->json([
             'error' => '',
+            // 'checklist_works' => $new_items,
             'checklist_works' => $tmp_checklist_works,
             'elapsed_time' => $request->elapsed_time,
             'progressA' => $progressA,
@@ -955,8 +994,9 @@ class ApiController extends Controller
         if (is_null($user_name)) {
             return response()->json([
                 'error' => 'チェック操作する権限がありません。',
+                'status' => 403,
                 'checklist_works' => [],
-            ], 403);
+            ]);
         }
 
         $now = new Carbon();

@@ -4,9 +4,32 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Lib\Util\CheckItemService;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class ChecklistWorkSeeder extends Seeder
 {
+    public function create_check_items_json($id, $max)
+    {
+        $max_row = $max;
+        $now = new Carbon();
+        $check_items = [];
+
+        for ($i = 1; $i <= $max_row; $i++) {
+            $item = [
+                "title" => 'テスト' . $i,
+                "headline" => random_int(0, 1),
+                "input" => random_int(0, 1),
+                "edited_at" => $now->format('Y-m-d H:i:s'),
+            ];
+            $check_items["{$i}"] = $item;
+        }
+
+        // $json_file_path = "public/works/{$id}_checkitem.dat";
+        $json_file_path = "public/works/{$id}_checkitem.dat";
+        Storage::put($json_file_path, json_encode($check_items, true));
+    }
     /**
      * Run the database seeds.
      *
@@ -14,78 +37,78 @@ class ChecklistWorkSeeder extends Seeder
      */
     public function run()
     {
-        $check_items = [
-            [
-            "id"=>1,
-            "no" => 1,
-            "title" => "TITLE1",
-            "headline" => '見出し1',
-            "input" => 0
-            ],
-            [
-                "id" => 2,
-                "no" => 2,
-                "title" => "TITLE2",
-                "headline" => "見出し2",
-                "input" => 0,
-            ],
-            [
-                "id" => 3,
-                "no" => 3,
-                "title" => "TITLE3",
-                "headline" => "見出し3",
-                "input" => 0
-            ],
-            [
-                "id" => 4,
-                "no" => 4,
-                "title" => "TITLE4",
-                "headline" => "見出し",
-                "input" => 0
-            ],
-            [
-                "id" => 5,
-                "no" => 5,
-                "title" => "TITLE5",
-                "headline" => "見出し5",
-                "input" => 0
-            ],
-            [
-                "id" => 6,
-                "no" => 6,
-                "title" => "TITLE6",
-                "headline" => "見出し6",
-                "input" => 0
-            ],
-            [
-                "id" => 7,
-                "no" => 7,
-                "title" => "TITLE7",
-                "headline" => "見出し7",
-                "input" => 0
-            ],
-            [
-                "id" => 8,
-                "no" => 8,
-                "title" => "TITLE8",
-                "headline" => "見出し8",
-                "input" => 0
-            ],
-            [
-                "id" => 9,
-                "no" => 9,
-                "title" => "TITLE9",
-                "headline" => "見出し9",
-                "input" => 0
-            ],
-            [
-                "id" => 10,
-                "no" => 10,
-                "title" => "TITLE10",
-                "headline" => "見出し10",
-                "input" => 0
-            ],
-        ];
+        // $check_items = [
+        //     [
+        //     "id"=>1,
+        //     "no" => 1,
+        //     "title" => "TITLE1",
+        //     "headline" => '見出し1',
+        //     "input" => 0
+        //     ],
+        //     [
+        //         "id" => 2,
+        //         "no" => 2,
+        //         "title" => "TITLE2",
+        //         "headline" => "見出し2",
+        //         "input" => 0,
+        //     ],
+        //     [
+        //         "id" => 3,
+        //         "no" => 3,
+        //         "title" => "TITLE3",
+        //         "headline" => "見出し3",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 4,
+        //         "no" => 4,
+        //         "title" => "TITLE4",
+        //         "headline" => "見出し",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 5,
+        //         "no" => 5,
+        //         "title" => "TITLE5",
+        //         "headline" => "見出し5",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 6,
+        //         "no" => 6,
+        //         "title" => "TITLE6",
+        //         "headline" => "見出し6",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 7,
+        //         "no" => 7,
+        //         "title" => "TITLE7",
+        //         "headline" => "見出し7",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 8,
+        //         "no" => 8,
+        //         "title" => "TITLE8",
+        //         "headline" => "見出し8",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 9,
+        //         "no" => 9,
+        //         "title" => "TITLE9",
+        //         "headline" => "見出し9",
+        //         "input" => 0
+        //     ],
+        //     [
+        //         "id" => 10,
+        //         "no" => 10,
+        //         "title" => "TITLE10",
+        //         "headline" => "見出し10",
+        //         "input" => 0
+        //     ],
+        // ];
         $participants = [
             // "5d87d115-7ebb-4d17-adce-4ffe4b39f8c6" => [
                 // "user_name" => "管理者",
@@ -140,6 +163,9 @@ class ChecklistWorkSeeder extends Seeder
             //     ],
             // ],
         ];
+
+        $this->create_check_items_json(1, 5);
+
         DB::table('checklist_works')->insert([
             [
                     'user_id' => 1,
@@ -148,11 +174,11 @@ class ChecklistWorkSeeder extends Seeder
                     'client_id' => 1,
                     'year' => 2023,
                     'month' => 12,
-                    'title' => 'ハイツA101号室',
+                    'checklist_title' => 'ハイツA101号室',
                     "opened_at" => '2001-12-6 00:00:00',
                     "colsed_at" => '2025-10-6 23:59:59',
                     'deadline_at' => '2025-9-30 23:59:59',
-                    "check_items" => json_encode($check_items, true),
+                    // "check_items" => json_encode($check_items, true),
                     'participants' => json_encode($participants, true),
             ],
         ]);

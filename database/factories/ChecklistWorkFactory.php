@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
 
 class ChecklistWorkFactory extends Factory
 {
@@ -22,16 +23,19 @@ class ChecklistWorkFactory extends Factory
 
         for($i = 1; $i <= $max_num; $i++) {
             $item = [
-                "id"=> (string)$i,
-                "no" => (string)$i,
-                "checklist_title" => $this->faker->title() . $i,
-                "headline" => '見出し' . $i,
-                "input" => 0
+                "title" => $this->faker->title() . $i,
+                "headline" => $this->faker->numberBetween(0, 1),
+                "input" => $this->faker->numberBetween(0, 1),
+                "edited_at" => $this->faker->dateTimeThisDecade(),
             ];
-            array_push($check_items, $item);
+            $check_items["{$i}"] = $item;
         }
+
         $category1_id = $this->faker->numberBetween(1, 150);
         $category2_id = $this->faker->numberBetween(1, 150);
+        $id = $this->faker->numberBetween(1, $max_num);
+        $json_file_path = "public/works/{$id}_checkitem.dat";
+        Storage::put($json_file_path, json_encode($check_items));
         // $date = new (Carbon(1696639444)->
         return [
             'category1_id' => $category1_id,
