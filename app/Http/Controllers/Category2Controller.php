@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category2;
 use Illuminate\Http\Request;
 use App\Models\User;
 
-class UserController extends Controller
+class Category2Controller extends Controller
 {
-    public function getUser(Request $request) {
-
-        $user = User::find($request->user_id)->get();
-
-        return $user
-        ? response()->json(['user_id' => $user->id, 'name' => $user->name], 200)
-        : response()->json([], 500);
-    }
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all()->toArray();
+        return Category2::all()->toArray();
     }
 
     /**
@@ -33,6 +26,25 @@ class UserController extends Controller
     public function create()
     {
         //
+    }
+    public function getCategory(Request $request) {
+
+        $user = User::where('user_id', '=', $request->user_id)->first();
+        if(is_null($user)){
+            return response()->json([
+                'error' => '権限エラー',
+                'categories' => [],
+            ], 419);
+        }
+
+        $categories = Category2::where('category1_id', '=', $request->category1_id)->get()->toArray();
+        $res = [
+            'categories' => $categories,
+            'client_key' => $user->client_key,
+            'error' => '',
+        ];
+
+        return response()->json($res, 200);
     }
 
     /**

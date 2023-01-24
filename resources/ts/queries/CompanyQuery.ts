@@ -25,7 +25,7 @@ const useCreateCompany = () => {
 
     return useMutation(api.createCompany, {
         onSuccess: () => {
-            queryClient.invalidateQueries("companies");
+            //リアルタイム更新時に現在の状態を一時保存
             toast.success("登録に成功しました。");
         },
         onError: (error: AxiosError) => {
@@ -73,13 +73,23 @@ const useDeleteCompany = () => {
 
 const useUpdateCompany = () => {
     const queryClient = useQueryClient();
-
+    const
     return useMutation(api.updateCompany, {
         onSuccess: () => {
             queryClient.invalidateQueries("companies");
+            const checkItem = localStorage.getItem('checkItem');
+            localStorage.setItem('checkItem', checkItem)
+
             toast.success("更新に成功しました。");
         },
+
+        //リアルタイム更新(10秒おき)エラーの場合
         onError: (error: AxiosError) => {
+            const checkItem = localStorage.getItem('checkItem');
+            // ↓グローバルコンテクスト作成して現在の状態取り出す。
+            const {} = useCheckEditContext();
+
+            localStorage.setItem('checkItem', JSON.stringify(checkItem));
             // エラーメッセージ
             if (error.response?.data.errors) {
                 Object.values(error.response.data.errors).map(

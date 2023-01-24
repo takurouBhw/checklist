@@ -18,8 +18,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::where('user_id', \Auth::id())->orderByDesc('id')->get();
-        return $companies;
+        // $companies = Company::where('user_id', \Auth::id())->orderByDesc('id')->get();
+        $companies = Company::all();
+        return $companies->toArray();
     }
 
     public function getChecklistWorks($request)

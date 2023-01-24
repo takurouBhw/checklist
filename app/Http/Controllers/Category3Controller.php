@@ -2,27 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category3;
 use Illuminate\Http\Request;
-use App\Models\User;
 
-class UserController extends Controller
+class Category3Controller extends Controller
 {
-    public function getUser(Request $request) {
-
-        $user = User::find($request->user_id)->get();
-
-        return $user
-        ? response()->json(['user_id' => $user->id, 'name' => $user->name], 200)
-        : response()->json([], 500);
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($request)
     {
-        return User::all()->toArray();
+        return Category3::where('category1_id', '=',  $request->category1_id)
+        ->where('category2_id', '=', $request->category2_id)
+        ->get()
+        ->toArray();
     }
 
     /**
@@ -35,6 +30,20 @@ class UserController extends Controller
         //
     }
 
+    public function getCategory(Request $request) {
+
+        $categories = Category3::where('category2_id', '=', $request->category2_id)
+        ->where('category1_id', '=', $request->category1_id)
+        ->get()->toArray();
+
+        $res = [
+            'categories' => $categories,
+            'user_id' => '1235',
+            'error' => '',
+        ];
+
+        return response()->json($res, 200);
+    }
     /**
      * Store a newly created resource in storage.
      *
