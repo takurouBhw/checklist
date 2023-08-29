@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCompanyRequest;
-use App\Http\Requests\UpdateCompanyRequest;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use Illuminate\Http\Request;
-use App\Models\Company;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
-class CompanyController extends Controller
+class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,17 +19,17 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::where('user_id', \Auth::id())->orderByDesc('id')->get();
-        return $companies;
+        $tasks = Task::where('user_id', Auth::id())->orderByDesc('id')->get();
+        return $tasks;
     }
 
     public function getChecklistWorks($request)
     {
 
-        $companies = Company::where('user_id', $request->user_id);
+        $tasks = Task::where('user_id', $request->user_id);
 
-        return $companies;
-        // return Company::all()->toArray();
+        return $tasks;
+        // return Task::all()->toArray();
     }
 
     /**
@@ -43,20 +44,20 @@ class CompanyController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreCompanyRequest $request
-     * @param Company $company
+     * @param StoreTaskRequest $request
+     * @param Task $task
      * @return JsonResponse
      */
-    public function store(StoreCompanyRequest $request, Company $company): JsonResponse
+    public function store(StoreTaskRequest $request, Task $task): JsonResponse
     {
         // 作成
 
         $request->merge([
-            'user_id' => \Auth::id()
+            'user_id' => Auth::id()
         ]);
-        $company = Company::create($request->companyAttributes());
-        return $company
-            ? response()->json($company, 201)
+        $task = Task::create($request->TaskAttributes());
+        return $task
+            ? response()->json($task, 201)
             : response()->json([], 500);
     }
 
@@ -85,17 +86,17 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateCompanyRequest $request
+     * @param UpdateTaskRequest $request
      * @param [type] $id
      * @return JsonResponse
      */
-    public function update(UpdateCompanyRequest $request, $id): JsonResponse
+    public function update(UpdateTaskRequest $request, $id): JsonResponse
     {
-        $company = Company::find($id);
-        $company->update($request->companyAttributes());
+        $task = Task::find($id);
+        $task->update($request->TaskAttributes());
         // 更新
-        return $company->update($request->companyAttributes())
-            ? response()->json($company, 200)
+        return $task->update($request->TaskAttributes())
+            ? response()->json($task, 200)
             : response()->json([], 500);
     }
 
@@ -108,11 +109,10 @@ class CompanyController extends Controller
     public function destroy($id): JsonResponse
     {
         // 論理削除
-        $company = Company::findOrFail($id)->delete();
+        $task = Task::findOrFail($id)->delete();
 
-        return $company
-        ? response()->json($company)
-        : response()->json([], 500);
-
+        return $task
+            ? response()->json($task)
+            : response()->json([], 500);
     }
 }

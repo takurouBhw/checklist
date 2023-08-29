@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Company extends Model
+class Task extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'companies';
+    protected $table = 'tasks';
     protected $guarded = [
         'id',
         'created_at',
@@ -18,4 +18,8 @@ class Company extends Model
         'deleted_at',
     ];
 
+    protected $fillable = [
+        'title',
+        'memo',
+    ];
 }

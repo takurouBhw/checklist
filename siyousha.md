@@ -171,7 +171,7 @@ NULL
 
 
 
-会社マスター：companies
+会社マスター：tasks
 
 カラム名
 データ型
