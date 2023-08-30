@@ -14,8 +14,8 @@ class CategoryFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'テスト' . random_int(1, 10) . 'カテゴリ',
-            'sort_num' => random_int(1, 5),
+            'client_key' => $this->faker->uniqid(),
+            'category_title' => $this->faker->title(),
         ];
     }
 }

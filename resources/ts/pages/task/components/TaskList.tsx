@@ -19,6 +19,7 @@ const TaskList: React.FC = () => {
             </div>
         );
     }
+    console.log(tasks);
     return (
         <>
             <div className="inner">

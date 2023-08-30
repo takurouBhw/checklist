@@ -3,7 +3,7 @@ type ChecklistWork = {
     category_id: number;
     checklist_id: number;
     user_id: string;
-    title: string;
+    task_title: string;
     started_at: string;
     ended_at: string;
 };

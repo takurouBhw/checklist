@@ -28,6 +28,8 @@ class StoreTaskRequest extends FormRequest
         return [
             'memo' => 'nullable|string|min:1',
             'title' =>  'required|string|min:1||max:100',
+            'todo_id' => 'required|integer|min:0',
+            'sort_no' => 'required|integer|min:0',
         ];
     }
 
@@ -48,6 +50,7 @@ class StoreTaskRequest extends FormRequest
             'memo',
             'title',
             'user_id',
+            'sort_no',
         ]);
     }
 }

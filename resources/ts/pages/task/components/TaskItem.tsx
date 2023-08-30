@@ -17,9 +17,10 @@ const TaskItem: React.FC<Props> = ({ task, id }) => {
     const updateTaskDone = useUpdateTaskDone();
     const updateTask = useUpdateTask();
     const [editTitle, setEditTitle] = useState<string | undefined>(undefined);
+    console.log(task);
 
     const handleToggleEdit = () => {
-        setEditTitle(task.title);
+        setEditTitle(task.task_title);
     };
     const handleOnKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (["Escape", "Tab"].includes(e.key)) {
@@ -42,7 +43,7 @@ const TaskItem: React.FC<Props> = ({ task, id }) => {
         }
 
         const newTask = { ...task };
-        newTask.title = editTitle;
+        newTask.task_title = editTitle;
 
         updateTask.mutate(({
             id: task.id,
@@ -73,7 +74,7 @@ const TaskItem: React.FC<Props> = ({ task, id }) => {
     const itemText = () => (
         <>
             <div onClick={handleToggleEdit}>
-                <span>{task.title}</span>
+                <span>{task.task_title}</span>
             </div>
             <button className="btn is-delete">削除</button>
         </>

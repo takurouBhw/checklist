@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateChecklistParticipantsTable extends Migration
+class CreateTodosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateChecklistParticipantsTable extends Migration
      */
     public function up()
     {
-        Schema::create('checklist_participants', function (Blueprint $table) {
+        Schema::create('todos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('checklist_id');
-            $table->string('user_id', 32);
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->string('todo_title');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,6 +29,6 @@ class CreateChecklistParticipantsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('checklist_participants');
+        Schema::dropIfExists('todos');
     }
 }
