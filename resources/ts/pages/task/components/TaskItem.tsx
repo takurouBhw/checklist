@@ -1,55 +1,55 @@
 import React, { useState } from "react";
-import Company from "../../../types/Company";
+import Task from "../../../types/Task";
 import { toast } from "react-toastify";
 
 import {
-    useUpdateCompanyDone,
-    useDeleteCompany,
-    useUpdateCompany,
-} from "../../../queries/CompanyQuery";
+    useUpdateTaskDone,
+    useDeleteTask,
+    useUpdateTask,
+} from "../../../queries/TaskQuery";
 
 type Props = {
-    company: Company;
+    task: Task;
     id: number;
 };
 
-const CompanyItem: React.FC<Props> = ({ company, id }) => {
-    const updateCompanyDone = useUpdateCompanyDone();
-    const updateCompany = useUpdateCompany();
-    const [editName, setEditName] = useState<string | undefined>(undefined);
+const TaskItem: React.FC<Props> = ({ task, id }) => {
+    const updateTaskDone = useUpdateTaskDone();
+    const updateTask = useUpdateTask();
+    const [editTitle, setEditTitle] = useState<string | undefined>(undefined);
 
     const handleToggleEdit = () => {
-        setEditName(company.name);
+        setEditTitle(task.title);
     };
     const handleOnKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (["Escape", "Tab"].includes(e.key)) {
-            setEditName(undefined);
+            setEditTitle(undefined);
         }
     };
     const handleOnBlur = () => {
-        setEditName(undefined);
+        setEditTitle(undefined);
     };
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setEditName(e.target.value);
+        setEditTitle(e.target.value);
     };
     const handleUpdate = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         // 未入力の場合
-        if (editName === undefined) {
-            toast.error('会社名を入力してください。');
+        if (editTitle === undefined) {
+            toast.error('タスク名');
             return;
         }
 
-        const newCompany = { ...company };
-        newCompany.name = editName;
+        const newTask = { ...task };
+        newTask.title = editTitle;
 
-        updateCompany.mutate(({
-            id: company.id,
-            company: newCompany,
+        updateTask.mutate(({
+            id: task.id,
+            task: newTask,
         }))
 
-        setEditName(undefined);
+        setEditTitle(undefined);
     };
     const itemInput = () => {
         return (
@@ -58,7 +58,7 @@ const CompanyItem: React.FC<Props> = ({ company, id }) => {
                     <input
                         type="text"
                         className="input"
-                        defaultValue={editName}
+                        defaultValue={editTitle}
                         onKeyDown={handleOnKey}
                         onBlur={handleOnBlur}
                         onChange={handleInputChange}
@@ -73,24 +73,24 @@ const CompanyItem: React.FC<Props> = ({ company, id }) => {
     const itemText = () => (
         <>
             <div onClick={handleToggleEdit}>
-                <span>{company.name}</span>
+                <span>{task.title}</span>
             </div>
             <button className="btn is-delete">削除</button>
         </>
     );
 
     return (
-        <li key={id} className={company.is_done ? "done" : ""}>
+        <li key={id} className={task.is_done ? "done" : ""}>
             <label className="checkbox-label">
                 <input
                     type="checkbox"
                     className="checkbox-input"
-                    onClick={() => updateCompanyDone.mutate(company)}
-                />
+                    onClick={() => updateTaskDone.mutate(task)} />
+
             </label>
-            {editName === undefined ? itemText() : itemInput()}
+            {editTitle === undefined ? itemText() : itemInput()}
         </li>
     );
 };
 
-export default CompanyItem;
+export default TaskItem;

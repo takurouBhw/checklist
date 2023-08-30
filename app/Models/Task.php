@@ -21,5 +21,6 @@ class Task extends Model
     protected $fillable = [
         'title',
         'memo',
+        'is_done',
     ];
 }

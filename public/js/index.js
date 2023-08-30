@@ -2172,9 +2172,7 @@ var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/reac
 
 var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 
-var company_1 = __importDefault(__webpack_require__(/*! ./pages/company */ "./resources/ts/pages/company/index.tsx"));
-
-var login_1 = __importDefault(__webpack_require__(/*! ./pages/login */ "./resources/ts/pages/login/index.tsx"));
+var task_1 = __importDefault(__webpack_require__(/*! ./pages/task */ "./resources/ts/pages/task/index.tsx"));
 
 var error_1 = __importDefault(__webpack_require__(/*! ./pages/error */ "./resources/ts/pages/error/index.tsx"));
 
@@ -2197,14 +2195,10 @@ function Router() {
     if (authUser) {
       setIsAuth(true);
     }
-  }, [authUser]);
-
-  var GuardRoute = function GuardRoute(props) {
-    if (!isAuth) return react_1["default"].createElement(react_router_dom_1.Redirect, {
-      to: "/login"
-    });
-    return react_1["default"].createElement(react_router_dom_1.Route, Object.assign({}, props));
-  };
+  }, [authUser]); // const GuardRoute = (props: RouteProps) => {
+  //     if (!isAuth) return <Redirect to="/login" />;
+  //     return <Route {...props} />;
+  // };
 
   var LoginRoute = function LoginRoute(props) {
     if (isAuth) return react_1["default"].createElement(react_router_dom_1.Redirect, {
@@ -2219,8 +2213,8 @@ function Router() {
     }, react_1["default"].createElement("nav", null, react_1["default"].createElement("ul", null, react_1["default"].createElement("li", null, react_1["default"].createElement(react_router_dom_1.Link, {
       to: "/"
     }, "\u30C8\u30C3\u30D7")), react_1["default"].createElement("li", null, react_1["default"].createElement(react_router_dom_1.Link, {
-      to: "/company"
-    }, "\u4F1A\u793E")), react_1["default"].createElement("li", {
+      to: "/task"
+    }, "\u30BF\u30B9\u30AF")), react_1["default"].createElement("li", {
       onClick: function onClick() {
         return logout.mutate();
       }
@@ -2235,19 +2229,13 @@ function Router() {
     }, "\u30ED\u30B0\u30A4\u30F3")))));
   };
 
-  return react_1["default"].createElement(react_router_dom_1.BrowserRouter, null, react_1["default"].createElement(react_1["default"].Fragment, null, isAuth ? react_1["default"].createElement(Navigation, null) : react_1["default"].createElement(LoginNavigation, null)
-  /* A <Switch> looks through its children <Route>s and
-  renders the first one that matches the current URL. */
-  , react_1["default"].createElement(react_router_dom_1.Switch, null, react_1["default"].createElement(GuardRoute, {
-    path: "/",
-    exact: true
-  }, react_1["default"].createElement("h1", null, "\u30D8\u30ED\u30FC")), react_1["default"].createElement(LoginRoute, {
-    path: "/login"
-  }, react_1["default"].createElement(login_1["default"], null)), react_1["default"].createElement(GuardRoute, {
-    path: "/company",
+  return react_1["default"].createElement(react_router_dom_1.BrowserRouter, null, react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(Navigation, null), react_1["default"].createElement(react_router_dom_1.Switch, null, react_1["default"].createElement(react_router_dom_1.Route, {
+    path: "/task",
     exact: true,
-    component: company_1["default"]
+    component: task_1["default"]
   }), react_1["default"].createElement(react_router_dom_1.Route, {
+    path: "/"
+  }, react_1["default"].createElement("h1", null, "HOME")), react_1["default"].createElement(react_router_dom_1.Route, {
     component: error_1["default"]
   }))));
 }
@@ -2402,10 +2390,10 @@ exports.logout = logout;
 
 /***/ }),
 
-/***/ "./resources/ts/api/CompanyAPI.ts":
-/*!****************************************!*\
-  !*** ./resources/ts/api/CompanyAPI.ts ***!
-  \****************************************/
+/***/ "./resources/ts/api/TaskAPI.ts":
+/*!*************************************!*\
+  !*** ./resources/ts/api/TaskAPI.ts ***!
+  \*************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2456,11 +2444,11 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.deleteCompany = exports.updateCompany = exports.createCompany = exports.updateCompanyDone = exports.getCompanies = void 0;
+exports.deleteTask = exports.updateTask = exports.createTask = exports.updateTaskDone = exports.getTasks = void 0;
 
 var axios_1 = __importDefault(__webpack_require__(/*! axios */ "./node_modules/axios/index.js"));
 
-var getCompanies = function getCompanies() {
+var getTasks = function getTasks() {
   return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
     var _yield$axios_1$defaul, data;
 
@@ -2469,7 +2457,7 @@ var getCompanies = function getCompanies() {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return axios_1["default"].get("api/comapnies");
+            return axios_1["default"].get("api/task");
 
           case 2:
             _yield$axios_1$defaul = _context.sent;
@@ -2486,9 +2474,9 @@ var getCompanies = function getCompanies() {
   }));
 };
 
-exports.getCompanies = getCompanies;
+exports.getTasks = getTasks;
 
-var updateCompanyDone = function updateCompanyDone(_ref) {
+var updateTaskDone = function updateTaskDone(_ref) {
   var id = _ref.id,
       is_done = _ref.is_done;
   return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -2499,7 +2487,8 @@ var updateCompanyDone = function updateCompanyDone(_ref) {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.next = 2;
-            return axios_1["default"].patch("api/comapnies/".concat(id), {
+            return axios_1["default"].patch("api/task/".concat(id), {
+              id: id,
               is_done: !is_done
             });
 
@@ -2517,9 +2506,9 @@ var updateCompanyDone = function updateCompanyDone(_ref) {
   }));
 };
 
-exports.updateCompanyDone = updateCompanyDone;
+exports.updateTaskDone = updateTaskDone;
 
-var createCompany = function createCompany(name) {
+var createTask = function createTask(title) {
   return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
     var _yield$axios_1$defaul3, data;
 
@@ -2528,9 +2517,8 @@ var createCompany = function createCompany(name) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.next = 2;
-            return axios_1["default"].post("api/comapnies", {
-              name: name // is_done: !is_done,
-
+            return axios_1["default"].post("api/task", {
+              title: title
             });
 
           case 2:
@@ -2547,11 +2535,11 @@ var createCompany = function createCompany(name) {
   }));
 };
 
-exports.createCompany = createCompany;
+exports.createTask = createTask;
 
-var updateCompany = function updateCompany(_ref2) {
+var updateTask = function updateTask(_ref2) {
   var id = _ref2.id,
-      company = _ref2.company;
+      task = _ref2.task;
   return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     var _yield$axios_1$defaul4, data;
 
@@ -2560,7 +2548,7 @@ var updateCompany = function updateCompany(_ref2) {
         switch (_context4.prev = _context4.next) {
           case 0:
             _context4.next = 2;
-            return axios_1["default"].put("api/comapnies/".concat(id), company);
+            return axios_1["default"].put("api/task/".concat(id), task);
 
           case 2:
             _yield$axios_1$defaul4 = _context4.sent;
@@ -2576,9 +2564,9 @@ var updateCompany = function updateCompany(_ref2) {
   }));
 };
 
-exports.updateCompany = updateCompany;
+exports.updateTask = updateTask;
 
-var deleteCompany = function deleteCompany(id) {
+var deleteTask = function deleteTask(id) {
   return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     var _yield$axios_1$defaul5, data;
 
@@ -2587,7 +2575,7 @@ var deleteCompany = function deleteCompany(id) {
         switch (_context5.prev = _context5.next) {
           case 0:
             _context5.next = 2;
-            return axios_1["default"]["delete"]("api/comapnies/".concat(id));
+            return axios_1["default"]["delete"]("api/task/".concat(id));
 
           case 2:
             _yield$axios_1$defaul5 = _context5.sent;
@@ -2603,7 +2591,7 @@ var deleteCompany = function deleteCompany(id) {
   }));
 };
 
-exports.deleteCompany = deleteCompany;
+exports.deleteTask = deleteTask;
 
 /***/ }),
 
@@ -2740,10 +2728,41 @@ if (container) {
 
 /***/ }),
 
-/***/ "./resources/ts/pages/company/components/CompanyInput.tsx":
-/*!****************************************************************!*\
-  !*** ./resources/ts/pages/company/components/CompanyInput.tsx ***!
-  \****************************************************************/
+/***/ "./resources/ts/pages/error/index.tsx":
+/*!********************************************!*\
+  !*** ./resources/ts/pages/error/index.tsx ***!
+  \********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+
+var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+
+var NotFoundPage = function NotFoundPage() {
+  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
+    className: "align-center"
+  }, react_1["default"].createElement("h1", null, "404 Not Found ")));
+};
+
+exports["default"] = NotFoundPage;
+
+/***/ }),
+
+/***/ "./resources/ts/pages/task/components/TaskInput.tsx":
+/*!**********************************************************!*\
+  !*** ./resources/ts/pages/task/components/TaskInput.tsx ***!
+  \**********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2807,20 +2826,19 @@ Object.defineProperty(exports, "__esModule", ({
 
 var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
-var CompanyQuery_1 = __webpack_require__(/*! ../../../queries/CompanyQuery */ "./resources/ts/queries/CompanyQuery.ts");
+var TaskQuery_1 = __webpack_require__(/*! ../../../queries/TaskQuery */ "./resources/ts/queries/TaskQuery.ts");
 
-var CompanyInput = function CompanyInput() {
+var TaskInput = function TaskInput() {
   var _ref = (0, react_1.useState)(""),
       _ref2 = _slicedToArray(_ref, 2),
       name = _ref2[0],
       setName = _ref2[1];
 
-  var creteCompany = (0, CompanyQuery_1.useCreateCompany)();
+  var creteCompany = (0, TaskQuery_1.useCreateTask)();
 
   var handleSubmit = function handleSubmit(e) {
     e.preventDefault();
     creteCompany.mutate(name);
-    console.log(name);
     setName("");
   };
 
@@ -2842,14 +2860,14 @@ var CompanyInput = function CompanyInput() {
   }, "\u8FFD\u52A0")));
 };
 
-exports["default"] = CompanyInput;
+exports["default"] = TaskInput;
 
 /***/ }),
 
-/***/ "./resources/ts/pages/company/components/CompanyItem.tsx":
-/*!***************************************************************!*\
-  !*** ./resources/ts/pages/company/components/CompanyItem.tsx ***!
-  \***************************************************************/
+/***/ "./resources/ts/pages/task/components/TaskItem.tsx":
+/*!*********************************************************!*\
+  !*** ./resources/ts/pages/task/components/TaskItem.tsx ***!
+  \*********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2915,59 +2933,59 @@ var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/reac
 
 var react_toastify_1 = __webpack_require__(/*! react-toastify */ "./node_modules/react-toastify/dist/react-toastify.js");
 
-var CompanyQuery_1 = __webpack_require__(/*! ../../../queries/CompanyQuery */ "./resources/ts/queries/CompanyQuery.ts");
+var TaskQuery_1 = __webpack_require__(/*! ../../../queries/TaskQuery */ "./resources/ts/queries/TaskQuery.ts");
 
-var CompanyItem = function CompanyItem(_ref) {
-  var company = _ref.company,
+var TaskItem = function TaskItem(_ref) {
+  var task = _ref.task,
       id = _ref.id;
-  var updateCompanyDone = (0, CompanyQuery_1.useUpdateCompanyDone)();
-  var updateCompany = (0, CompanyQuery_1.useUpdateCompany)();
+  var updateTaskDone = (0, TaskQuery_1.useUpdateTaskDone)();
+  var updateTask = (0, TaskQuery_1.useUpdateTask)();
 
   var _ref2 = (0, react_1.useState)(undefined),
       _ref3 = _slicedToArray(_ref2, 2),
-      editName = _ref3[0],
-      setEditName = _ref3[1];
+      editTitle = _ref3[0],
+      setEditTitle = _ref3[1];
 
   var handleToggleEdit = function handleToggleEdit() {
-    setEditName(company.name);
+    setEditTitle(task.title);
   };
 
   var handleOnKey = function handleOnKey(e) {
     if (["Escape", "Tab"].includes(e.key)) {
-      setEditName(undefined);
+      setEditTitle(undefined);
     }
   };
 
   var handleOnBlur = function handleOnBlur() {
-    setEditName(undefined);
+    setEditTitle(undefined);
   };
 
   var handleInputChange = function handleInputChange(e) {
-    setEditName(e.target.value);
+    setEditTitle(e.target.value);
   };
 
   var handleUpdate = function handleUpdate(e) {
     e.preventDefault(); // 未入力の場合
 
-    if (editName === undefined) {
-      react_toastify_1.toast.error('会社名を入力してください。');
+    if (editTitle === undefined) {
+      react_toastify_1.toast.error('タスク名');
       return;
     }
 
-    var newCompany = Object.assign({}, company);
-    newCompany.name = editName;
-    updateCompany.mutate({
-      id: company.id,
-      company: newCompany
+    var newTask = Object.assign({}, task);
+    newTask.title = editTitle;
+    updateTask.mutate({
+      id: task.id,
+      task: newTask
     });
-    setEditName(undefined);
+    setEditTitle(undefined);
   };
 
   var itemInput = function itemInput() {
     return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("form", null, react_1["default"].createElement("input", {
       type: "text",
       className: "input",
-      defaultValue: editName,
+      defaultValue: editTitle,
       onKeyDown: handleOnKey,
       onBlur: handleOnBlur,
       onChange: handleInputChange
@@ -2980,33 +2998,33 @@ var CompanyItem = function CompanyItem(_ref) {
   var itemText = function itemText() {
     return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
       onClick: handleToggleEdit
-    }, react_1["default"].createElement("span", null, company.name)), react_1["default"].createElement("button", {
+    }, react_1["default"].createElement("span", null, task.title)), react_1["default"].createElement("button", {
       className: "btn is-delete"
     }, "\u524A\u9664"));
   };
 
   return react_1["default"].createElement("li", {
     key: id,
-    className: company.is_done ? "done" : ""
+    className: task.is_done ? "done" : ""
   }, react_1["default"].createElement("label", {
     className: "checkbox-label"
   }, react_1["default"].createElement("input", {
     type: "checkbox",
     className: "checkbox-input",
     onClick: function onClick() {
-      return updateCompanyDone.mutate(company);
+      return updateTaskDone.mutate(task);
     }
-  })), editName === undefined ? itemText() : itemInput());
+  })), editTitle === undefined ? itemText() : itemInput());
 };
 
-exports["default"] = CompanyItem;
+exports["default"] = TaskItem;
 
 /***/ }),
 
-/***/ "./resources/ts/pages/company/components/CompanyList.tsx":
-/*!***************************************************************!*\
-  !*** ./resources/ts/pages/company/components/CompanyList.tsx ***!
-  \***************************************************************/
+/***/ "./resources/ts/pages/task/components/TaskList.tsx":
+/*!*********************************************************!*\
+  !*** ./resources/ts/pages/task/components/TaskList.tsx ***!
+  \*********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3024,13 +3042,13 @@ Object.defineProperty(exports, "__esModule", ({
 
 var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
-var CompanyQuery_1 = __webpack_require__(/*! ../../../queries/CompanyQuery */ "./resources/ts/queries/CompanyQuery.ts");
+var TaskQuery_1 = __webpack_require__(/*! ../../../queries/TaskQuery */ "./resources/ts/queries/TaskQuery.ts");
 
-var CompanyItem_1 = __importDefault(__webpack_require__(/*! ./CompanyItem */ "./resources/ts/pages/company/components/CompanyItem.tsx"));
+var TaskItem_1 = __importDefault(__webpack_require__(/*! ./TaskItem */ "./resources/ts/pages/task/components/TaskItem.tsx"));
 
-var CompanyList = function CompanyList() {
-  var _ref = (0, CompanyQuery_1.useCompany)(),
-      companies = _ref.data,
+var TaskList = function TaskList() {
+  var _ref = (0, TaskQuery_1.useTask)(),
+      tasks = _ref.data,
       status = _ref.status;
 
   if (status === "loading") {
@@ -3041,7 +3059,7 @@ var CompanyList = function CompanyList() {
     return react_1["default"].createElement("div", {
       className: "align-center"
     }, "\u30C7\u30FC\u30BF\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002");
-  } else if (!companies || companies.length <= 0) {
+  } else if (!tasks || tasks.length <= 0) {
     return react_1["default"].createElement("div", {
       className: "align-center"
     }, "\u767B\u9332\u3055\u308C\u305F\u4F1A\u793E\u60C5\u5831\u304C\u5B58\u5728\u3057\u307E\u305B\u3093\u3002");
@@ -3051,22 +3069,23 @@ var CompanyList = function CompanyList() {
     className: "inner"
   }, react_1["default"].createElement("ul", {
     className: "task-list"
-  }, companies.map(function (company) {
-    return react_1["default"].createElement(CompanyItem_1["default"], {
-      company: company,
-      id: company.id
+  }, tasks.map(function (task) {
+    return react_1["default"].createElement(TaskItem_1["default"], {
+      key: task.id,
+      task: task,
+      id: task.id
     });
   }))));
 };
 
-exports["default"] = CompanyList;
+exports["default"] = TaskList;
 
 /***/ }),
 
-/***/ "./resources/ts/pages/company/index.tsx":
-/*!**********************************************!*\
-  !*** ./resources/ts/pages/company/index.tsx ***!
-  \**********************************************/
+/***/ "./resources/ts/pages/task/index.tsx":
+/*!*******************************************!*\
+  !*** ./resources/ts/pages/task/index.tsx ***!
+  \*******************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3084,174 +3103,15 @@ Object.defineProperty(exports, "__esModule", ({
 
 var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
-var CompanyInput_1 = __importDefault(__webpack_require__(/*! ./components/CompanyInput */ "./resources/ts/pages/company/components/CompanyInput.tsx"));
+var TaskInput_1 = __importDefault(__webpack_require__(/*! ./components/TaskInput */ "./resources/ts/pages/task/components/TaskInput.tsx"));
 
-var CompanyList_1 = __importDefault(__webpack_require__(/*! ./components/CompanyList */ "./resources/ts/pages/company/components/CompanyList.tsx"));
+var TaskList_1 = __importDefault(__webpack_require__(/*! ./components/TaskList */ "./resources/ts/pages/task/components/TaskList.tsx"));
 
-var CompanyPage = function CompanyPage() {
-  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(CompanyInput_1["default"], null), react_1["default"].createElement(CompanyList_1["default"], null));
+var TaskPage = function TaskPage() {
+  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(TaskInput_1["default"], null), react_1["default"].createElement(TaskList_1["default"], null));
 };
 
-exports["default"] = CompanyPage;
-
-/***/ }),
-
-/***/ "./resources/ts/pages/error/index.tsx":
-/*!********************************************!*\
-  !*** ./resources/ts/pages/error/index.tsx ***!
-  \********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var NotFoundPage = function NotFoundPage() {
-  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
-    className: "align-center"
-  }, react_1["default"].createElement("h1", null, "404 Not Found ")));
-};
-
-exports["default"] = NotFoundPage;
-
-/***/ }),
-
-/***/ "./resources/ts/pages/login/index.tsx":
-/*!********************************************!*\
-  !*** ./resources/ts/pages/login/index.tsx ***!
-  \********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  var desc = Object.getOwnPropertyDescriptor(m, k);
-
-  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-    desc = {
-      enumerable: true,
-      get: function get() {
-        return m[k];
-      }
-    };
-  }
-
-  Object.defineProperty(o, k2, desc);
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-
-var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
-  Object.defineProperty(o, "default", {
-    enumerable: true,
-    value: v
-  });
-} : function (o, v) {
-  o["default"] = v;
-});
-
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) {
-    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-  }
-
-  __setModuleDefault(result, mod);
-
-  return result;
-};
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-
-var AuthQuery_1 = __webpack_require__(/*! ../../queries/AuthQuery */ "./resources/ts/queries/AuthQuery.ts");
-
-var LoginPage = function LoginPage() {
-  var login = (0, AuthQuery_1.useLogin)();
-
-  var _ref = (0, react_1.useState)("test@test.com"),
-      _ref2 = _slicedToArray(_ref, 2),
-      email = _ref2[0],
-      setEmail = _ref2[1];
-
-  var _ref3 = (0, react_1.useState)("123456789"),
-      _ref4 = _slicedToArray(_ref3, 2),
-      password = _ref4[0],
-      setPassword = _ref4[1];
-
-  var handleLogin = function handleLogin(e) {
-    e.preventDefault();
-    login.mutate({
-      email: email,
-      password: password
-    });
-  };
-
-  return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
-    className: "login-page"
-  }, react_1["default"].createElement("div", {
-    className: "login-panel"
-  }, react_1["default"].createElement("form", {
-    onSubmit: handleLogin
-  }, react_1["default"].createElement("div", {
-    className: "input-group"
-  }, react_1["default"].createElement("label", null, "\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9"), react_1["default"].createElement("input", {
-    type: "email",
-    className: "input",
-    value: email,
-    onChange: function onChange(e) {
-      setEmail(e.target.value);
-    }
-  })), react_1["default"].createElement("div", {
-    className: "input-group"
-  }, react_1["default"].createElement("label", null, "\u30D1\u30B9\u30EF\u30FC\u30C9"), react_1["default"].createElement("input", {
-    type: "password",
-    className: "input",
-    value: password,
-    onChange: function onChange(e) {
-      return setPassword(e.target.value);
-    }
-  })), react_1["default"].createElement("button", {
-    type: "submit",
-    className: "btn"
-  }, "\u30ED\u30B0\u30A4\u30F3"))), react_1["default"].createElement("div", {
-    className: "links"
-  }, react_1["default"].createElement("a", {
-    href: "#"
-  }, "\u30D8\u30EB\u30D7"))));
-};
-
-exports["default"] = LoginPage;
+exports["default"] = TaskPage;
 
 /***/ }),
 
@@ -3350,11 +3210,9 @@ var useLogin = function useLogin() {
   return (0, react_query_1.useMutation)(api.login, {
     onSuccess: function onSuccess(user) {
       if (user) {
-        setIsAuth(true); // cookieを保存
-
+        setIsAuth(true);
         setCookie('user_id', user.user_id);
         setCookie('user_name', user.name);
-        console.log(user);
       }
     },
     onError: function onError() {
@@ -3398,10 +3256,10 @@ exports.useLogout = useLogout;
 
 /***/ }),
 
-/***/ "./resources/ts/queries/CompanyQuery.ts":
-/*!**********************************************!*\
-  !*** ./resources/ts/queries/CompanyQuery.ts ***!
-  \**********************************************/
+/***/ "./resources/ts/queries/TaskQuery.ts":
+/*!*******************************************!*\
+  !*** ./resources/ts/queries/TaskQuery.ts ***!
+  \*******************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3450,25 +3308,25 @@ var __importStar = this && this.__importStar || function (mod) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.useUpdateCompany = exports.useDeleteCompany = exports.useCreateCompany = exports.useUpdateCompanyDone = exports.useCompany = void 0;
+exports.useUpdateTask = exports.useDeleteTask = exports.useCreateTask = exports.useUpdateTaskDone = exports.useTask = void 0;
 
 var react_query_1 = __webpack_require__(/*! react-query */ "./node_modules/react-query/es/index.js");
 
 var react_toastify_1 = __webpack_require__(/*! react-toastify */ "./node_modules/react-toastify/dist/react-toastify.js");
 
-var api = __importStar(__webpack_require__(/*! ../api/CompanyAPI */ "./resources/ts/api/CompanyAPI.ts"));
+var api = __importStar(__webpack_require__(/*! ../api/TaskAPI */ "./resources/ts/api/TaskAPI.ts"));
 
-var useCompany = function useCompany() {
-  return (0, react_query_1.useQuery)("companies", api.getCompanies);
+var useTask = function useTask() {
+  return (0, react_query_1.useQuery)("tasks", api.getTasks);
 };
 
-exports.useCompany = useCompany;
+exports.useTask = useTask;
 
-var useUpdateCompanyDone = function useUpdateCompanyDone() {
+var useUpdateTaskDone = function useUpdateTaskDone() {
   var queryClient = (0, react_query_1.useQueryClient)();
-  return (0, react_query_1.useMutation)(api.updateCompanyDone, {
+  return (0, react_query_1.useMutation)(api.updateTaskDone, {
     onSuccess: function onSuccess() {
-      queryClient.invalidateQueries("companies");
+      queryClient.invalidateQueries("tasks");
     },
     onError: function onError() {
       react_toastify_1.toast.error("更新に失敗しました。");
@@ -3476,13 +3334,13 @@ var useUpdateCompanyDone = function useUpdateCompanyDone() {
   });
 };
 
-exports.useUpdateCompanyDone = useUpdateCompanyDone;
+exports.useUpdateTaskDone = useUpdateTaskDone;
 
-var useCreateCompany = function useCreateCompany() {
+var useCreateTask = function useCreateTask() {
   var queryClient = (0, react_query_1.useQueryClient)();
-  return (0, react_query_1.useMutation)(api.createCompany, {
+  return (0, react_query_1.useMutation)(api.createTask, {
     onSuccess: function onSuccess() {
-      queryClient.invalidateQueries("companies");
+      queryClient.invalidateQueries("tasks");
       react_toastify_1.toast.success("登録に成功しました。");
     },
     onError: function onError(error) {
@@ -3504,13 +3362,13 @@ var useCreateCompany = function useCreateCompany() {
   });
 };
 
-exports.useCreateCompany = useCreateCompany;
+exports.useCreateTask = useCreateTask;
 
-var useDeleteCompany = function useDeleteCompany() {
+var useDeleteTask = function useDeleteTask() {
   var queryClient = (0, react_query_1.useQueryClient)();
-  return (0, react_query_1.useMutation)(api.deleteCompany, {
+  return (0, react_query_1.useMutation)(api.deleteTask, {
     onSuccess: function onSuccess() {
-      queryClient.invalidateQueries("companies");
+      queryClient.invalidateQueries("tasks");
       react_toastify_1.toast.success("削除に成功しました。");
     },
     onError: function onError(error) {
@@ -3530,13 +3388,13 @@ var useDeleteCompany = function useDeleteCompany() {
   });
 };
 
-exports.useDeleteCompany = useDeleteCompany;
+exports.useDeleteTask = useDeleteTask;
 
-var useUpdateCompany = function useUpdateCompany() {
+var useUpdateTask = function useUpdateTask() {
   var queryClient = (0, react_query_1.useQueryClient)();
-  return (0, react_query_1.useMutation)(api.updateCompany, {
+  return (0, react_query_1.useMutation)(api.updateTask, {
     onSuccess: function onSuccess() {
-      queryClient.invalidateQueries("companies");
+      queryClient.invalidateQueries("tasks");
       react_toastify_1.toast.success("更新に成功しました。");
     },
     onError: function onError(error) {
@@ -3558,7 +3416,7 @@ var useUpdateCompany = function useUpdateCompany() {
   });
 };
 
-exports.useUpdateCompany = useUpdateCompany;
+exports.useUpdateTask = useUpdateTask;
 
 /***/ }),
 
@@ -3571,223 +3429,10 @@ exports.useUpdateCompany = useUpdateCompany;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "clsx": () => (/* binding */ clsx),
+/* harmony export */   clsx: () => (/* binding */ clsx),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e))for(t=0;t<e.length;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);else for(t in e)e[t]&&(n&&(n+=" "),n+=t);return n}function clsx(){for(var e,t,f=0,n="";f<arguments.length;)(e=arguments[f++])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (clsx);
-
-/***/ }),
-
-/***/ "./node_modules/cookie/index.js":
-/*!**************************************!*\
-  !*** ./node_modules/cookie/index.js ***!
-  \**************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-/*!
- * cookie
- * Copyright(c) 2012-2014 Roman Shtylman
- * Copyright(c) 2015 Douglas Christopher Wilson
- * MIT Licensed
- */
-
-
-
-/**
- * Module exports.
- * @public
- */
-
-exports.parse = parse;
-exports.serialize = serialize;
-
-/**
- * Module variables.
- * @private
- */
-
-var decode = decodeURIComponent;
-var encode = encodeURIComponent;
-
-/**
- * RegExp to match field-content in RFC 7230 sec 3.2
- *
- * field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
- * field-vchar   = VCHAR / obs-text
- * obs-text      = %x80-FF
- */
-
-var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
-
-/**
- * Parse a cookie header.
- *
- * Parse the given cookie header string into an object
- * The object has the various cookies as keys(names) => values
- *
- * @param {string} str
- * @param {object} [options]
- * @return {object}
- * @public
- */
-
-function parse(str, options) {
-  if (typeof str !== 'string') {
-    throw new TypeError('argument str must be a string');
-  }
-
-  var obj = {}
-  var opt = options || {};
-  var pairs = str.split(';')
-  var dec = opt.decode || decode;
-
-  for (var i = 0; i < pairs.length; i++) {
-    var pair = pairs[i];
-    var index = pair.indexOf('=')
-
-    // skip things that don't look like key=value
-    if (index < 0) {
-      continue;
-    }
-
-    var key = pair.substring(0, index).trim()
-
-    // only assign once
-    if (undefined == obj[key]) {
-      var val = pair.substring(index + 1, pair.length).trim()
-
-      // quoted values
-      if (val[0] === '"') {
-        val = val.slice(1, -1)
-      }
-
-      obj[key] = tryDecode(val, dec);
-    }
-  }
-
-  return obj;
-}
-
-/**
- * Serialize data into a cookie header.
- *
- * Serialize the a name value pair into a cookie string suitable for
- * http headers. An optional options object specified cookie parameters.
- *
- * serialize('foo', 'bar', { httpOnly: true })
- *   => "foo=bar; httpOnly"
- *
- * @param {string} name
- * @param {string} val
- * @param {object} [options]
- * @return {string}
- * @public
- */
-
-function serialize(name, val, options) {
-  var opt = options || {};
-  var enc = opt.encode || encode;
-
-  if (typeof enc !== 'function') {
-    throw new TypeError('option encode is invalid');
-  }
-
-  if (!fieldContentRegExp.test(name)) {
-    throw new TypeError('argument name is invalid');
-  }
-
-  var value = enc(val);
-
-  if (value && !fieldContentRegExp.test(value)) {
-    throw new TypeError('argument val is invalid');
-  }
-
-  var str = name + '=' + value;
-
-  if (null != opt.maxAge) {
-    var maxAge = opt.maxAge - 0;
-
-    if (isNaN(maxAge) || !isFinite(maxAge)) {
-      throw new TypeError('option maxAge is invalid')
-    }
-
-    str += '; Max-Age=' + Math.floor(maxAge);
-  }
-
-  if (opt.domain) {
-    if (!fieldContentRegExp.test(opt.domain)) {
-      throw new TypeError('option domain is invalid');
-    }
-
-    str += '; Domain=' + opt.domain;
-  }
-
-  if (opt.path) {
-    if (!fieldContentRegExp.test(opt.path)) {
-      throw new TypeError('option path is invalid');
-    }
-
-    str += '; Path=' + opt.path;
-  }
-
-  if (opt.expires) {
-    if (typeof opt.expires.toUTCString !== 'function') {
-      throw new TypeError('option expires is invalid');
-    }
-
-    str += '; Expires=' + opt.expires.toUTCString();
-  }
-
-  if (opt.httpOnly) {
-    str += '; HttpOnly';
-  }
-
-  if (opt.secure) {
-    str += '; Secure';
-  }
-
-  if (opt.sameSite) {
-    var sameSite = typeof opt.sameSite === 'string'
-      ? opt.sameSite.toLowerCase() : opt.sameSite;
-
-    switch (sameSite) {
-      case true:
-        str += '; SameSite=Strict';
-        break;
-      case 'lax':
-        str += '; SameSite=Lax';
-        break;
-      case 'strict':
-        str += '; SameSite=Strict';
-        break;
-      case 'none':
-        str += '; SameSite=None';
-        break;
-      default:
-        throw new TypeError('option sameSite is invalid');
-    }
-  }
-
-  return str;
-}
-
-/**
- * Try decoding a string using a decoding function.
- *
- * @param {string} str
- * @param {function} decode
- * @private
- */
-
-function tryDecode(str, decode) {
-  try {
-    return decode(str);
-  } catch (e) {
-    return str;
-  }
-}
-
 
 /***/ }),
 
@@ -3808,7 +3453,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --toastify-color-light: #fff;\n  --toastify-color-dark: #121212;\n  --toastify-color-info: #3498db;\n  --toastify-color-success: #07bc0c;\n  --toastify-color-warning: #f1c40f;\n  --toastify-color-error: #e74c3c;\n  --toastify-color-transparent: rgba(255, 255, 255, 0.7);\n  --toastify-icon-color-info: var(--toastify-color-info);\n  --toastify-icon-color-success: var(--toastify-color-success);\n  --toastify-icon-color-warning: var(--toastify-color-warning);\n  --toastify-icon-color-error: var(--toastify-color-error);\n  --toastify-toast-width: 320px;\n  --toastify-toast-background: #fff;\n  --toastify-toast-min-height: 64px;\n  --toastify-toast-max-height: 800px;\n  --toastify-font-family: sans-serif;\n  --toastify-z-index: 9999;\n  --toastify-text-color-light: #757575;\n  --toastify-text-color-dark: #fff;\n  --toastify-text-color-info: #fff;\n  --toastify-text-color-success: #fff;\n  --toastify-text-color-warning: #fff;\n  --toastify-text-color-error: #fff;\n  --toastify-spinner-color: #616161;\n  --toastify-spinner-color-empty-area: #e0e0e0;\n  --toastify-color-progress-light: linear-gradient(\n    to right,\n    #4cd964,\n    #5ac8fa,\n    #007aff,\n    #34aadc,\n    #5856d6,\n    #ff2d55\n  );\n  --toastify-color-progress-dark: #bb86fc;\n  --toastify-color-progress-info: var(--toastify-color-info);\n  --toastify-color-progress-success: var(--toastify-color-success);\n  --toastify-color-progress-warning: var(--toastify-color-warning);\n  --toastify-color-progress-error: var(--toastify-color-error);\n}\n\n.Toastify__toast-container {\n  z-index: var(--toastify-z-index);\n  -webkit-transform: translate3d(0, 0, var(--toastify-z-index) px);\n  position: fixed;\n  padding: 4px;\n  width: var(--toastify-toast-width);\n  box-sizing: border-box;\n  color: #fff;\n}\n.Toastify__toast-container--top-left {\n  top: 1em;\n  left: 1em;\n}\n.Toastify__toast-container--top-center {\n  top: 1em;\n  left: 50%;\n  transform: translateX(-50%);\n}\n.Toastify__toast-container--top-right {\n  top: 1em;\n  right: 1em;\n}\n.Toastify__toast-container--bottom-left {\n  bottom: 1em;\n  left: 1em;\n}\n.Toastify__toast-container--bottom-center {\n  bottom: 1em;\n  left: 50%;\n  transform: translateX(-50%);\n}\n.Toastify__toast-container--bottom-right {\n  bottom: 1em;\n  right: 1em;\n}\n\n@media only screen and (max-width : 480px) {\n  .Toastify__toast-container {\n    width: 100vw;\n    padding: 0;\n    left: 0;\n    margin: 0;\n  }\n  .Toastify__toast-container--top-left, .Toastify__toast-container--top-center, .Toastify__toast-container--top-right {\n    top: 0;\n    transform: translateX(0);\n  }\n  .Toastify__toast-container--bottom-left, .Toastify__toast-container--bottom-center, .Toastify__toast-container--bottom-right {\n    bottom: 0;\n    transform: translateX(0);\n  }\n  .Toastify__toast-container--rtl {\n    right: 0;\n    left: initial;\n  }\n}\n.Toastify__toast {\n  position: relative;\n  min-height: var(--toastify-toast-min-height);\n  box-sizing: border-box;\n  margin-bottom: 1rem;\n  padding: 8px;\n  border-radius: 4px;\n  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.1), 0 2px 15px 0 rgba(0, 0, 0, 0.05);\n  display: flex;\n  justify-content: space-between;\n  max-height: var(--toastify-toast-max-height);\n  overflow: hidden;\n  font-family: var(--toastify-font-family);\n  cursor: pointer;\n  direction: ltr;\n  /* webkit only issue #791 */\n  z-index: 0;\n}\n.Toastify__toast--rtl {\n  direction: rtl;\n}\n.Toastify__toast-body {\n  margin: auto 0;\n  flex: 1 1 auto;\n  padding: 6px;\n  display: flex;\n  align-items: center;\n}\n.Toastify__toast-body > div:last-child {\n  flex: 1;\n}\n.Toastify__toast-icon {\n  -webkit-margin-end: 10px;\n          margin-inline-end: 10px;\n  width: 20px;\n  flex-shrink: 0;\n  display: flex;\n}\n\n.Toastify--animate {\n  -webkit-animation-fill-mode: both;\n          animation-fill-mode: both;\n  -webkit-animation-duration: 0.7s;\n          animation-duration: 0.7s;\n}\n\n.Toastify--animate-icon {\n  -webkit-animation-fill-mode: both;\n          animation-fill-mode: both;\n  -webkit-animation-duration: 0.3s;\n          animation-duration: 0.3s;\n}\n\n@media only screen and (max-width : 480px) {\n  .Toastify__toast {\n    margin-bottom: 0;\n    border-radius: 0;\n  }\n}\n.Toastify__toast-theme--dark {\n  background: var(--toastify-color-dark);\n  color: var(--toastify-text-color-dark);\n}\n.Toastify__toast-theme--light {\n  background: var(--toastify-color-light);\n  color: var(--toastify-text-color-light);\n}\n.Toastify__toast-theme--colored.Toastify__toast--default {\n  background: var(--toastify-color-light);\n  color: var(--toastify-text-color-light);\n}\n.Toastify__toast-theme--colored.Toastify__toast--info {\n  color: var(--toastify-text-color-info);\n  background: var(--toastify-color-info);\n}\n.Toastify__toast-theme--colored.Toastify__toast--success {\n  color: var(--toastify-text-color-success);\n  background: var(--toastify-color-success);\n}\n.Toastify__toast-theme--colored.Toastify__toast--warning {\n  color: var(--toastify-text-color-warning);\n  background: var(--toastify-color-warning);\n}\n.Toastify__toast-theme--colored.Toastify__toast--error {\n  color: var(--toastify-text-color-error);\n  background: var(--toastify-color-error);\n}\n\n.Toastify__progress-bar-theme--light {\n  background: var(--toastify-color-progress-light);\n}\n.Toastify__progress-bar-theme--dark {\n  background: var(--toastify-color-progress-dark);\n}\n.Toastify__progress-bar--info {\n  background: var(--toastify-color-progress-info);\n}\n.Toastify__progress-bar--success {\n  background: var(--toastify-color-progress-success);\n}\n.Toastify__progress-bar--warning {\n  background: var(--toastify-color-progress-warning);\n}\n.Toastify__progress-bar--error {\n  background: var(--toastify-color-progress-error);\n}\n.Toastify__progress-bar-theme--colored.Toastify__progress-bar--info, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--success, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--warning, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--error {\n  background: var(--toastify-color-transparent);\n}\n\n.Toastify__close-button {\n  color: #fff;\n  background: transparent;\n  outline: none;\n  border: none;\n  padding: 0;\n  cursor: pointer;\n  opacity: 0.7;\n  transition: 0.3s ease;\n  align-self: flex-start;\n}\n.Toastify__close-button--light {\n  color: #000;\n  opacity: 0.3;\n}\n.Toastify__close-button > svg {\n  fill: currentColor;\n  height: 16px;\n  width: 14px;\n}\n.Toastify__close-button:hover, .Toastify__close-button:focus {\n  opacity: 1;\n}\n\n@-webkit-keyframes Toastify__trackProgress {\n  0% {\n    transform: scaleX(1);\n  }\n  100% {\n    transform: scaleX(0);\n  }\n}\n\n@keyframes Toastify__trackProgress {\n  0% {\n    transform: scaleX(1);\n  }\n  100% {\n    transform: scaleX(0);\n  }\n}\n.Toastify__progress-bar {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 5px;\n  z-index: var(--toastify-z-index);\n  opacity: 0.7;\n  transform-origin: left;\n}\n.Toastify__progress-bar--animated {\n  -webkit-animation: Toastify__trackProgress linear 1 forwards;\n          animation: Toastify__trackProgress linear 1 forwards;\n}\n.Toastify__progress-bar--controlled {\n  transition: transform 0.2s;\n}\n.Toastify__progress-bar--rtl {\n  right: 0;\n  left: initial;\n  transform-origin: right;\n}\n\n.Toastify__spinner {\n  width: 20px;\n  height: 20px;\n  box-sizing: border-box;\n  border: 2px solid;\n  border-radius: 100%;\n  border-color: var(--toastify-spinner-color-empty-area);\n  border-right-color: var(--toastify-spinner-color);\n  -webkit-animation: Toastify__spin 0.65s linear infinite;\n          animation: Toastify__spin 0.65s linear infinite;\n}\n\n@-webkit-keyframes Toastify__bounceInRight {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  from {\n    opacity: 0;\n    transform: translate3d(3000px, 0, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(-25px, 0, 0);\n  }\n  75% {\n    transform: translate3d(10px, 0, 0);\n  }\n  90% {\n    transform: translate3d(-5px, 0, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes Toastify__bounceInRight {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  from {\n    opacity: 0;\n    transform: translate3d(3000px, 0, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(-25px, 0, 0);\n  }\n  75% {\n    transform: translate3d(10px, 0, 0);\n  }\n  90% {\n    transform: translate3d(-5px, 0, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@-webkit-keyframes Toastify__bounceOutRight {\n  20% {\n    opacity: 1;\n    transform: translate3d(-20px, 0, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(2000px, 0, 0);\n  }\n}\n@keyframes Toastify__bounceOutRight {\n  20% {\n    opacity: 1;\n    transform: translate3d(-20px, 0, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(2000px, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__bounceInLeft {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  0% {\n    opacity: 0;\n    transform: translate3d(-3000px, 0, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(25px, 0, 0);\n  }\n  75% {\n    transform: translate3d(-10px, 0, 0);\n  }\n  90% {\n    transform: translate3d(5px, 0, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@keyframes Toastify__bounceInLeft {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  0% {\n    opacity: 0;\n    transform: translate3d(-3000px, 0, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(25px, 0, 0);\n  }\n  75% {\n    transform: translate3d(-10px, 0, 0);\n  }\n  90% {\n    transform: translate3d(5px, 0, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@-webkit-keyframes Toastify__bounceOutLeft {\n  20% {\n    opacity: 1;\n    transform: translate3d(20px, 0, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(-2000px, 0, 0);\n  }\n}\n@keyframes Toastify__bounceOutLeft {\n  20% {\n    opacity: 1;\n    transform: translate3d(20px, 0, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(-2000px, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__bounceInUp {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  from {\n    opacity: 0;\n    transform: translate3d(0, 3000px, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(0, -20px, 0);\n  }\n  75% {\n    transform: translate3d(0, 10px, 0);\n  }\n  90% {\n    transform: translate3d(0, -5px, 0);\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__bounceInUp {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  from {\n    opacity: 0;\n    transform: translate3d(0, 3000px, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(0, -20px, 0);\n  }\n  75% {\n    transform: translate3d(0, 10px, 0);\n  }\n  90% {\n    transform: translate3d(0, -5px, 0);\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__bounceOutUp {\n  20% {\n    transform: translate3d(0, -10px, 0);\n  }\n  40%, 45% {\n    opacity: 1;\n    transform: translate3d(0, 20px, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(0, -2000px, 0);\n  }\n}\n@keyframes Toastify__bounceOutUp {\n  20% {\n    transform: translate3d(0, -10px, 0);\n  }\n  40%, 45% {\n    opacity: 1;\n    transform: translate3d(0, 20px, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(0, -2000px, 0);\n  }\n}\n@-webkit-keyframes Toastify__bounceInDown {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  0% {\n    opacity: 0;\n    transform: translate3d(0, -3000px, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(0, 25px, 0);\n  }\n  75% {\n    transform: translate3d(0, -10px, 0);\n  }\n  90% {\n    transform: translate3d(0, 5px, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@keyframes Toastify__bounceInDown {\n  from, 60%, 75%, 90%, to {\n    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  0% {\n    opacity: 0;\n    transform: translate3d(0, -3000px, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(0, 25px, 0);\n  }\n  75% {\n    transform: translate3d(0, -10px, 0);\n  }\n  90% {\n    transform: translate3d(0, 5px, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@-webkit-keyframes Toastify__bounceOutDown {\n  20% {\n    transform: translate3d(0, 10px, 0);\n  }\n  40%, 45% {\n    opacity: 1;\n    transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(0, 2000px, 0);\n  }\n}\n@keyframes Toastify__bounceOutDown {\n  20% {\n    transform: translate3d(0, 10px, 0);\n  }\n  40%, 45% {\n    opacity: 1;\n    transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(0, 2000px, 0);\n  }\n}\n.Toastify__bounce-enter--top-left, .Toastify__bounce-enter--bottom-left {\n  -webkit-animation-name: Toastify__bounceInLeft;\n          animation-name: Toastify__bounceInLeft;\n}\n.Toastify__bounce-enter--top-right, .Toastify__bounce-enter--bottom-right {\n  -webkit-animation-name: Toastify__bounceInRight;\n          animation-name: Toastify__bounceInRight;\n}\n.Toastify__bounce-enter--top-center {\n  -webkit-animation-name: Toastify__bounceInDown;\n          animation-name: Toastify__bounceInDown;\n}\n.Toastify__bounce-enter--bottom-center {\n  -webkit-animation-name: Toastify__bounceInUp;\n          animation-name: Toastify__bounceInUp;\n}\n\n.Toastify__bounce-exit--top-left, .Toastify__bounce-exit--bottom-left {\n  -webkit-animation-name: Toastify__bounceOutLeft;\n          animation-name: Toastify__bounceOutLeft;\n}\n.Toastify__bounce-exit--top-right, .Toastify__bounce-exit--bottom-right {\n  -webkit-animation-name: Toastify__bounceOutRight;\n          animation-name: Toastify__bounceOutRight;\n}\n.Toastify__bounce-exit--top-center {\n  -webkit-animation-name: Toastify__bounceOutUp;\n          animation-name: Toastify__bounceOutUp;\n}\n.Toastify__bounce-exit--bottom-center {\n  -webkit-animation-name: Toastify__bounceOutDown;\n          animation-name: Toastify__bounceOutDown;\n}\n\n@-webkit-keyframes Toastify__zoomIn {\n  from {\n    opacity: 0;\n    transform: scale3d(0.3, 0.3, 0.3);\n  }\n  50% {\n    opacity: 1;\n  }\n}\n\n@keyframes Toastify__zoomIn {\n  from {\n    opacity: 0;\n    transform: scale3d(0.3, 0.3, 0.3);\n  }\n  50% {\n    opacity: 1;\n  }\n}\n@-webkit-keyframes Toastify__zoomOut {\n  from {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0;\n    transform: scale3d(0.3, 0.3, 0.3);\n  }\n  to {\n    opacity: 0;\n  }\n}\n@keyframes Toastify__zoomOut {\n  from {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0;\n    transform: scale3d(0.3, 0.3, 0.3);\n  }\n  to {\n    opacity: 0;\n  }\n}\n.Toastify__zoom-enter {\n  -webkit-animation-name: Toastify__zoomIn;\n          animation-name: Toastify__zoomIn;\n}\n\n.Toastify__zoom-exit {\n  -webkit-animation-name: Toastify__zoomOut;\n          animation-name: Toastify__zoomOut;\n}\n\n@-webkit-keyframes Toastify__flipIn {\n  from {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    -webkit-animation-timing-function: ease-in;\n            animation-timing-function: ease-in;\n    opacity: 0;\n  }\n  40% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    -webkit-animation-timing-function: ease-in;\n            animation-timing-function: ease-in;\n  }\n  60% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);\n    opacity: 1;\n  }\n  80% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);\n  }\n  to {\n    transform: perspective(400px);\n  }\n}\n\n@keyframes Toastify__flipIn {\n  from {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    -webkit-animation-timing-function: ease-in;\n            animation-timing-function: ease-in;\n    opacity: 0;\n  }\n  40% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    -webkit-animation-timing-function: ease-in;\n            animation-timing-function: ease-in;\n  }\n  60% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);\n    opacity: 1;\n  }\n  80% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);\n  }\n  to {\n    transform: perspective(400px);\n  }\n}\n@-webkit-keyframes Toastify__flipOut {\n  from {\n    transform: perspective(400px);\n  }\n  30% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    opacity: 1;\n  }\n  to {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    opacity: 0;\n  }\n}\n@keyframes Toastify__flipOut {\n  from {\n    transform: perspective(400px);\n  }\n  30% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    opacity: 1;\n  }\n  to {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    opacity: 0;\n  }\n}\n.Toastify__flip-enter {\n  -webkit-animation-name: Toastify__flipIn;\n          animation-name: Toastify__flipIn;\n}\n\n.Toastify__flip-exit {\n  -webkit-animation-name: Toastify__flipOut;\n          animation-name: Toastify__flipOut;\n}\n\n@-webkit-keyframes Toastify__slideInRight {\n  from {\n    transform: translate3d(110%, 0, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n@keyframes Toastify__slideInRight {\n  from {\n    transform: translate3d(110%, 0, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideInLeft {\n  from {\n    transform: translate3d(-110%, 0, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideInLeft {\n  from {\n    transform: translate3d(-110%, 0, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideInUp {\n  from {\n    transform: translate3d(0, 110%, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideInUp {\n  from {\n    transform: translate3d(0, 110%, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideInDown {\n  from {\n    transform: translate3d(0, -110%, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideInDown {\n  from {\n    transform: translate3d(0, -110%, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideOutRight {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(110%, 0, 0);\n  }\n}\n@keyframes Toastify__slideOutRight {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(110%, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideOutLeft {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(-110%, 0, 0);\n  }\n}\n@keyframes Toastify__slideOutLeft {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(-110%, 0, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideOutDown {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(0, 500px, 0);\n  }\n}\n@keyframes Toastify__slideOutDown {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(0, 500px, 0);\n  }\n}\n@-webkit-keyframes Toastify__slideOutUp {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(0, -500px, 0);\n  }\n}\n@keyframes Toastify__slideOutUp {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(0, -500px, 0);\n  }\n}\n.Toastify__slide-enter--top-left, .Toastify__slide-enter--bottom-left {\n  -webkit-animation-name: Toastify__slideInLeft;\n          animation-name: Toastify__slideInLeft;\n}\n.Toastify__slide-enter--top-right, .Toastify__slide-enter--bottom-right {\n  -webkit-animation-name: Toastify__slideInRight;\n          animation-name: Toastify__slideInRight;\n}\n.Toastify__slide-enter--top-center {\n  -webkit-animation-name: Toastify__slideInDown;\n          animation-name: Toastify__slideInDown;\n}\n.Toastify__slide-enter--bottom-center {\n  -webkit-animation-name: Toastify__slideInUp;\n          animation-name: Toastify__slideInUp;\n}\n\n.Toastify__slide-exit--top-left, .Toastify__slide-exit--bottom-left {\n  -webkit-animation-name: Toastify__slideOutLeft;\n          animation-name: Toastify__slideOutLeft;\n}\n.Toastify__slide-exit--top-right, .Toastify__slide-exit--bottom-right {\n  -webkit-animation-name: Toastify__slideOutRight;\n          animation-name: Toastify__slideOutRight;\n}\n.Toastify__slide-exit--top-center {\n  -webkit-animation-name: Toastify__slideOutUp;\n          animation-name: Toastify__slideOutUp;\n}\n.Toastify__slide-exit--bottom-center {\n  -webkit-animation-name: Toastify__slideOutDown;\n          animation-name: Toastify__slideOutDown;\n}\n\n@-webkit-keyframes Toastify__spin {\n  from {\n    transform: rotate(0deg);\n  }\n  to {\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes Toastify__spin {\n  from {\n    transform: rotate(0deg);\n  }\n  to {\n    transform: rotate(360deg);\n  }\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --toastify-color-light: #fff;\n  --toastify-color-dark: #121212;\n  --toastify-color-info: #3498db;\n  --toastify-color-success: #07bc0c;\n  --toastify-color-warning: #f1c40f;\n  --toastify-color-error: #e74c3c;\n  --toastify-color-transparent: rgba(255, 255, 255, 0.7);\n  --toastify-icon-color-info: var(--toastify-color-info);\n  --toastify-icon-color-success: var(--toastify-color-success);\n  --toastify-icon-color-warning: var(--toastify-color-warning);\n  --toastify-icon-color-error: var(--toastify-color-error);\n  --toastify-toast-width: 320px;\n  --toastify-toast-background: #fff;\n  --toastify-toast-min-height: 64px;\n  --toastify-toast-max-height: 800px;\n  --toastify-font-family: sans-serif;\n  --toastify-z-index: 9999;\n  --toastify-text-color-light: #757575;\n  --toastify-text-color-dark: #fff;\n  --toastify-text-color-info: #fff;\n  --toastify-text-color-success: #fff;\n  --toastify-text-color-warning: #fff;\n  --toastify-text-color-error: #fff;\n  --toastify-spinner-color: #616161;\n  --toastify-spinner-color-empty-area: #e0e0e0;\n  --toastify-color-progress-light: linear-gradient(\n    to right,\n    #4cd964,\n    #5ac8fa,\n    #007aff,\n    #34aadc,\n    #5856d6,\n    #ff2d55\n  );\n  --toastify-color-progress-dark: #bb86fc;\n  --toastify-color-progress-info: var(--toastify-color-info);\n  --toastify-color-progress-success: var(--toastify-color-success);\n  --toastify-color-progress-warning: var(--toastify-color-warning);\n  --toastify-color-progress-error: var(--toastify-color-error);\n}\n\n.Toastify__toast-container {\n  z-index: var(--toastify-z-index);\n  -webkit-transform: translate3d(0, 0, var(--toastify-z-index) px);\n  position: fixed;\n  padding: 4px;\n  width: var(--toastify-toast-width);\n  box-sizing: border-box;\n  color: #fff;\n}\n.Toastify__toast-container--top-left {\n  top: 1em;\n  left: 1em;\n}\n.Toastify__toast-container--top-center {\n  top: 1em;\n  left: 50%;\n  transform: translateX(-50%);\n}\n.Toastify__toast-container--top-right {\n  top: 1em;\n  right: 1em;\n}\n.Toastify__toast-container--bottom-left {\n  bottom: 1em;\n  left: 1em;\n}\n.Toastify__toast-container--bottom-center {\n  bottom: 1em;\n  left: 50%;\n  transform: translateX(-50%);\n}\n.Toastify__toast-container--bottom-right {\n  bottom: 1em;\n  right: 1em;\n}\n\n@media only screen and (max-width : 480px) {\n  .Toastify__toast-container {\n    width: 100vw;\n    padding: 0;\n    left: 0;\n    margin: 0;\n  }\n  .Toastify__toast-container--top-left, .Toastify__toast-container--top-center, .Toastify__toast-container--top-right {\n    top: 0;\n    transform: translateX(0);\n  }\n  .Toastify__toast-container--bottom-left, .Toastify__toast-container--bottom-center, .Toastify__toast-container--bottom-right {\n    bottom: 0;\n    transform: translateX(0);\n  }\n  .Toastify__toast-container--rtl {\n    right: 0;\n    left: initial;\n  }\n}\n.Toastify__toast {\n  position: relative;\n  min-height: var(--toastify-toast-min-height);\n  box-sizing: border-box;\n  margin-bottom: 1rem;\n  padding: 8px;\n  border-radius: 4px;\n  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.1), 0 2px 15px 0 rgba(0, 0, 0, 0.05);\n  display: flex;\n  justify-content: space-between;\n  max-height: var(--toastify-toast-max-height);\n  overflow: hidden;\n  font-family: var(--toastify-font-family);\n  cursor: pointer;\n  direction: ltr;\n  /* webkit only issue #791 */\n  z-index: 0;\n}\n.Toastify__toast--rtl {\n  direction: rtl;\n}\n.Toastify__toast-body {\n  margin: auto 0;\n  flex: 1 1 auto;\n  padding: 6px;\n  display: flex;\n  align-items: center;\n}\n.Toastify__toast-body > div:last-child {\n  flex: 1;\n}\n.Toastify__toast-icon {\n  margin-inline-end: 10px;\n  width: 20px;\n  flex-shrink: 0;\n  display: flex;\n}\n\n.Toastify--animate {\n  animation-fill-mode: both;\n  animation-duration: 0.7s;\n}\n\n.Toastify--animate-icon {\n  animation-fill-mode: both;\n  animation-duration: 0.3s;\n}\n\n@media only screen and (max-width : 480px) {\n  .Toastify__toast {\n    margin-bottom: 0;\n    border-radius: 0;\n  }\n}\n.Toastify__toast-theme--dark {\n  background: var(--toastify-color-dark);\n  color: var(--toastify-text-color-dark);\n}\n.Toastify__toast-theme--light {\n  background: var(--toastify-color-light);\n  color: var(--toastify-text-color-light);\n}\n.Toastify__toast-theme--colored.Toastify__toast--default {\n  background: var(--toastify-color-light);\n  color: var(--toastify-text-color-light);\n}\n.Toastify__toast-theme--colored.Toastify__toast--info {\n  color: var(--toastify-text-color-info);\n  background: var(--toastify-color-info);\n}\n.Toastify__toast-theme--colored.Toastify__toast--success {\n  color: var(--toastify-text-color-success);\n  background: var(--toastify-color-success);\n}\n.Toastify__toast-theme--colored.Toastify__toast--warning {\n  color: var(--toastify-text-color-warning);\n  background: var(--toastify-color-warning);\n}\n.Toastify__toast-theme--colored.Toastify__toast--error {\n  color: var(--toastify-text-color-error);\n  background: var(--toastify-color-error);\n}\n\n.Toastify__progress-bar-theme--light {\n  background: var(--toastify-color-progress-light);\n}\n.Toastify__progress-bar-theme--dark {\n  background: var(--toastify-color-progress-dark);\n}\n.Toastify__progress-bar--info {\n  background: var(--toastify-color-progress-info);\n}\n.Toastify__progress-bar--success {\n  background: var(--toastify-color-progress-success);\n}\n.Toastify__progress-bar--warning {\n  background: var(--toastify-color-progress-warning);\n}\n.Toastify__progress-bar--error {\n  background: var(--toastify-color-progress-error);\n}\n.Toastify__progress-bar-theme--colored.Toastify__progress-bar--info, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--success, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--warning, .Toastify__progress-bar-theme--colored.Toastify__progress-bar--error {\n  background: var(--toastify-color-transparent);\n}\n\n.Toastify__close-button {\n  color: #fff;\n  background: transparent;\n  outline: none;\n  border: none;\n  padding: 0;\n  cursor: pointer;\n  opacity: 0.7;\n  transition: 0.3s ease;\n  align-self: flex-start;\n}\n.Toastify__close-button--light {\n  color: #000;\n  opacity: 0.3;\n}\n.Toastify__close-button > svg {\n  fill: currentColor;\n  height: 16px;\n  width: 14px;\n}\n.Toastify__close-button:hover, .Toastify__close-button:focus {\n  opacity: 1;\n}\n\n@keyframes Toastify__trackProgress {\n  0% {\n    transform: scaleX(1);\n  }\n  100% {\n    transform: scaleX(0);\n  }\n}\n.Toastify__progress-bar {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 5px;\n  z-index: var(--toastify-z-index);\n  opacity: 0.7;\n  transform-origin: left;\n}\n.Toastify__progress-bar--animated {\n  animation: Toastify__trackProgress linear 1 forwards;\n}\n.Toastify__progress-bar--controlled {\n  transition: transform 0.2s;\n}\n.Toastify__progress-bar--rtl {\n  right: 0;\n  left: initial;\n  transform-origin: right;\n}\n\n.Toastify__spinner {\n  width: 20px;\n  height: 20px;\n  box-sizing: border-box;\n  border: 2px solid;\n  border-radius: 100%;\n  border-color: var(--toastify-spinner-color-empty-area);\n  border-right-color: var(--toastify-spinner-color);\n  animation: Toastify__spin 0.65s linear infinite;\n}\n\n@keyframes Toastify__bounceInRight {\n  from, 60%, 75%, 90%, to {\n    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  from {\n    opacity: 0;\n    transform: translate3d(3000px, 0, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(-25px, 0, 0);\n  }\n  75% {\n    transform: translate3d(10px, 0, 0);\n  }\n  90% {\n    transform: translate3d(-5px, 0, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@keyframes Toastify__bounceOutRight {\n  20% {\n    opacity: 1;\n    transform: translate3d(-20px, 0, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(2000px, 0, 0);\n  }\n}\n@keyframes Toastify__bounceInLeft {\n  from, 60%, 75%, 90%, to {\n    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  0% {\n    opacity: 0;\n    transform: translate3d(-3000px, 0, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(25px, 0, 0);\n  }\n  75% {\n    transform: translate3d(-10px, 0, 0);\n  }\n  90% {\n    transform: translate3d(5px, 0, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@keyframes Toastify__bounceOutLeft {\n  20% {\n    opacity: 1;\n    transform: translate3d(20px, 0, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(-2000px, 0, 0);\n  }\n}\n@keyframes Toastify__bounceInUp {\n  from, 60%, 75%, 90%, to {\n    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  from {\n    opacity: 0;\n    transform: translate3d(0, 3000px, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(0, -20px, 0);\n  }\n  75% {\n    transform: translate3d(0, 10px, 0);\n  }\n  90% {\n    transform: translate3d(0, -5px, 0);\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__bounceOutUp {\n  20% {\n    transform: translate3d(0, -10px, 0);\n  }\n  40%, 45% {\n    opacity: 1;\n    transform: translate3d(0, 20px, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(0, -2000px, 0);\n  }\n}\n@keyframes Toastify__bounceInDown {\n  from, 60%, 75%, 90%, to {\n    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n  }\n  0% {\n    opacity: 0;\n    transform: translate3d(0, -3000px, 0);\n  }\n  60% {\n    opacity: 1;\n    transform: translate3d(0, 25px, 0);\n  }\n  75% {\n    transform: translate3d(0, -10px, 0);\n  }\n  90% {\n    transform: translate3d(0, 5px, 0);\n  }\n  to {\n    transform: none;\n  }\n}\n@keyframes Toastify__bounceOutDown {\n  20% {\n    transform: translate3d(0, 10px, 0);\n  }\n  40%, 45% {\n    opacity: 1;\n    transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 0;\n    transform: translate3d(0, 2000px, 0);\n  }\n}\n.Toastify__bounce-enter--top-left, .Toastify__bounce-enter--bottom-left {\n  animation-name: Toastify__bounceInLeft;\n}\n.Toastify__bounce-enter--top-right, .Toastify__bounce-enter--bottom-right {\n  animation-name: Toastify__bounceInRight;\n}\n.Toastify__bounce-enter--top-center {\n  animation-name: Toastify__bounceInDown;\n}\n.Toastify__bounce-enter--bottom-center {\n  animation-name: Toastify__bounceInUp;\n}\n\n.Toastify__bounce-exit--top-left, .Toastify__bounce-exit--bottom-left {\n  animation-name: Toastify__bounceOutLeft;\n}\n.Toastify__bounce-exit--top-right, .Toastify__bounce-exit--bottom-right {\n  animation-name: Toastify__bounceOutRight;\n}\n.Toastify__bounce-exit--top-center {\n  animation-name: Toastify__bounceOutUp;\n}\n.Toastify__bounce-exit--bottom-center {\n  animation-name: Toastify__bounceOutDown;\n}\n\n@keyframes Toastify__zoomIn {\n  from {\n    opacity: 0;\n    transform: scale3d(0.3, 0.3, 0.3);\n  }\n  50% {\n    opacity: 1;\n  }\n}\n@keyframes Toastify__zoomOut {\n  from {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0;\n    transform: scale3d(0.3, 0.3, 0.3);\n  }\n  to {\n    opacity: 0;\n  }\n}\n.Toastify__zoom-enter {\n  animation-name: Toastify__zoomIn;\n}\n\n.Toastify__zoom-exit {\n  animation-name: Toastify__zoomOut;\n}\n\n@keyframes Toastify__flipIn {\n  from {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    animation-timing-function: ease-in;\n    opacity: 0;\n  }\n  40% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    animation-timing-function: ease-in;\n  }\n  60% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);\n    opacity: 1;\n  }\n  80% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);\n  }\n  to {\n    transform: perspective(400px);\n  }\n}\n@keyframes Toastify__flipOut {\n  from {\n    transform: perspective(400px);\n  }\n  30% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    opacity: 1;\n  }\n  to {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    opacity: 0;\n  }\n}\n.Toastify__flip-enter {\n  animation-name: Toastify__flipIn;\n}\n\n.Toastify__flip-exit {\n  animation-name: Toastify__flipOut;\n}\n\n@keyframes Toastify__slideInRight {\n  from {\n    transform: translate3d(110%, 0, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideInLeft {\n  from {\n    transform: translate3d(-110%, 0, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideInUp {\n  from {\n    transform: translate3d(0, 110%, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideInDown {\n  from {\n    transform: translate3d(0, -110%, 0);\n    visibility: visible;\n  }\n  to {\n    transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes Toastify__slideOutRight {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(110%, 0, 0);\n  }\n}\n@keyframes Toastify__slideOutLeft {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(-110%, 0, 0);\n  }\n}\n@keyframes Toastify__slideOutDown {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(0, 500px, 0);\n  }\n}\n@keyframes Toastify__slideOutUp {\n  from {\n    transform: translate3d(0, 0, 0);\n  }\n  to {\n    visibility: hidden;\n    transform: translate3d(0, -500px, 0);\n  }\n}\n.Toastify__slide-enter--top-left, .Toastify__slide-enter--bottom-left {\n  animation-name: Toastify__slideInLeft;\n}\n.Toastify__slide-enter--top-right, .Toastify__slide-enter--bottom-right {\n  animation-name: Toastify__slideInRight;\n}\n.Toastify__slide-enter--top-center {\n  animation-name: Toastify__slideInDown;\n}\n.Toastify__slide-enter--bottom-center {\n  animation-name: Toastify__slideInUp;\n}\n\n.Toastify__slide-exit--top-left, .Toastify__slide-exit--bottom-left {\n  animation-name: Toastify__slideOutLeft;\n}\n.Toastify__slide-exit--top-right, .Toastify__slide-exit--bottom-right {\n  animation-name: Toastify__slideOutRight;\n}\n.Toastify__slide-exit--top-center {\n  animation-name: Toastify__slideOutUp;\n}\n.Toastify__slide-exit--bottom-center {\n  animation-name: Toastify__slideOutDown;\n}\n\n@keyframes Toastify__spin {\n  from {\n    transform: rotate(0deg);\n  }\n  to {\n    transform: rotate(360deg);\n  }\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3900,13 +3545,13 @@ module.exports = function (cssWithMappingToString) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "createBrowserHistory": () => (/* binding */ createBrowserHistory),
-/* harmony export */   "createHashHistory": () => (/* binding */ createHashHistory),
-/* harmony export */   "createLocation": () => (/* binding */ createLocation),
-/* harmony export */   "createMemoryHistory": () => (/* binding */ createMemoryHistory),
-/* harmony export */   "createPath": () => (/* binding */ createPath),
-/* harmony export */   "locationsAreEqual": () => (/* binding */ locationsAreEqual),
-/* harmony export */   "parsePath": () => (/* binding */ parsePath)
+/* harmony export */   createBrowserHistory: () => (/* binding */ createBrowserHistory),
+/* harmony export */   createHashHistory: () => (/* binding */ createHashHistory),
+/* harmony export */   createLocation: () => (/* binding */ createLocation),
+/* harmony export */   createMemoryHistory: () => (/* binding */ createMemoryHistory),
+/* harmony export */   createPath: () => (/* binding */ createPath),
+/* harmony export */   locationsAreEqual: () => (/* binding */ locationsAreEqual),
+/* harmony export */   parsePath: () => (/* binding */ parsePath)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var resolve_pathname__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! resolve-pathname */ "./node_modules/resolve-pathname/esm/resolve-pathname.js");
@@ -5070,7 +4715,7 @@ function createReactContext(defaultValue, calculateChangedBits) {
     return Provider;
   }(react__WEBPACK_IMPORTED_MODULE_0__.Component);
 
-  Provider.childContextTypes = (_Provider$childContex = {}, _Provider$childContex[contextProp] = (prop_types__WEBPACK_IMPORTED_MODULE_3___default().object.isRequired), _Provider$childContex);
+  Provider.childContextTypes = (_Provider$childContex = {}, _Provider$childContex[contextProp] = (prop_types__WEBPACK_IMPORTED_MODULE_3___default().object).isRequired, _Provider$childContex);
 
   var Consumer = /*#__PURE__*/function (_Component2) {
     (0,_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__["default"])(Consumer, _Component2);
@@ -5256,455 +4901,6 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	}
 
 	return to;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/path-to-regexp/index.js":
-/*!**********************************************!*\
-  !*** ./node_modules/path-to-regexp/index.js ***!
-  \**********************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var isarray = __webpack_require__(/*! isarray */ "./node_modules/path-to-regexp/node_modules/isarray/index.js")
-
-/**
- * Expose `pathToRegexp`.
- */
-module.exports = pathToRegexp
-module.exports.parse = parse
-module.exports.compile = compile
-module.exports.tokensToFunction = tokensToFunction
-module.exports.tokensToRegExp = tokensToRegExp
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
-  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
-  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
-  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
-].join('|'), 'g')
-
-/**
- * Parse a string for the raw tokens.
- *
- * @param  {string}  str
- * @param  {Object=} options
- * @return {!Array}
- */
-function parse (str, options) {
-  var tokens = []
-  var key = 0
-  var index = 0
-  var path = ''
-  var defaultDelimiter = options && options.delimiter || '/'
-  var res
-
-  while ((res = PATH_REGEXP.exec(str)) != null) {
-    var m = res[0]
-    var escaped = res[1]
-    var offset = res.index
-    path += str.slice(index, offset)
-    index = offset + m.length
-
-    // Ignore already escaped sequences.
-    if (escaped) {
-      path += escaped[1]
-      continue
-    }
-
-    var next = str[index]
-    var prefix = res[2]
-    var name = res[3]
-    var capture = res[4]
-    var group = res[5]
-    var modifier = res[6]
-    var asterisk = res[7]
-
-    // Push the current path onto the tokens.
-    if (path) {
-      tokens.push(path)
-      path = ''
-    }
-
-    var partial = prefix != null && next != null && next !== prefix
-    var repeat = modifier === '+' || modifier === '*'
-    var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || defaultDelimiter
-    var pattern = capture || group
-
-    tokens.push({
-      name: name || key++,
-      prefix: prefix || '',
-      delimiter: delimiter,
-      optional: optional,
-      repeat: repeat,
-      partial: partial,
-      asterisk: !!asterisk,
-      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
-    })
-  }
-
-  // Match any characters still remaining.
-  if (index < str.length) {
-    path += str.substr(index)
-  }
-
-  // If the path exists, push it onto the end.
-  if (path) {
-    tokens.push(path)
-  }
-
-  return tokens
-}
-
-/**
- * Compile a string to a template function for the path.
- *
- * @param  {string}             str
- * @param  {Object=}            options
- * @return {!function(Object=, Object=)}
- */
-function compile (str, options) {
-  return tokensToFunction(parse(str, options), options)
-}
-
-/**
- * Prettier encoding of URI path segments.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeURIComponentPretty (str) {
-  return encodeURI(str).replace(/[\/?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeAsterisk (str) {
-  return encodeURI(str).replace(/[?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Expose a method for transforming tokens into the path function.
- */
-function tokensToFunction (tokens, options) {
-  // Compile all the tokens into regexps.
-  var matches = new Array(tokens.length)
-
-  // Compile all the patterns before compilation.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$', flags(options))
-    }
-  }
-
-  return function (obj, opts) {
-    var path = ''
-    var data = obj || {}
-    var options = opts || {}
-    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
-
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i]
-
-      if (typeof token === 'string') {
-        path += token
-
-        continue
-      }
-
-      var value = data[token.name]
-      var segment
-
-      if (value == null) {
-        if (token.optional) {
-          // Prepend partial segment prefixes.
-          if (token.partial) {
-            path += token.prefix
-          }
-
-          continue
-        } else {
-          throw new TypeError('Expected "' + token.name + '" to be defined')
-        }
-      }
-
-      if (isarray(value)) {
-        if (!token.repeat) {
-          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
-        }
-
-        if (value.length === 0) {
-          if (token.optional) {
-            continue
-          } else {
-            throw new TypeError('Expected "' + token.name + '" to not be empty')
-          }
-        }
-
-        for (var j = 0; j < value.length; j++) {
-          segment = encode(value[j])
-
-          if (!matches[i].test(segment)) {
-            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
-          }
-
-          path += (j === 0 ? token.prefix : token.delimiter) + segment
-        }
-
-        continue
-      }
-
-      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
-
-      if (!matches[i].test(segment)) {
-        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
-      }
-
-      path += token.prefix + segment
-    }
-
-    return path
-  }
-}
-
-/**
- * Escape a regular expression string.
- *
- * @param  {string} str
- * @return {string}
- */
-function escapeString (str) {
-  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
-}
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {string} group
- * @return {string}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1')
-}
-
-/**
- * Attach the keys as a property of the regexp.
- *
- * @param  {!RegExp} re
- * @param  {Array}   keys
- * @return {!RegExp}
- */
-function attachKeys (re, keys) {
-  re.keys = keys
-  return re
-}
-
-/**
- * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {string}
- */
-function flags (options) {
-  return options && options.sensitive ? '' : 'i'
-}
-
-/**
- * Pull out keys from a regexp.
- *
- * @param  {!RegExp} path
- * @param  {!Array}  keys
- * @return {!RegExp}
- */
-function regexpToRegexp (path, keys) {
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g)
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name: i,
-        prefix: null,
-        delimiter: null,
-        optional: false,
-        repeat: false,
-        partial: false,
-        asterisk: false,
-        pattern: null
-      })
-    }
-  }
-
-  return attachKeys(path, keys)
-}
-
-/**
- * Transform an array into a regexp.
- *
- * @param  {!Array}  path
- * @param  {Array}   keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function arrayToRegexp (path, keys, options) {
-  var parts = []
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options).source)
-  }
-
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options))
-
-  return attachKeys(regexp, keys)
-}
-
-/**
- * Create a path regexp from string input.
- *
- * @param  {string}  path
- * @param  {!Array}  keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function stringToRegexp (path, keys, options) {
-  return tokensToRegExp(parse(path, options), keys, options)
-}
-
-/**
- * Expose a function for taking tokens and returning a RegExp.
- *
- * @param  {!Array}          tokens
- * @param  {(Array|Object)=} keys
- * @param  {Object=}         options
- * @return {!RegExp}
- */
-function tokensToRegExp (tokens, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options)
-    keys = []
-  }
-
-  options = options || {}
-
-  var strict = options.strict
-  var end = options.end !== false
-  var route = ''
-
-  // Iterate over the tokens and create our regexp string.
-  for (var i = 0; i < tokens.length; i++) {
-    var token = tokens[i]
-
-    if (typeof token === 'string') {
-      route += escapeString(token)
-    } else {
-      var prefix = escapeString(token.prefix)
-      var capture = '(?:' + token.pattern + ')'
-
-      keys.push(token)
-
-      if (token.repeat) {
-        capture += '(?:' + prefix + capture + ')*'
-      }
-
-      if (token.optional) {
-        if (!token.partial) {
-          capture = '(?:' + prefix + '(' + capture + '))?'
-        } else {
-          capture = prefix + '(' + capture + ')?'
-        }
-      } else {
-        capture = prefix + '(' + capture + ')'
-      }
-
-      route += capture
-    }
-  }
-
-  var delimiter = escapeString(options.delimiter || '/')
-  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?'
-  }
-
-  if (end) {
-    route += '$'
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)'
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys)
-}
-
-/**
- * Normalize the given path string, returning a regular expression.
- *
- * An empty array can be passed in for the keys, which will hold the
- * placeholder key descriptions. For example, using `/user/:id`, `keys` will
- * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(string|RegExp|Array)} path
- * @param  {(Array|Object)=}       keys
- * @param  {Object=}               options
- * @return {!RegExp}
- */
-function pathToRegexp (path, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options)
-    keys = []
-  }
-
-  options = options || {}
-
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, /** @type {!Array} */ (keys))
-  }
-
-  if (isarray(path)) {
-    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
-  }
-
-  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/path-to-regexp/node_modules/isarray/index.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/path-to-regexp/node_modules/isarray/index.js ***!
-  \*******************************************************************/
-/***/ ((module) => {
-
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 
@@ -6725,8 +5921,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Consumer": () => (/* binding */ Consumer),
-/* harmony export */   "Provider": () => (/* binding */ Provider),
+/* harmony export */   Consumer: () => (/* binding */ Consumer),
+/* harmony export */   Provider: () => (/* binding */ Provider),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
@@ -6803,10 +5999,10 @@ var CookiesProvider = /** @class */ (function (_super) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Cookies": () => (/* reexport safe */ _Cookies__WEBPACK_IMPORTED_MODULE_0__["default"]),
-/* harmony export */   "CookiesProvider": () => (/* reexport safe */ _CookiesProvider__WEBPACK_IMPORTED_MODULE_1__["default"]),
-/* harmony export */   "useCookies": () => (/* reexport safe */ _useCookies__WEBPACK_IMPORTED_MODULE_3__["default"]),
-/* harmony export */   "withCookies": () => (/* reexport safe */ _withCookies__WEBPACK_IMPORTED_MODULE_2__["default"])
+/* harmony export */   Cookies: () => (/* reexport safe */ _Cookies__WEBPACK_IMPORTED_MODULE_0__["default"]),
+/* harmony export */   CookiesProvider: () => (/* reexport safe */ _CookiesProvider__WEBPACK_IMPORTED_MODULE_1__["default"]),
+/* harmony export */   useCookies: () => (/* reexport safe */ _useCookies__WEBPACK_IMPORTED_MODULE_3__["default"]),
+/* harmony export */   withCookies: () => (/* reexport safe */ _withCookies__WEBPACK_IMPORTED_MODULE_2__["default"])
 /* harmony export */ });
 /* harmony import */ var _Cookies__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cookies */ "./node_modules/react-cookie/es6/Cookies.js");
 /* harmony import */ var _CookiesProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CookiesProvider */ "./node_modules/react-cookie/es6/CookiesProvider.js");
@@ -6906,7 +6102,7 @@ function shouldUpdate(dependencies, newCookies, oldCookies) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "isInBrowser": () => (/* binding */ isInBrowser)
+/* harmony export */   isInBrowser: () => (/* binding */ isInBrowser)
 /* harmony export */ });
 function isInBrowser() {
     return (typeof window !== 'undefined' &&
@@ -37190,8 +36386,8 @@ if (false) {} else {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "FocusManager": () => (/* binding */ FocusManager),
-/* harmony export */   "focusManager": () => (/* binding */ focusManager)
+/* harmony export */   FocusManager: () => (/* binding */ FocusManager),
+/* harmony export */   focusManager: () => (/* binding */ focusManager)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var _subscribable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./subscribable */ "./node_modules/react-query/es/core/subscribable.js");
@@ -37303,8 +36499,8 @@ var focusManager = new FocusManager();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "dehydrate": () => (/* binding */ dehydrate),
-/* harmony export */   "hydrate": () => (/* binding */ hydrate)
+/* harmony export */   dehydrate: () => (/* binding */ dehydrate),
+/* harmony export */   hydrate: () => (/* binding */ hydrate)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 
@@ -37416,23 +36612,23 @@ function hydrate(client, dehydratedState, options) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "CancelledError": () => (/* reexport safe */ _retryer__WEBPACK_IMPORTED_MODULE_0__.CancelledError),
-/* harmony export */   "InfiniteQueryObserver": () => (/* reexport safe */ _infiniteQueryObserver__WEBPACK_IMPORTED_MODULE_5__.InfiniteQueryObserver),
-/* harmony export */   "MutationCache": () => (/* reexport safe */ _mutationCache__WEBPACK_IMPORTED_MODULE_6__.MutationCache),
-/* harmony export */   "MutationObserver": () => (/* reexport safe */ _mutationObserver__WEBPACK_IMPORTED_MODULE_7__.MutationObserver),
-/* harmony export */   "QueriesObserver": () => (/* reexport safe */ _queriesObserver__WEBPACK_IMPORTED_MODULE_4__.QueriesObserver),
-/* harmony export */   "QueryCache": () => (/* reexport safe */ _queryCache__WEBPACK_IMPORTED_MODULE_1__.QueryCache),
-/* harmony export */   "QueryClient": () => (/* reexport safe */ _queryClient__WEBPACK_IMPORTED_MODULE_2__.QueryClient),
-/* harmony export */   "QueryObserver": () => (/* reexport safe */ _queryObserver__WEBPACK_IMPORTED_MODULE_3__.QueryObserver),
-/* harmony export */   "dehydrate": () => (/* reexport safe */ _hydration__WEBPACK_IMPORTED_MODULE_13__.dehydrate),
-/* harmony export */   "focusManager": () => (/* reexport safe */ _focusManager__WEBPACK_IMPORTED_MODULE_10__.focusManager),
-/* harmony export */   "hashQueryKey": () => (/* reexport safe */ _utils__WEBPACK_IMPORTED_MODULE_12__.hashQueryKey),
-/* harmony export */   "hydrate": () => (/* reexport safe */ _hydration__WEBPACK_IMPORTED_MODULE_13__.hydrate),
-/* harmony export */   "isCancelledError": () => (/* reexport safe */ _retryer__WEBPACK_IMPORTED_MODULE_0__.isCancelledError),
-/* harmony export */   "isError": () => (/* reexport safe */ _utils__WEBPACK_IMPORTED_MODULE_12__.isError),
-/* harmony export */   "notifyManager": () => (/* reexport safe */ _notifyManager__WEBPACK_IMPORTED_MODULE_9__.notifyManager),
-/* harmony export */   "onlineManager": () => (/* reexport safe */ _onlineManager__WEBPACK_IMPORTED_MODULE_11__.onlineManager),
-/* harmony export */   "setLogger": () => (/* reexport safe */ _logger__WEBPACK_IMPORTED_MODULE_8__.setLogger)
+/* harmony export */   CancelledError: () => (/* reexport safe */ _retryer__WEBPACK_IMPORTED_MODULE_0__.CancelledError),
+/* harmony export */   InfiniteQueryObserver: () => (/* reexport safe */ _infiniteQueryObserver__WEBPACK_IMPORTED_MODULE_5__.InfiniteQueryObserver),
+/* harmony export */   MutationCache: () => (/* reexport safe */ _mutationCache__WEBPACK_IMPORTED_MODULE_6__.MutationCache),
+/* harmony export */   MutationObserver: () => (/* reexport safe */ _mutationObserver__WEBPACK_IMPORTED_MODULE_7__.MutationObserver),
+/* harmony export */   QueriesObserver: () => (/* reexport safe */ _queriesObserver__WEBPACK_IMPORTED_MODULE_4__.QueriesObserver),
+/* harmony export */   QueryCache: () => (/* reexport safe */ _queryCache__WEBPACK_IMPORTED_MODULE_1__.QueryCache),
+/* harmony export */   QueryClient: () => (/* reexport safe */ _queryClient__WEBPACK_IMPORTED_MODULE_2__.QueryClient),
+/* harmony export */   QueryObserver: () => (/* reexport safe */ _queryObserver__WEBPACK_IMPORTED_MODULE_3__.QueryObserver),
+/* harmony export */   dehydrate: () => (/* reexport safe */ _hydration__WEBPACK_IMPORTED_MODULE_13__.dehydrate),
+/* harmony export */   focusManager: () => (/* reexport safe */ _focusManager__WEBPACK_IMPORTED_MODULE_10__.focusManager),
+/* harmony export */   hashQueryKey: () => (/* reexport safe */ _utils__WEBPACK_IMPORTED_MODULE_12__.hashQueryKey),
+/* harmony export */   hydrate: () => (/* reexport safe */ _hydration__WEBPACK_IMPORTED_MODULE_13__.hydrate),
+/* harmony export */   isCancelledError: () => (/* reexport safe */ _retryer__WEBPACK_IMPORTED_MODULE_0__.isCancelledError),
+/* harmony export */   isError: () => (/* reexport safe */ _utils__WEBPACK_IMPORTED_MODULE_12__.isError),
+/* harmony export */   notifyManager: () => (/* reexport safe */ _notifyManager__WEBPACK_IMPORTED_MODULE_9__.notifyManager),
+/* harmony export */   onlineManager: () => (/* reexport safe */ _onlineManager__WEBPACK_IMPORTED_MODULE_11__.onlineManager),
+/* harmony export */   setLogger: () => (/* reexport safe */ _logger__WEBPACK_IMPORTED_MODULE_8__.setLogger)
 /* harmony export */ });
 /* harmony import */ var _retryer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./retryer */ "./node_modules/react-query/es/core/retryer.js");
 /* harmony import */ var _queryCache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./queryCache */ "./node_modules/react-query/es/core/queryCache.js");
@@ -37482,11 +36678,11 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getNextPageParam": () => (/* binding */ getNextPageParam),
-/* harmony export */   "getPreviousPageParam": () => (/* binding */ getPreviousPageParam),
-/* harmony export */   "hasNextPage": () => (/* binding */ hasNextPage),
-/* harmony export */   "hasPreviousPage": () => (/* binding */ hasPreviousPage),
-/* harmony export */   "infiniteQueryBehavior": () => (/* binding */ infiniteQueryBehavior)
+/* harmony export */   getNextPageParam: () => (/* binding */ getNextPageParam),
+/* harmony export */   getPreviousPageParam: () => (/* binding */ getPreviousPageParam),
+/* harmony export */   hasNextPage: () => (/* binding */ hasNextPage),
+/* harmony export */   hasPreviousPage: () => (/* binding */ hasPreviousPage),
+/* harmony export */   infiniteQueryBehavior: () => (/* binding */ infiniteQueryBehavior)
 /* harmony export */ });
 /* harmony import */ var _retryer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./retryer */ "./node_modules/react-query/es/core/retryer.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./node_modules/react-query/es/core/utils.js");
@@ -37655,7 +36851,7 @@ function hasPreviousPage(options, pages) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "InfiniteQueryObserver": () => (/* binding */ InfiniteQueryObserver)
+/* harmony export */   InfiniteQueryObserver: () => (/* binding */ InfiniteQueryObserver)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
@@ -37759,8 +36955,8 @@ var InfiniteQueryObserver = /*#__PURE__*/function (_QueryObserver) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getLogger": () => (/* binding */ getLogger),
-/* harmony export */   "setLogger": () => (/* binding */ setLogger)
+/* harmony export */   getLogger: () => (/* binding */ getLogger),
+/* harmony export */   setLogger: () => (/* binding */ setLogger)
 /* harmony export */ });
 // TYPES
 // FUNCTIONS
@@ -37783,8 +36979,8 @@ function setLogger(newLogger) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Mutation": () => (/* binding */ Mutation),
-/* harmony export */   "getDefaultState": () => (/* binding */ getDefaultState)
+/* harmony export */   Mutation: () => (/* binding */ Mutation),
+/* harmony export */   getDefaultState: () => (/* binding */ getDefaultState)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _logger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./logger */ "./node_modules/react-query/es/core/logger.js");
@@ -38035,7 +37231,7 @@ function reducer(state, action) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MutationCache": () => (/* binding */ MutationCache)
+/* harmony export */   MutationCache: () => (/* binding */ MutationCache)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var _notifyManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./notifyManager */ "./node_modules/react-query/es/core/notifyManager.js");
@@ -38165,7 +37361,7 @@ var MutationCache = /*#__PURE__*/function (_Subscribable) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MutationObserver": () => (/* binding */ MutationObserver)
+/* harmony export */   MutationObserver: () => (/* binding */ MutationObserver)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
@@ -38310,8 +37506,8 @@ var MutationObserver = /*#__PURE__*/function (_Subscribable) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "NotifyManager": () => (/* binding */ NotifyManager),
-/* harmony export */   "notifyManager": () => (/* binding */ notifyManager)
+/* harmony export */   NotifyManager: () => (/* binding */ NotifyManager),
+/* harmony export */   notifyManager: () => (/* binding */ notifyManager)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./node_modules/react-query/es/core/utils.js");
  // TYPES
@@ -38431,8 +37627,8 @@ var notifyManager = new NotifyManager();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "OnlineManager": () => (/* binding */ OnlineManager),
-/* harmony export */   "onlineManager": () => (/* binding */ onlineManager)
+/* harmony export */   OnlineManager: () => (/* binding */ OnlineManager),
+/* harmony export */   onlineManager: () => (/* binding */ onlineManager)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var _subscribable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./subscribable */ "./node_modules/react-query/es/core/subscribable.js");
@@ -38543,7 +37739,7 @@ var onlineManager = new OnlineManager();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QueriesObserver": () => (/* binding */ QueriesObserver)
+/* harmony export */   QueriesObserver: () => (/* binding */ QueriesObserver)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./node_modules/react-query/es/core/utils.js");
@@ -38764,7 +37960,7 @@ var QueriesObserver = /*#__PURE__*/function (_Subscribable) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Query": () => (/* binding */ Query)
+/* harmony export */   Query: () => (/* binding */ Query)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./node_modules/react-query/es/core/utils.js");
@@ -39283,7 +38479,7 @@ var Query = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QueryCache": () => (/* binding */ QueryCache)
+/* harmony export */   QueryCache: () => (/* binding */ QueryCache)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./node_modules/react-query/es/core/utils.js");
@@ -39449,7 +38645,7 @@ var QueryCache = /*#__PURE__*/function (_Subscribable) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QueryClient": () => (/* binding */ QueryClient)
+/* harmony export */   QueryClient: () => (/* binding */ QueryClient)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils */ "./node_modules/react-query/es/core/utils.js");
@@ -39821,7 +39017,7 @@ var QueryClient = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QueryObserver": () => (/* binding */ QueryObserver)
+/* harmony export */   QueryObserver: () => (/* binding */ QueryObserver)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
@@ -40392,10 +39588,10 @@ function isStale(query, options) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "CancelledError": () => (/* binding */ CancelledError),
-/* harmony export */   "Retryer": () => (/* binding */ Retryer),
-/* harmony export */   "isCancelable": () => (/* binding */ isCancelable),
-/* harmony export */   "isCancelledError": () => (/* binding */ isCancelledError)
+/* harmony export */   CancelledError: () => (/* binding */ CancelledError),
+/* harmony export */   Retryer: () => (/* binding */ Retryer),
+/* harmony export */   isCancelable: () => (/* binding */ isCancelable),
+/* harmony export */   isCancelledError: () => (/* binding */ isCancelledError)
 /* harmony export */ });
 /* harmony import */ var _focusManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./focusManager */ "./node_modules/react-query/es/core/focusManager.js");
 /* harmony import */ var _onlineManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./onlineManager */ "./node_modules/react-query/es/core/onlineManager.js");
@@ -40569,7 +39765,7 @@ var Retryer = function Retryer(config) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Subscribable": () => (/* binding */ Subscribable)
+/* harmony export */   Subscribable: () => (/* binding */ Subscribable)
 /* harmony export */ });
 var Subscribable = /*#__PURE__*/function () {
   function Subscribable() {
@@ -40630,34 +39826,34 @@ var Subscribable = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "difference": () => (/* binding */ difference),
-/* harmony export */   "ensureQueryKeyArray": () => (/* binding */ ensureQueryKeyArray),
-/* harmony export */   "functionalUpdate": () => (/* binding */ functionalUpdate),
-/* harmony export */   "getAbortController": () => (/* binding */ getAbortController),
-/* harmony export */   "hashQueryKey": () => (/* binding */ hashQueryKey),
-/* harmony export */   "hashQueryKeyByOptions": () => (/* binding */ hashQueryKeyByOptions),
-/* harmony export */   "isError": () => (/* binding */ isError),
-/* harmony export */   "isPlainObject": () => (/* binding */ isPlainObject),
-/* harmony export */   "isQueryKey": () => (/* binding */ isQueryKey),
-/* harmony export */   "isServer": () => (/* binding */ isServer),
-/* harmony export */   "isValidTimeout": () => (/* binding */ isValidTimeout),
-/* harmony export */   "mapQueryStatusFilter": () => (/* binding */ mapQueryStatusFilter),
-/* harmony export */   "matchMutation": () => (/* binding */ matchMutation),
-/* harmony export */   "matchQuery": () => (/* binding */ matchQuery),
-/* harmony export */   "noop": () => (/* binding */ noop),
-/* harmony export */   "parseFilterArgs": () => (/* binding */ parseFilterArgs),
-/* harmony export */   "parseMutationArgs": () => (/* binding */ parseMutationArgs),
-/* harmony export */   "parseMutationFilterArgs": () => (/* binding */ parseMutationFilterArgs),
-/* harmony export */   "parseQueryArgs": () => (/* binding */ parseQueryArgs),
-/* harmony export */   "partialDeepEqual": () => (/* binding */ partialDeepEqual),
-/* harmony export */   "partialMatchKey": () => (/* binding */ partialMatchKey),
-/* harmony export */   "replaceAt": () => (/* binding */ replaceAt),
-/* harmony export */   "replaceEqualDeep": () => (/* binding */ replaceEqualDeep),
-/* harmony export */   "scheduleMicrotask": () => (/* binding */ scheduleMicrotask),
-/* harmony export */   "shallowEqualObjects": () => (/* binding */ shallowEqualObjects),
-/* harmony export */   "sleep": () => (/* binding */ sleep),
-/* harmony export */   "stableValueHash": () => (/* binding */ stableValueHash),
-/* harmony export */   "timeUntilStale": () => (/* binding */ timeUntilStale)
+/* harmony export */   difference: () => (/* binding */ difference),
+/* harmony export */   ensureQueryKeyArray: () => (/* binding */ ensureQueryKeyArray),
+/* harmony export */   functionalUpdate: () => (/* binding */ functionalUpdate),
+/* harmony export */   getAbortController: () => (/* binding */ getAbortController),
+/* harmony export */   hashQueryKey: () => (/* binding */ hashQueryKey),
+/* harmony export */   hashQueryKeyByOptions: () => (/* binding */ hashQueryKeyByOptions),
+/* harmony export */   isError: () => (/* binding */ isError),
+/* harmony export */   isPlainObject: () => (/* binding */ isPlainObject),
+/* harmony export */   isQueryKey: () => (/* binding */ isQueryKey),
+/* harmony export */   isServer: () => (/* binding */ isServer),
+/* harmony export */   isValidTimeout: () => (/* binding */ isValidTimeout),
+/* harmony export */   mapQueryStatusFilter: () => (/* binding */ mapQueryStatusFilter),
+/* harmony export */   matchMutation: () => (/* binding */ matchMutation),
+/* harmony export */   matchQuery: () => (/* binding */ matchQuery),
+/* harmony export */   noop: () => (/* binding */ noop),
+/* harmony export */   parseFilterArgs: () => (/* binding */ parseFilterArgs),
+/* harmony export */   parseMutationArgs: () => (/* binding */ parseMutationArgs),
+/* harmony export */   parseMutationFilterArgs: () => (/* binding */ parseMutationFilterArgs),
+/* harmony export */   parseQueryArgs: () => (/* binding */ parseQueryArgs),
+/* harmony export */   partialDeepEqual: () => (/* binding */ partialDeepEqual),
+/* harmony export */   partialMatchKey: () => (/* binding */ partialMatchKey),
+/* harmony export */   replaceAt: () => (/* binding */ replaceAt),
+/* harmony export */   replaceEqualDeep: () => (/* binding */ replaceEqualDeep),
+/* harmony export */   scheduleMicrotask: () => (/* binding */ scheduleMicrotask),
+/* harmony export */   shallowEqualObjects: () => (/* binding */ shallowEqualObjects),
+/* harmony export */   sleep: () => (/* binding */ sleep),
+/* harmony export */   stableValueHash: () => (/* binding */ stableValueHash),
+/* harmony export */   timeUntilStale: () => (/* binding */ timeUntilStale)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 
@@ -41025,8 +40221,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Hydrate": () => (/* binding */ Hydrate),
-/* harmony export */   "useHydrate": () => (/* binding */ useHydrate)
+/* harmony export */   Hydrate: () => (/* binding */ Hydrate),
+/* harmony export */   useHydrate: () => (/* binding */ useHydrate)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41068,8 +40264,8 @@ var Hydrate = function Hydrate(_ref) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QueryClientProvider": () => (/* binding */ QueryClientProvider),
-/* harmony export */   "useQueryClient": () => (/* binding */ useQueryClient)
+/* harmony export */   QueryClientProvider: () => (/* binding */ QueryClientProvider),
+/* harmony export */   useQueryClient: () => (/* binding */ useQueryClient)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41133,8 +40329,8 @@ var QueryClientProvider = function QueryClientProvider(_ref) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QueryErrorResetBoundary": () => (/* binding */ QueryErrorResetBoundary),
-/* harmony export */   "useQueryErrorResetBoundary": () => (/* binding */ useQueryErrorResetBoundary)
+/* harmony export */   QueryErrorResetBoundary: () => (/* binding */ QueryErrorResetBoundary),
+/* harmony export */   useQueryErrorResetBoundary: () => (/* binding */ useQueryErrorResetBoundary)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41182,18 +40378,18 @@ var QueryErrorResetBoundary = function QueryErrorResetBoundary(_ref) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Hydrate": () => (/* reexport safe */ _Hydrate__WEBPACK_IMPORTED_MODULE_10__.Hydrate),
-/* harmony export */   "QueryClientProvider": () => (/* reexport safe */ _QueryClientProvider__WEBPACK_IMPORTED_MODULE_2__.QueryClientProvider),
-/* harmony export */   "QueryErrorResetBoundary": () => (/* reexport safe */ _QueryErrorResetBoundary__WEBPACK_IMPORTED_MODULE_3__.QueryErrorResetBoundary),
-/* harmony export */   "useHydrate": () => (/* reexport safe */ _Hydrate__WEBPACK_IMPORTED_MODULE_10__.useHydrate),
-/* harmony export */   "useInfiniteQuery": () => (/* reexport safe */ _useInfiniteQuery__WEBPACK_IMPORTED_MODULE_9__.useInfiniteQuery),
-/* harmony export */   "useIsFetching": () => (/* reexport safe */ _useIsFetching__WEBPACK_IMPORTED_MODULE_4__.useIsFetching),
-/* harmony export */   "useIsMutating": () => (/* reexport safe */ _useIsMutating__WEBPACK_IMPORTED_MODULE_5__.useIsMutating),
-/* harmony export */   "useMutation": () => (/* reexport safe */ _useMutation__WEBPACK_IMPORTED_MODULE_6__.useMutation),
-/* harmony export */   "useQueries": () => (/* reexport safe */ _useQueries__WEBPACK_IMPORTED_MODULE_8__.useQueries),
-/* harmony export */   "useQuery": () => (/* reexport safe */ _useQuery__WEBPACK_IMPORTED_MODULE_7__.useQuery),
-/* harmony export */   "useQueryClient": () => (/* reexport safe */ _QueryClientProvider__WEBPACK_IMPORTED_MODULE_2__.useQueryClient),
-/* harmony export */   "useQueryErrorResetBoundary": () => (/* reexport safe */ _QueryErrorResetBoundary__WEBPACK_IMPORTED_MODULE_3__.useQueryErrorResetBoundary)
+/* harmony export */   Hydrate: () => (/* reexport safe */ _Hydrate__WEBPACK_IMPORTED_MODULE_10__.Hydrate),
+/* harmony export */   QueryClientProvider: () => (/* reexport safe */ _QueryClientProvider__WEBPACK_IMPORTED_MODULE_2__.QueryClientProvider),
+/* harmony export */   QueryErrorResetBoundary: () => (/* reexport safe */ _QueryErrorResetBoundary__WEBPACK_IMPORTED_MODULE_3__.QueryErrorResetBoundary),
+/* harmony export */   useHydrate: () => (/* reexport safe */ _Hydrate__WEBPACK_IMPORTED_MODULE_10__.useHydrate),
+/* harmony export */   useInfiniteQuery: () => (/* reexport safe */ _useInfiniteQuery__WEBPACK_IMPORTED_MODULE_9__.useInfiniteQuery),
+/* harmony export */   useIsFetching: () => (/* reexport safe */ _useIsFetching__WEBPACK_IMPORTED_MODULE_4__.useIsFetching),
+/* harmony export */   useIsMutating: () => (/* reexport safe */ _useIsMutating__WEBPACK_IMPORTED_MODULE_5__.useIsMutating),
+/* harmony export */   useMutation: () => (/* reexport safe */ _useMutation__WEBPACK_IMPORTED_MODULE_6__.useMutation),
+/* harmony export */   useQueries: () => (/* reexport safe */ _useQueries__WEBPACK_IMPORTED_MODULE_8__.useQueries),
+/* harmony export */   useQuery: () => (/* reexport safe */ _useQuery__WEBPACK_IMPORTED_MODULE_7__.useQuery),
+/* harmony export */   useQueryClient: () => (/* reexport safe */ _QueryClientProvider__WEBPACK_IMPORTED_MODULE_2__.useQueryClient),
+/* harmony export */   useQueryErrorResetBoundary: () => (/* reexport safe */ _QueryErrorResetBoundary__WEBPACK_IMPORTED_MODULE_3__.useQueryErrorResetBoundary)
 /* harmony export */ });
 /* harmony import */ var _setBatchUpdatesFn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./setBatchUpdatesFn */ "./node_modules/react-query/es/react/setBatchUpdatesFn.js");
 /* harmony import */ var _setLogger__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./setLogger */ "./node_modules/react-query/es/react/setLogger.js");
@@ -41237,7 +40433,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "logger": () => (/* binding */ logger)
+/* harmony export */   logger: () => (/* binding */ logger)
 /* harmony export */ });
 var logger = console;
 
@@ -41252,7 +40448,7 @@ var logger = console;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "unstable_batchedUpdates": () => (/* binding */ unstable_batchedUpdates)
+/* harmony export */   unstable_batchedUpdates: () => (/* binding */ unstable_batchedUpdates)
 /* harmony export */ });
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 
@@ -41311,7 +40507,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useBaseQuery": () => (/* binding */ useBaseQuery)
+/* harmony export */   useBaseQuery: () => (/* binding */ useBaseQuery)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41437,7 +40633,7 @@ function useBaseQuery(options, Observer) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useInfiniteQuery": () => (/* binding */ useInfiniteQuery)
+/* harmony export */   useInfiniteQuery: () => (/* binding */ useInfiniteQuery)
 /* harmony export */ });
 /* harmony import */ var _core_infiniteQueryObserver__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/infiniteQueryObserver */ "./node_modules/react-query/es/core/infiniteQueryObserver.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/utils */ "./node_modules/react-query/es/core/utils.js");
@@ -41462,7 +40658,7 @@ function useInfiniteQuery(arg1, arg2, arg3) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useIsFetching": () => (/* binding */ useIsFetching)
+/* harmony export */   useIsFetching: () => (/* binding */ useIsFetching)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41524,7 +40720,7 @@ function useIsFetching(arg1, arg2) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useIsMutating": () => (/* binding */ useIsMutating)
+/* harmony export */   useIsMutating: () => (/* binding */ useIsMutating)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41578,7 +40774,7 @@ function useIsMutating(arg1, arg2) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useMutation": () => (/* binding */ useMutation)
+/* harmony export */   useMutation: () => (/* binding */ useMutation)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
@@ -41652,7 +40848,7 @@ function useMutation(arg1, arg2, arg3) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useQueries": () => (/* binding */ useQueries)
+/* harmony export */   useQueries: () => (/* binding */ useQueries)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -41720,7 +40916,7 @@ function useQueries(queries) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useQuery": () => (/* binding */ useQuery)
+/* harmony export */   useQuery: () => (/* binding */ useQuery)
 /* harmony export */ });
 /* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core */ "./node_modules/react-query/es/core/queryObserver.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/utils */ "./node_modules/react-query/es/core/utils.js");
@@ -41745,7 +40941,7 @@ function useQuery(arg1, arg2, arg3) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "shouldThrowError": () => (/* binding */ shouldThrowError)
+/* harmony export */   shouldThrowError: () => (/* binding */ shouldThrowError)
 /* harmony export */ });
 function shouldThrowError(suspense, _useErrorBoundary, params) {
   // Allow useErrorBoundary function to override throwing behavior on a per-error basis
@@ -41770,24 +40966,24 @@ function shouldThrowError(suspense, _useErrorBoundary, params) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BrowserRouter": () => (/* binding */ BrowserRouter),
-/* harmony export */   "HashRouter": () => (/* binding */ HashRouter),
-/* harmony export */   "Link": () => (/* binding */ Link),
-/* harmony export */   "MemoryRouter": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.MemoryRouter),
-/* harmony export */   "NavLink": () => (/* binding */ NavLink),
-/* harmony export */   "Prompt": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Prompt),
-/* harmony export */   "Redirect": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Redirect),
-/* harmony export */   "Route": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Route),
-/* harmony export */   "Router": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Router),
-/* harmony export */   "StaticRouter": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.StaticRouter),
-/* harmony export */   "Switch": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Switch),
-/* harmony export */   "generatePath": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.generatePath),
-/* harmony export */   "matchPath": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.matchPath),
-/* harmony export */   "useHistory": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useHistory),
-/* harmony export */   "useLocation": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useLocation),
-/* harmony export */   "useParams": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useParams),
-/* harmony export */   "useRouteMatch": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useRouteMatch),
-/* harmony export */   "withRouter": () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.withRouter)
+/* harmony export */   BrowserRouter: () => (/* binding */ BrowserRouter),
+/* harmony export */   HashRouter: () => (/* binding */ HashRouter),
+/* harmony export */   Link: () => (/* binding */ Link),
+/* harmony export */   MemoryRouter: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.MemoryRouter),
+/* harmony export */   NavLink: () => (/* binding */ NavLink),
+/* harmony export */   Prompt: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Prompt),
+/* harmony export */   Redirect: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Redirect),
+/* harmony export */   Route: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Route),
+/* harmony export */   Router: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Router),
+/* harmony export */   StaticRouter: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.StaticRouter),
+/* harmony export */   Switch: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.Switch),
+/* harmony export */   generatePath: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.generatePath),
+/* harmony export */   matchPath: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.matchPath),
+/* harmony export */   useHistory: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useHistory),
+/* harmony export */   useLocation: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useLocation),
+/* harmony export */   useParams: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useParams),
+/* harmony export */   useRouteMatch: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.useRouteMatch),
+/* harmony export */   withRouter: () => (/* reexport safe */ react_router__WEBPACK_IMPORTED_MODULE_0__.withRouter)
 /* harmony export */ });
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
@@ -42132,22 +41328,22 @@ if (true) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MemoryRouter": () => (/* binding */ MemoryRouter),
-/* harmony export */   "Prompt": () => (/* binding */ Prompt),
-/* harmony export */   "Redirect": () => (/* binding */ Redirect),
-/* harmony export */   "Route": () => (/* binding */ Route),
-/* harmony export */   "Router": () => (/* binding */ Router),
-/* harmony export */   "StaticRouter": () => (/* binding */ StaticRouter),
-/* harmony export */   "Switch": () => (/* binding */ Switch),
-/* harmony export */   "__HistoryContext": () => (/* binding */ historyContext),
-/* harmony export */   "__RouterContext": () => (/* binding */ context),
-/* harmony export */   "generatePath": () => (/* binding */ generatePath),
-/* harmony export */   "matchPath": () => (/* binding */ matchPath),
-/* harmony export */   "useHistory": () => (/* binding */ useHistory),
-/* harmony export */   "useLocation": () => (/* binding */ useLocation),
-/* harmony export */   "useParams": () => (/* binding */ useParams),
-/* harmony export */   "useRouteMatch": () => (/* binding */ useRouteMatch),
-/* harmony export */   "withRouter": () => (/* binding */ withRouter)
+/* harmony export */   MemoryRouter: () => (/* binding */ MemoryRouter),
+/* harmony export */   Prompt: () => (/* binding */ Prompt),
+/* harmony export */   Redirect: () => (/* binding */ Redirect),
+/* harmony export */   Route: () => (/* binding */ Route),
+/* harmony export */   Router: () => (/* binding */ Router),
+/* harmony export */   StaticRouter: () => (/* binding */ StaticRouter),
+/* harmony export */   Switch: () => (/* binding */ Switch),
+/* harmony export */   __HistoryContext: () => (/* binding */ historyContext),
+/* harmony export */   __RouterContext: () => (/* binding */ context),
+/* harmony export */   generatePath: () => (/* binding */ generatePath),
+/* harmony export */   matchPath: () => (/* binding */ matchPath),
+/* harmony export */   useHistory: () => (/* binding */ useHistory),
+/* harmony export */   useLocation: () => (/* binding */ useLocation),
+/* harmony export */   useParams: () => (/* binding */ useParams),
+/* harmony export */   useRouteMatch: () => (/* binding */ useRouteMatch),
+/* harmony export */   withRouter: () => (/* binding */ withRouter)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
@@ -42159,7 +41355,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mini_create_react_context__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! mini-create-react-context */ "./node_modules/mini-create-react-context/dist/esm/index.js");
 /* harmony import */ var tiny_invariant__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! tiny-invariant */ "./node_modules/tiny-invariant/dist/tiny-invariant.esm.js");
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var path_to_regexp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! path-to-regexp */ "./node_modules/path-to-regexp/index.js");
+/* harmony import */ var path_to_regexp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! path-to-regexp */ "./node_modules/react-router/node_modules/path-to-regexp/index.js");
 /* harmony import */ var path_to_regexp__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(path_to_regexp__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var react_is__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-is */ "./node_modules/react-is/index.js");
 /* harmony import */ var _babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectWithoutPropertiesLoose */ "./node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js");
@@ -42288,7 +41484,7 @@ var Router = /*#__PURE__*/function (_React$Component) {
 if (true) {
   Router.propTypes = {
     children: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().node),
-    history: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().object.isRequired),
+    history: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().object).isRequired,
     staticContext: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().object)
   };
 
@@ -42927,6 +42123,455 @@ if (true) {
 
 
 //# sourceMappingURL=react-router.js.map
+
+
+/***/ }),
+
+/***/ "./node_modules/react-router/node_modules/isarray/index.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/react-router/node_modules/isarray/index.js ***!
+  \*****************************************************************/
+/***/ ((module) => {
+
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/react-router/node_modules/path-to-regexp/index.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/react-router/node_modules/path-to-regexp/index.js ***!
+  \************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var isarray = __webpack_require__(/*! isarray */ "./node_modules/react-router/node_modules/isarray/index.js")
+
+/**
+ * Expose `pathToRegexp`.
+ */
+module.exports = pathToRegexp
+module.exports.parse = parse
+module.exports.compile = compile
+module.exports.tokensToFunction = tokensToFunction
+module.exports.tokensToRegExp = tokensToRegExp
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
+  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
+  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
+  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
+].join('|'), 'g')
+
+/**
+ * Parse a string for the raw tokens.
+ *
+ * @param  {string}  str
+ * @param  {Object=} options
+ * @return {!Array}
+ */
+function parse (str, options) {
+  var tokens = []
+  var key = 0
+  var index = 0
+  var path = ''
+  var defaultDelimiter = options && options.delimiter || '/'
+  var res
+
+  while ((res = PATH_REGEXP.exec(str)) != null) {
+    var m = res[0]
+    var escaped = res[1]
+    var offset = res.index
+    path += str.slice(index, offset)
+    index = offset + m.length
+
+    // Ignore already escaped sequences.
+    if (escaped) {
+      path += escaped[1]
+      continue
+    }
+
+    var next = str[index]
+    var prefix = res[2]
+    var name = res[3]
+    var capture = res[4]
+    var group = res[5]
+    var modifier = res[6]
+    var asterisk = res[7]
+
+    // Push the current path onto the tokens.
+    if (path) {
+      tokens.push(path)
+      path = ''
+    }
+
+    var partial = prefix != null && next != null && next !== prefix
+    var repeat = modifier === '+' || modifier === '*'
+    var optional = modifier === '?' || modifier === '*'
+    var delimiter = res[2] || defaultDelimiter
+    var pattern = capture || group
+
+    tokens.push({
+      name: name || key++,
+      prefix: prefix || '',
+      delimiter: delimiter,
+      optional: optional,
+      repeat: repeat,
+      partial: partial,
+      asterisk: !!asterisk,
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
+    })
+  }
+
+  // Match any characters still remaining.
+  if (index < str.length) {
+    path += str.substr(index)
+  }
+
+  // If the path exists, push it onto the end.
+  if (path) {
+    tokens.push(path)
+  }
+
+  return tokens
+}
+
+/**
+ * Compile a string to a template function for the path.
+ *
+ * @param  {string}             str
+ * @param  {Object=}            options
+ * @return {!function(Object=, Object=)}
+ */
+function compile (str, options) {
+  return tokensToFunction(parse(str, options), options)
+}
+
+/**
+ * Prettier encoding of URI path segments.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeURIComponentPretty (str) {
+  return encodeURI(str).replace(/[\/?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeAsterisk (str) {
+  return encodeURI(str).replace(/[?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Expose a method for transforming tokens into the path function.
+ */
+function tokensToFunction (tokens, options) {
+  // Compile all the tokens into regexps.
+  var matches = new Array(tokens.length)
+
+  // Compile all the patterns before compilation.
+  for (var i = 0; i < tokens.length; i++) {
+    if (typeof tokens[i] === 'object') {
+      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$', flags(options))
+    }
+  }
+
+  return function (obj, opts) {
+    var path = ''
+    var data = obj || {}
+    var options = opts || {}
+    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
+
+    for (var i = 0; i < tokens.length; i++) {
+      var token = tokens[i]
+
+      if (typeof token === 'string') {
+        path += token
+
+        continue
+      }
+
+      var value = data[token.name]
+      var segment
+
+      if (value == null) {
+        if (token.optional) {
+          // Prepend partial segment prefixes.
+          if (token.partial) {
+            path += token.prefix
+          }
+
+          continue
+        } else {
+          throw new TypeError('Expected "' + token.name + '" to be defined')
+        }
+      }
+
+      if (isarray(value)) {
+        if (!token.repeat) {
+          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
+        }
+
+        if (value.length === 0) {
+          if (token.optional) {
+            continue
+          } else {
+            throw new TypeError('Expected "' + token.name + '" to not be empty')
+          }
+        }
+
+        for (var j = 0; j < value.length; j++) {
+          segment = encode(value[j])
+
+          if (!matches[i].test(segment)) {
+            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
+          }
+
+          path += (j === 0 ? token.prefix : token.delimiter) + segment
+        }
+
+        continue
+      }
+
+      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
+
+      if (!matches[i].test(segment)) {
+        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+      }
+
+      path += token.prefix + segment
+    }
+
+    return path
+  }
+}
+
+/**
+ * Escape a regular expression string.
+ *
+ * @param  {string} str
+ * @return {string}
+ */
+function escapeString (str) {
+  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
+}
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {string} group
+ * @return {string}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1')
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {!RegExp} re
+ * @param  {Array}   keys
+ * @return {!RegExp}
+ */
+function attachKeys (re, keys) {
+  re.keys = keys
+  return re
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {string}
+ */
+function flags (options) {
+  return options && options.sensitive ? '' : 'i'
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {!RegExp} path
+ * @param  {!Array}  keys
+ * @return {!RegExp}
+ */
+function regexpToRegexp (path, keys) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g)
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name: i,
+        prefix: null,
+        delimiter: null,
+        optional: false,
+        repeat: false,
+        partial: false,
+        asterisk: false,
+        pattern: null
+      })
+    }
+  }
+
+  return attachKeys(path, keys)
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {!Array}  path
+ * @param  {Array}   keys
+ * @param  {!Object} options
+ * @return {!RegExp}
+ */
+function arrayToRegexp (path, keys, options) {
+  var parts = []
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options).source)
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options))
+
+  return attachKeys(regexp, keys)
+}
+
+/**
+ * Create a path regexp from string input.
+ *
+ * @param  {string}  path
+ * @param  {!Array}  keys
+ * @param  {!Object} options
+ * @return {!RegExp}
+ */
+function stringToRegexp (path, keys, options) {
+  return tokensToRegExp(parse(path, options), keys, options)
+}
+
+/**
+ * Expose a function for taking tokens and returning a RegExp.
+ *
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
+ * @return {!RegExp}
+ */
+function tokensToRegExp (tokens, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
+  options = options || {}
+
+  var strict = options.strict
+  var end = options.end !== false
+  var route = ''
+
+  // Iterate over the tokens and create our regexp string.
+  for (var i = 0; i < tokens.length; i++) {
+    var token = tokens[i]
+
+    if (typeof token === 'string') {
+      route += escapeString(token)
+    } else {
+      var prefix = escapeString(token.prefix)
+      var capture = '(?:' + token.pattern + ')'
+
+      keys.push(token)
+
+      if (token.repeat) {
+        capture += '(?:' + prefix + capture + ')*'
+      }
+
+      if (token.optional) {
+        if (!token.partial) {
+          capture = '(?:' + prefix + '(' + capture + '))?'
+        } else {
+          capture = prefix + '(' + capture + ')?'
+        }
+      } else {
+        capture = prefix + '(' + capture + ')'
+      }
+
+      route += capture
+    }
+  }
+
+  var delimiter = escapeString(options.delimiter || '/')
+  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?'
+  }
+
+  if (end) {
+    route += '$'
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)'
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(string|RegExp|Array)} path
+ * @param  {(Array|Object)=}       keys
+ * @param  {Object=}               options
+ * @return {!RegExp}
+ */
+function pathToRegexp (path, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
+  options = options || {}
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, /** @type {!Array} */ (keys))
+  }
+
+  if (isarray(path)) {
+    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
+  }
+
+  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
+}
 
 
 /***/ }),
@@ -48273,7 +47918,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cookie */ "./node_modules/cookie/index.js");
+/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cookie */ "./node_modules/universal-cookie/node_modules/cookie/index.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./node_modules/universal-cookie/es6/utils.js");
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -48386,13 +48031,13 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "cleanCookies": () => (/* binding */ cleanCookies),
-/* harmony export */   "hasDocumentCookie": () => (/* binding */ hasDocumentCookie),
-/* harmony export */   "isParsingCookie": () => (/* binding */ isParsingCookie),
-/* harmony export */   "parseCookies": () => (/* binding */ parseCookies),
-/* harmony export */   "readCookie": () => (/* binding */ readCookie)
+/* harmony export */   cleanCookies: () => (/* binding */ cleanCookies),
+/* harmony export */   hasDocumentCookie: () => (/* binding */ hasDocumentCookie),
+/* harmony export */   isParsingCookie: () => (/* binding */ isParsingCookie),
+/* harmony export */   parseCookies: () => (/* binding */ parseCookies),
+/* harmony export */   readCookie: () => (/* binding */ readCookie)
 /* harmony export */ });
-/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cookie */ "./node_modules/cookie/index.js");
+/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cookie */ "./node_modules/universal-cookie/node_modules/cookie/index.js");
 
 function hasDocumentCookie() {
     // Can we get/set cookies on document.cookie?
@@ -48445,6 +48090,219 @@ function cleanupCookieValue(value) {
         return value.substr(2);
     }
     return value;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/universal-cookie/node_modules/cookie/index.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/universal-cookie/node_modules/cookie/index.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+/*!
+ * cookie
+ * Copyright(c) 2012-2014 Roman Shtylman
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+
+
+/**
+ * Module exports.
+ * @public
+ */
+
+exports.parse = parse;
+exports.serialize = serialize;
+
+/**
+ * Module variables.
+ * @private
+ */
+
+var decode = decodeURIComponent;
+var encode = encodeURIComponent;
+
+/**
+ * RegExp to match field-content in RFC 7230 sec 3.2
+ *
+ * field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
+ * field-vchar   = VCHAR / obs-text
+ * obs-text      = %x80-FF
+ */
+
+var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
+
+/**
+ * Parse a cookie header.
+ *
+ * Parse the given cookie header string into an object
+ * The object has the various cookies as keys(names) => values
+ *
+ * @param {string} str
+ * @param {object} [options]
+ * @return {object}
+ * @public
+ */
+
+function parse(str, options) {
+  if (typeof str !== 'string') {
+    throw new TypeError('argument str must be a string');
+  }
+
+  var obj = {}
+  var opt = options || {};
+  var pairs = str.split(';')
+  var dec = opt.decode || decode;
+
+  for (var i = 0; i < pairs.length; i++) {
+    var pair = pairs[i];
+    var index = pair.indexOf('=')
+
+    // skip things that don't look like key=value
+    if (index < 0) {
+      continue;
+    }
+
+    var key = pair.substring(0, index).trim()
+
+    // only assign once
+    if (undefined == obj[key]) {
+      var val = pair.substring(index + 1, pair.length).trim()
+
+      // quoted values
+      if (val[0] === '"') {
+        val = val.slice(1, -1)
+      }
+
+      obj[key] = tryDecode(val, dec);
+    }
+  }
+
+  return obj;
+}
+
+/**
+ * Serialize data into a cookie header.
+ *
+ * Serialize the a name value pair into a cookie string suitable for
+ * http headers. An optional options object specified cookie parameters.
+ *
+ * serialize('foo', 'bar', { httpOnly: true })
+ *   => "foo=bar; httpOnly"
+ *
+ * @param {string} name
+ * @param {string} val
+ * @param {object} [options]
+ * @return {string}
+ * @public
+ */
+
+function serialize(name, val, options) {
+  var opt = options || {};
+  var enc = opt.encode || encode;
+
+  if (typeof enc !== 'function') {
+    throw new TypeError('option encode is invalid');
+  }
+
+  if (!fieldContentRegExp.test(name)) {
+    throw new TypeError('argument name is invalid');
+  }
+
+  var value = enc(val);
+
+  if (value && !fieldContentRegExp.test(value)) {
+    throw new TypeError('argument val is invalid');
+  }
+
+  var str = name + '=' + value;
+
+  if (null != opt.maxAge) {
+    var maxAge = opt.maxAge - 0;
+
+    if (isNaN(maxAge) || !isFinite(maxAge)) {
+      throw new TypeError('option maxAge is invalid')
+    }
+
+    str += '; Max-Age=' + Math.floor(maxAge);
+  }
+
+  if (opt.domain) {
+    if (!fieldContentRegExp.test(opt.domain)) {
+      throw new TypeError('option domain is invalid');
+    }
+
+    str += '; Domain=' + opt.domain;
+  }
+
+  if (opt.path) {
+    if (!fieldContentRegExp.test(opt.path)) {
+      throw new TypeError('option path is invalid');
+    }
+
+    str += '; Path=' + opt.path;
+  }
+
+  if (opt.expires) {
+    if (typeof opt.expires.toUTCString !== 'function') {
+      throw new TypeError('option expires is invalid');
+    }
+
+    str += '; Expires=' + opt.expires.toUTCString();
+  }
+
+  if (opt.httpOnly) {
+    str += '; HttpOnly';
+  }
+
+  if (opt.secure) {
+    str += '; Secure';
+  }
+
+  if (opt.sameSite) {
+    var sameSite = typeof opt.sameSite === 'string'
+      ? opt.sameSite.toLowerCase() : opt.sameSite;
+
+    switch (sameSite) {
+      case true:
+        str += '; SameSite=Strict';
+        break;
+      case 'lax':
+        str += '; SameSite=Lax';
+        break;
+      case 'strict':
+        str += '; SameSite=Strict';
+        break;
+      case 'none':
+        str += '; SameSite=None';
+        break;
+      default:
+        throw new TypeError('option sameSite is invalid');
+    }
+  }
+
+  return str;
+}
+
+/**
+ * Try decoding a string using a decoding function.
+ *
+ * @param {string} str
+ * @param {function} decode
+ * @private
+ */
+
+function tryDecode(str, decode) {
+  try {
+    return decode(str);
+  } catch (e) {
+    return str;
+  }
 }
 
 

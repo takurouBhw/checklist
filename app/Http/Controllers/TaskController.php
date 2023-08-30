@@ -7,8 +7,11 @@ use App\Http\Requests\UpdateTaskRequest;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Stmt\Catch_;
 
 class TaskController extends Controller
 {
@@ -19,17 +22,31 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::where('user_id', Auth::id())->orderByDesc('id')->get();
-        return $tasks;
+        try {
+            // $tasks = Task::where('user_id', Auth::id())->orderByDesc('id')->get();
+            $tasks = Task::all();
+            return $tasks;
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getChecklistWorks($request)
     {
 
-        $tasks = Task::where('user_id', $request->user_id);
-
-        return $tasks;
-        // return Task::all()->toArray();
+        try {
+            $tasks = Task::where('user_id', $request->user_id);
+            Log::error($tasks);
+            return $tasks;
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -53,9 +70,10 @@ class TaskController extends Controller
         // 作成
 
         $request->merge([
-            'user_id' => Auth::id()
+            'user_id' => 1,
         ]);
-        $task = Task::create($request->TaskAttributes());
+
+        $task = Task::create($request->taskAttributes());
         return $task
             ? response()->json($task, 201)
             : response()->json([], 500);
@@ -92,10 +110,12 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, $id): JsonResponse
     {
+        Log::error($request->taskPatchAttribute());
         $task = Task::find($id);
-        $task->update($request->TaskAttributes());
+        // $task->update($request->taskAttributes());
+
         // 更新
-        return $task->update($request->TaskAttributes())
+        return $task->update($request->taskPatchAttribute())
             ? response()->json($task, 200)
             : response()->json([], 500);
     }

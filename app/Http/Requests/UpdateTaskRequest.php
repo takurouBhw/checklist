@@ -26,8 +26,9 @@ class UpdateTaskRequest extends FormRequest
     public function rules()
     {
         return [
-            'memo' => 'required|string|min:1',
-            'title' =>  'required|string|min:1||max:100',
+            'memo' => 'nullable|string|min:1',
+            'title' =>  'nullable|string|min:1||max:100',
+            'is_done' =>  'nullable|boolean',
         ];
     }
 
@@ -36,6 +37,11 @@ class UpdateTaskRequest extends FormRequest
         return $this->only([
             'title',
             'memo',
+        ]);
+    }
+    public function taskPatchAttribute() {
+        return $this->only([
+            'is_done',
         ]);
     }
 }

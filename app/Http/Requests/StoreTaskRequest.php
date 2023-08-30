@@ -26,7 +26,7 @@ class StoreTaskRequest extends FormRequest
     public function rules()
     {
         return [
-            'memo' => 'required|string|min:1',
+            'memo' => 'nullable|string|min:1',
             'title' =>  'required|string|min:1||max:100',
         ];
     }
@@ -45,8 +45,9 @@ class StoreTaskRequest extends FormRequest
     public function taskAttributes()
     {
         return $this->only([
-            'title',
             'memo',
+            'title',
+            'user_id',
         ]);
     }
 }
