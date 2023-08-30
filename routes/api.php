@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\BranchOfficeController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GroupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -28,7 +28,7 @@ Route::apiResource('task', TaskController::class);
 // });
 Route::apiResource('task', TaskController::class);
 Route::apiResource('todo', TodoController::class);
-Route::apiResource('category', CategoryController::class);
+Route::apiResource('group', GroupController::class);
 
 // Route::group(['middleware' => 'auth:sanctum'], function () {
 //     Route::apiResource('task', TaskController::class);

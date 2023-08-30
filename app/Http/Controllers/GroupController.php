@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
+use App\Models\Group;
 
-class CategoryController extends Controller
+class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +14,11 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Category::all()->toArray();
+        return Group::all()->toArray();
     }
 
-    public function getCategory(string $user_id) {
-        return Category::all()->toArray();
+    public function getGroup(string $user_id) {
+        return Group::all()->toArray();
     }
     /**
      * Show the form for creating a new resource.
