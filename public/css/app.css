@@ -330,17 +330,7 @@ ul.tag-list > li > a:hover {
   border-bottom: 0.4em solid rgba(255, 174, 0, 0.2);
   border-left: 0.4em solid #ffae00;
   transform: translateZ(0);
-  -webkit-animation: load-animate 0.5s infinite linear;
-          animation: load-animate 0.5s infinite linear;
-}
-
-@-webkit-keyframes load-animate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  animation: load-animate 0.5s infinite linear;
 }
 
 @keyframes load-animate {

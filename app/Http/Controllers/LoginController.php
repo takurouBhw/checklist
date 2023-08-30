@@ -27,8 +27,9 @@ class LoginController extends Controller
 
             return response()->json(Auth::user());
         }
-
-        return response()->json([], 401);
+        else {
+            return response()->json([], 401);
+        }
     }
     /**
      * Log the user out of the application.

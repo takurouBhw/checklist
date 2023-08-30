@@ -12,7 +12,7 @@ class DutyStation extends Model
 {
     use HasFactory;
 
-    public function company()
+    public function task()
     {
         return $this->belongsTo(Company::class);
     }

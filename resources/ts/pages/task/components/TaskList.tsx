@@ -1,10 +1,10 @@
 import React from "react";
-import { useCompany } from "../../../queries/CompanyQuery";
-import CompanyItem from './CompanyItem';
+import { useTask } from "../../../queries/TaskQuery";
+import TaskItem from './TaskItem';
 
 
-const CompanyList: React.FC = () => {
-    const { data: companies, status } = useCompany();
+const TaskList: React.FC = () => {
+    const { data: tasks, status } = useTask();
 
     if (status === "loading") {
         return <div className="loader" />;
@@ -12,7 +12,7 @@ const CompanyList: React.FC = () => {
         return (
             <div className="align-center">データの読み込みに失敗しました。</div>
         );
-    } else if (!companies || companies.length <= 0) {
+    } else if (!tasks || tasks.length <= 0) {
         return (
             <div className="align-center">
                 登録された会社情報が存在しません。
@@ -23,8 +23,8 @@ const CompanyList: React.FC = () => {
         <>
             <div className="inner">
                 <ul className="task-list">
-                    {companies.map((company) => (
-                        <CompanyItem company={company} id={company.id}/>
+                    {tasks.map((task) => (
+                        <TaskItem key={task.id} task={task} id={task.id}/>
                     ))}
                 </ul>
             </div>
@@ -32,4 +32,4 @@ const CompanyList: React.FC = () => {
     );
 };
 
-export default CompanyList;
+export default TaskList;

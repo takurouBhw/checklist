@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { useCreateCompany } from "../../../queries/CompanyQuery";
+import { useCreateTask } from "../../../queries/TaskQuery";
 
-const CompanyInput: React.FC = () => {
+const TaskInput: React.FC = () => {
     const [name, setName] = useState("");
-    const creteCompany = useCreateCompany();
+    const creteCompany = useCreateTask();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         creteCompany.mutate(name);
-        console.log(name);
         setName("");
     };
     return (
@@ -27,4 +26,4 @@ const CompanyInput: React.FC = () => {
     );
 };
 
-export default CompanyInput;
+export default TaskInput;

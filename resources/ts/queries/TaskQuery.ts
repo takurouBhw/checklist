@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
-import * as api from "../api/CompanyAPI";
+import * as api from "../api/TaskAPI";
 
-const useCompany = () => {
-    return useQuery("companies", api.getCompanies);
+const useTask = () => {
+    return useQuery("tasks", api.getTasks);
 };
 
-const useUpdateCompanyDone = () => {
+const useUpdateTaskDone = () => {
     const queryClient = useQueryClient();
 
-    return useMutation(api.updateCompanyDone, {
+    return useMutation(api.updateTaskDone, {
         onSuccess: () => {
-            queryClient.invalidateQueries("companies");
+            queryClient.invalidateQueries("tasks");
         },
         onError: () => {
             toast.error("更新に失敗しました。");
@@ -20,12 +20,12 @@ const useUpdateCompanyDone = () => {
     });
 };
 
-const useCreateCompany = () => {
+const useCreateTask = () => {
     const queryClient = useQueryClient();
 
-    return useMutation(api.createCompany, {
+    return useMutation(api.createTask, {
         onSuccess: () => {
-            queryClient.invalidateQueries("companies");
+            queryClient.invalidateQueries("tasks");
             toast.success("登録に成功しました。");
         },
         onError: (error: AxiosError) => {
@@ -46,12 +46,12 @@ const useCreateCompany = () => {
     });
 };
 
-const useDeleteCompany = () => {
+const useDeleteTask = () => {
     const queryClient = useQueryClient();
 
-    return useMutation(api.deleteCompany, {
+    return useMutation(api.deleteTask, {
         onSuccess: () => {
-            queryClient.invalidateQueries("companies");
+            queryClient.invalidateQueries("tasks");
             toast.success("削除に成功しました。");
         },
         onError: (error: AxiosError) => {
@@ -71,12 +71,12 @@ const useDeleteCompany = () => {
     });
 };
 
-const useUpdateCompany = () => {
+const useUpdateTask = () => {
     const queryClient = useQueryClient();
 
-    return useMutation(api.updateCompany, {
+    return useMutation(api.updateTask, {
         onSuccess: () => {
-            queryClient.invalidateQueries("companies");
+            queryClient.invalidateQueries("tasks");
             toast.success("更新に成功しました。");
         },
         onError: (error: AxiosError) => {
@@ -97,4 +97,4 @@ const useUpdateCompany = () => {
     });
 };
 
-export { useCompany, useUpdateCompanyDone, useCreateCompany, useDeleteCompany, useUpdateCompany };
+export { useTask, useUpdateTaskDone, useCreateTask, useDeleteTask, useUpdateTask };

@@ -17,10 +17,8 @@ const useLogin = () => {
         onSuccess: (user) => {
             if (user) {
                 setIsAuth(true);
-                // cookieを保存
                 setCookie('user_id', user.user_id);
                 setCookie('user_name', user.name);
-                console.log(user);
             }
         },
         onError: () => {
