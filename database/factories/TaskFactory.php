@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TaskFactory extends Factory
 {
+    static int $sort_no = 0;
     /**
      * Define the model's default state.
      *
@@ -15,10 +16,12 @@ class TaskFactory extends Factory
     {
         $user_id = $this->faker->numberBetween(1, 3);
         return [
-            'title' => 'user_id ' . $user_id . ':' . $this->faker->title(),
+            'task_title' => $this->faker->title(),
             'memo' =>  $this->faker->sentence(),
             'user_id' => $user_id,
             'is_done' => random_int(0, 1),
+            'sort_no' => TaskFactory::$sort_no++,
+            'todo_id' => random_int(1, 3),
         ];
     }
 }

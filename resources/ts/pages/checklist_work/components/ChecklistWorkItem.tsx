@@ -11,7 +11,7 @@ const ChecklistWorkItem: React.FC<Props> = ({ checklistWork }) => (
             <input type="checkbox" className="checkbox-input" />
         </label>
         <div>
-            <span>{checklistWork.title}</span>
+            <span>{checklistWork.task_title}</span>
         </div>
         <button className="btn is-delete">削除</button>
     </li>

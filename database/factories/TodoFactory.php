@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CategoryFactory extends Factory
+class TodoFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -14,8 +14,8 @@ class CategoryFactory extends Factory
     public function definition()
     {
         return [
-            'client_key' => $this->faker->uniqid(),
-            'category_title' => $this->faker->title(),
+            'todo_title' => $this->faker->title(),
+            'parent_id' => random_int(1,3),
         ];
     }
 }

@@ -19,8 +19,10 @@ class Task extends Model
     ];
 
     protected $fillable = [
-        'title',
+        'task_title',
         'memo',
         'is_done',
+        'todo_id',
+        'sort_no',
     ];
 }

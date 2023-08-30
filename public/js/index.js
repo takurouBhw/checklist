@@ -2508,7 +2508,7 @@ var updateTaskDone = function updateTaskDone(_ref) {
 
 exports.updateTaskDone = updateTaskDone;
 
-var createTask = function createTask(title) {
+var createTask = function createTask(task_title) {
   return __awaiter(void 0, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
     var _yield$axios_1$defaul3, data;
 
@@ -2518,7 +2518,7 @@ var createTask = function createTask(title) {
           case 0:
             _context3.next = 2;
             return axios_1["default"].post("api/task", {
-              title: title
+              task_title: task_title
             });
 
           case 2:
@@ -2946,8 +2946,10 @@ var TaskItem = function TaskItem(_ref) {
       editTitle = _ref3[0],
       setEditTitle = _ref3[1];
 
+  console.log(task);
+
   var handleToggleEdit = function handleToggleEdit() {
-    setEditTitle(task.title);
+    setEditTitle(task.task_title);
   };
 
   var handleOnKey = function handleOnKey(e) {
@@ -2973,7 +2975,7 @@ var TaskItem = function TaskItem(_ref) {
     }
 
     var newTask = Object.assign({}, task);
-    newTask.title = editTitle;
+    newTask.task_title = editTitle;
     updateTask.mutate({
       id: task.id,
       task: newTask
@@ -2998,7 +3000,7 @@ var TaskItem = function TaskItem(_ref) {
   var itemText = function itemText() {
     return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
       onClick: handleToggleEdit
-    }, react_1["default"].createElement("span", null, task.title)), react_1["default"].createElement("button", {
+    }, react_1["default"].createElement("span", null, task.task_title)), react_1["default"].createElement("button", {
       className: "btn is-delete"
     }, "\u524A\u9664"));
   };
@@ -3065,6 +3067,7 @@ var TaskList = function TaskList() {
     }, "\u767B\u9332\u3055\u308C\u305F\u4F1A\u793E\u60C5\u5831\u304C\u5B58\u5728\u3057\u307E\u305B\u3093\u3002");
   }
 
+  console.log(tasks);
   return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("div", {
     className: "inner"
   }, react_1["default"].createElement("ul", {
