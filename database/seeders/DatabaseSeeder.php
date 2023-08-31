@@ -19,6 +19,5 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
         \App\Models\Task::factory(30)->create();
-        Todo::factory(3)->create();
     }
 }
