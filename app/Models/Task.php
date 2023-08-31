@@ -25,4 +25,16 @@ class Task extends Model
         'todo_id',
         'sort_no',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function completions()
+    {
+        return $this->belongsToMany(User::class, 'task_completions', 'task_id', 'user_id')
+            ->withPivot('completed_at')
+            ->withTimestamps();
+    }
 }

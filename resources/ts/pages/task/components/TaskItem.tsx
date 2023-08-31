@@ -17,7 +17,6 @@ const TaskItem: React.FC<Props> = ({ task, id }) => {
     const updateTaskDone = useUpdateTaskDone();
     const updateTask = useUpdateTask();
     const [editTitle, setEditTitle] = useState<string | undefined>(undefined);
-    console.log(task);
 
     const handleToggleEdit = () => {
         setEditTitle(task.task_title);

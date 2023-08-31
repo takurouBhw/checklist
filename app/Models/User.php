@@ -11,10 +11,11 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Company;
 use App\Models\BranchOffice;
 use App\Models\DutyStation;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +27,8 @@ class User extends Authenticatable
         'email',
         'password',
         'user_id',
+        'role',
+        'client_key'
     ];
 
     /**
@@ -47,10 +50,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function task()
+    public function tasks()
     {
-        return $this->belongsTo(Company::class);
+        return $this->hasMany(Task::class);
     }
+
     public function branchOffice()
     {
         return $this->belongsTo(BranchOffice::class);
